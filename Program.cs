@@ -7,14 +7,12 @@ using System.Text;
 
 namespace A
 {
-    class Program
+    partial class Program
     {
         public IEnumerable<string> Solve()
         {
-            var ut = new Util();
-            var sc = new Scanner();
-
-            yield return "";
+            var res = 0;
+            yield return res.ToString();
         }
     }
 
@@ -52,17 +50,18 @@ namespace A
         }
     }
 
-    class Scanner
+    partial class Program
     {
-        int[] Nums(int count) => Enumerable.Range(0, count).Select(_ => Num).ToArray();
-        int Num => int.Parse(Str);
-        long NumLong => long.Parse(Str);
-        double NumDouble => (double)NumLong;
+        public long[] Nums(int count) => Enumerable.Range(0, count).Select(_ => Num).ToArray();
+        public long[] Nums(long count) => Nums((int)count);
+        public int NumInt => int.Parse(Str);
+        public long Num => long.Parse(Str);
+        public double NumDouble => (double)Num;
 
         StringBuilder sb = new StringBuilder();
 
-        string Str => GetStr();
-        string GetStr()
+        public string Str => GetStr();
+        public string GetStr()
         {
             sb.Clear();
 
@@ -101,12 +100,11 @@ namespace A
                     return false;
             }
         }
-    }
 
-    class Util
-    {
         public IEnumerable<int> Loop(int count) => Enumerable.Range(0, count);
         public IEnumerable<int> Loop(int from, int to) => Enumerable.Range(from, to - from + 1);
+
+        public string YesNo(bool isYes) => isYes ? "Yes" : "No";
 
         public int Gcm(int a, int b)
         {
@@ -176,7 +174,8 @@ namespace A
         readonly Dictionary<long, long> invCache = new Dictionary<long, long>();
         long Inv(long a)
         {
-            if (invCache.TryGetValue(a, out var cache))
+            long cache = 0L;
+            if (invCache.TryGetValue(a, out cache))
                 return cache;
 
             var result = Pow(a, _divider - 2);
@@ -199,6 +198,19 @@ namespace A
             }
 
             return val;
+        }
+
+        public int Perm(int n, int r)
+        {
+            if (n < r)
+                return 0;
+
+            if (r <= 0)
+                return 1;
+
+            int nn = Fac(n);
+            int nr = Fac(n - r);
+            return Div(nn, nr);
         }
 
         public int Comb(int n, int r)
