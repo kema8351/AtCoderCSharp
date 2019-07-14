@@ -52,16 +52,18 @@ namespace A
 
     partial class Program
     {
-        public long[] Nums(int count) => Enumerable.Range(0, count).Select(_ => Num).ToArray();
-        public long[] Nums(long count) => Nums((int)count);
-        public int NumInt => int.Parse(Str);
-        public long Num => long.Parse(Str);
-        public double NumDouble => (double)Num;
+        public List<int> ScanInts(int count) => Enumerable.Range(0, count).Select(_ => ScanInt).ToList();
+        public List<int> ScanInts(long count) => ScanInts((int)count);
+        public List<long> ScanLongs(int count) => Enumerable.Range(0, count).Select(_ => Scan).ToList();
+        public List<long> ScanLongs(long count) => ScanLongs((int)count);
+        public int ScanInt => int.Parse(Str);
+        public long Scan => long.Parse(Str);
+        public double ScanDouble => (double)Scan;
 
         StringBuilder sb = new StringBuilder();
 
-        public string Str => GetStr();
-        public string GetStr()
+        public string Str => ScanStr();
+        public string ScanStr()
         {
             sb.Clear();
 
