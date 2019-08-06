@@ -11,7 +11,7 @@ namespace A
     {
         public IEnumerable<string> Solve()
         {
-            var res = 0;
+            var res = 0L;
             yield return res.ToString();
         }
     }
@@ -279,102 +279,111 @@ namespace A
         }
     }
 
-    class Mod
+    struct Mint
     {
-        readonly int _divider = 1000000007;
-        public Mod(int divider = 1000000007)
+        public static long Divider { set { divider = value; } }
+        private static long divider = 1000000007;
+        public static void Set998244353() { divider = 998244353; }
+
+        public long Value { get; }
+
+        public Mint(long value)
         {
-            _divider = divider;
+            this.Value = value;
         }
 
-        public int Add(int a, int b) => (int)Add((long)a, (long)b);
-        public int Sub(int a, int b) => (int)Sub((long)a, (long)b);
-        public int Mul(int a, int b) => (int)Mul((long)a, (long)b);
-        public int Div(int a, int b) => (int)Div((long)a, (long)b);
-        public int Pow(int a, int p) => (int)Pow((long)a, (long)p);
+        public static Mint operator +(Mint a, Mint b) => new Mint((a.Value + b.Value) % divider);
 
-        public long Add(long a, long b) => (a + b) % _divider;
-
-        public long Sub(long a, long b)
+        public static Mint operator -(Mint a, Mint b)
         {
-            var t = (a - b) % _divider;
+            var t = (a.Value - b.Value) % divider;
             if (t < 0)
-                t += _divider;
-            return t;
+                t += divider;
+            return new Mint(t);
         }
 
-        public long Mul(long a, long b) => (a * b) % _divider;
+        public static Mint operator *(Mint a, Mint b) => new Mint((a.Value * b.Value) % divider);
 
-        public long Div(long a, long b) => Mul(a, Inv(b));
+        public static Mint operator /(Mint a, Mint b) => new Mint((a.Value * InvImpl(b.Value)) % divider);
 
-        public long Pow(long a, long p)
+        public Mint Pow(long p) => new Mint(PowImpl(Value, p));
+        private static long PowImpl(long a, long p)
         {
-            switch (p)
-            {
-                case 0: return 1;
-                case 1: return a;
-                default:
-                    var halfP = p / 2;
-                    var halfPowered = Pow(a, halfP);
-                    var powered = Mul(halfPowered, halfPowered);
-                    return p % 2 == 0 ? powered : Mul(powered, a);
-            }
+            if (p == 0)
+                return 1L;
+
+            if (p == 1)
+                return a;
+
+            var halfP = p / 2;
+            var halfPowered = PowImpl(a, halfP);
+            var powered = halfPowered * halfPowered % divider;
+            return p % 2 == 0 ? powered : powered * a % divider;
         }
 
-        readonly Dictionary<long, long> invCache = new Dictionary<long, long>();
-        long Inv(long a)
+        public static Mint Inv(long a) => new Mint(InvImpl(a));
+        private static readonly Dictionary<long, long> invCache = new Dictionary<long, long>();
+        private static long InvImpl(long a)
         {
             long cache = 0L;
             if (invCache.TryGetValue(a, out cache))
                 return cache;
 
-            var result = Pow(a, _divider - 2);
+            var result = PowImpl(a, divider - 2);
             invCache.Add(a, result);
             return result;
         }
 
-        readonly List<int> facCache = new List<int>() { 1 };
-        public int Fac(int a)
+        public static Mint Fac(long a) => new Mint(FacImpl(a));
+        private static readonly List<long> facCache = new List<long>() { 1L };
+        private static long FacImpl(long a)
         {
+            if (a >= divider)
+                return 0;
+
             if (a < facCache.Count)
-                return facCache[a];
+                return facCache[(int)a];
 
             var val = facCache.Last();
             var start = facCache.Count;
             for (int i = start; i <= a; i++)
             {
-                val = Mul(val, i);
+                val = (val * i) % divider;
                 facCache.Add(val);
             }
 
             return val;
         }
 
-        public int Perm(int n, int r)
+        public static Mint Perm(long n, long r) => new Mint(PermImpl(n, r));
+        private static long PermImpl(long n, long r)
         {
             if (n < r)
-                return 0;
+                return 0L;
 
             if (r <= 0)
-                return 1;
+                return 1L;
 
-            int nn = Fac(n);
-            int nr = Fac(n - r);
-            return Div(nn, nr);
+            var nn = FacImpl(n);
+            var nr = FacImpl(n - r);
+            return (nn * InvImpl(nr)) % divider;
         }
 
-        public int Comb(int n, int r)
+        public static Mint Comb(long n, long r) => new Mint(CombImpl(n, r));
+        private static long CombImpl(long n, long r)
         {
             if (n < r)
-                return 0;
+                return 0L;
 
             if (n == r)
-                return 1;
+                return 1L;
 
-            int nn = Fac(n);
-            int nr = Fac(n - r);
-            int rr = Fac(r);
-            return Div(Div(nn, nr), rr);
+            var nn = FacImpl(n);
+            var nr = FacImpl(n - r);
+            var rr = FacImpl(r);
+
+            var nndnr = (nn * InvImpl(nr)) % divider;
+            return (nndnr * InvImpl(rr)) % divider;
         }
     }
 }
