@@ -108,6 +108,8 @@ namespace A
 
         public string YesNo(bool isYes) => isYes ? "Yes" : "No";
 
+        public HashSet<T> ToHashSet<T>(IEnumerable<T> ts) => new HashSet<T>(ts);
+
         public int Gcm(int a, int b)
         {
             if (a < b)
