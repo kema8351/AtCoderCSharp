@@ -139,6 +139,111 @@ namespace A
             return a / Gcm(a, b) * b;
         }
 
+        int GetFirstIndexGreater(long x, ref List<long> listOrdered)
+        {
+            var count = listOrdered.Count;
+
+            if (count == 0)
+                return 0;
+
+            if (listOrdered[count - 1] <= x)
+                return count;
+
+            int low = 0;
+            int high = listOrdered.Count - 1;
+
+            while (low < high)
+            {
+                var mid = (low + high) / 2;
+
+                if (listOrdered[mid] > x)
+                    high = mid;
+                else
+                    low = mid + 1;
+            }
+
+            return low;
+        }
+
+        int GetFirstIndexGreater(int x, ref List<int> listOrdered)
+        {
+            var count = listOrdered.Count;
+
+            if (count == 0)
+                return 0;
+
+            if (listOrdered[count - 1] <= x)
+                return count;
+
+            int low = 0;
+            int high = listOrdered.Count - 1;
+
+            while (low < high)
+            {
+                var mid = (low + high) / 2;
+
+                if (listOrdered[mid] > x)
+                    high = mid;
+                else
+                    low = mid + 1;
+            }
+
+            return low;
+        }
+
+        int GetLastIndexLess(long x, ref List<long> listOrdered)
+        {
+            var count = listOrdered.Count;
+
+            if (count == 0)
+                return -1;
+
+            if (listOrdered[0] >= x)
+                return -1;
+
+            int low = 0;
+            int high = listOrdered.Count - 1;
+
+            while (low < high)
+            {
+                var mid = (low + high + 1) / 2;
+
+                if (listOrdered[mid] < x)
+                    low = mid;
+                else
+                    high = mid - 1;
+            }
+
+            return low;
+        }
+
+        int GetLastIndexLess(int x, ref List<int> listOrdered)
+        {
+            var count = listOrdered.Count;
+
+            if (count == 0)
+                return -1;
+
+            if (listOrdered[0] >= x)
+                return -1;
+
+            int low = 0;
+            int high = listOrdered.Count - 1;
+
+            while (low < high)
+            {
+                var mid = (low + high + 1) / 2;
+
+                if (listOrdered[mid] < x)
+                    low = mid;
+                else
+                    high = mid - 1;
+            }
+
+            return low;
+        }
+    }
+
     class Bit
     {
         long length;
