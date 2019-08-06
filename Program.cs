@@ -106,6 +106,13 @@ namespace A
         public IEnumerable<int> Loop(int count) => Enumerable.Range(0, count);
         public IEnumerable<int> Loop(int from, int to) => Enumerable.Range(from, to - from + 1);
 
+        public IEnumerable<long> Loop(long count) => Loop(0, count - 1);
+        public IEnumerable<long> Loop(long from, long to)
+        {
+            for (long i = from; i <= to; i++)
+                yield return i;
+        }
+
         public string YesNo(bool isYes) => isYes ? "Yes" : "No";
 
         public HashSet<T> ToHashSet<T>(IEnumerable<T> ts) => new HashSet<T>(ts);
