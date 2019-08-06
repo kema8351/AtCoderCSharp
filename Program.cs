@@ -129,6 +129,40 @@ namespace A
         {
             return a / Gcm(a, b) * b;
         }
+
+    class Bit
+    {
+        long length;
+        long[] binaryIndexedTree;
+        public Bit(long length)
+        {
+            this.length = length;
+            binaryIndexedTree = new long[length + 1];
+        }
+
+        public void Add(long indexZeroBase, long additional)
+        {
+            // i += i & -i
+            // 1が立っている最下位ビットを足す、の意味
+            for (long i = indexZeroBase + 1; i <= length; i += i & -i)
+            {
+                binaryIndexedTree[i] += additional;
+            }
+        }
+
+        public long Sum(long indexZeroBase)
+        {
+            long result = 0;
+
+            // i += i & -i
+            // 1が立っている最下位ビットを引く、の意味
+            for (long i = indexZeroBase + 1; i > 0; i -= i & -i)
+            {
+                result += binaryIndexedTree[i];
+            }
+
+            return result;
+        }
     }
 
     class Mod
