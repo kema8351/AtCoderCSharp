@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+      <Title>BellmanFord</Title>
+      <Author>
+      </Author>
+      <Description>
+      </Description>
+      <HelpUrl>
+      </HelpUrl>
+      <Shortcut>
+      </Shortcut>
+    </Header>
+    <Snippet>
+      <Code Language="csharp" Delimiter="$"><![CDATA[        public class Vertex
+        {
+            public long Distance { get; set; }
+
+            public Vertex()
+            {
+                Distance = long.MaxValue;
+            }
+        }
+
+        public class Edge
+        {
+            public int From { get; private set; }
+            public int To { get; private set; }
+            public long Weight { get; private set; }
+
+            public Edge(int from, int to, long weight)
+            {
+                From = from;
+                To = to;
+                Weight = weight;
+            }
+        }
+
+        void GetReachable(int origin, ref HashSet<int> reached, ref Dictionary<int, int[]> paths)
+        {
+            if (reached.Contains(origin))
+                return;
+
+            reached.Add(origin);
+
+            if (paths.ContainsKey(origin) == false)
+                return;
+
+            foreach (var p in paths[origin])
+                GetReachable(p, ref reached, ref paths);
+        }
+
+        /// <summary>
+        /// null: 負の無限大
+        /// long.MaxValue: たどり着けない
+        /// その他: 距離
+        /// </summary>
+        public long? BellmanFord(int vertexCount, List<Edge> rawEdges, int source, int dest)
+        {
+            var forwards = rawEdges.GroupBy(x => x.From).ToDictionary(x => x.Key, x => x.Select(xs => xs.To).ToArray());
+            var reverses = rawEdges.GroupBy(x => x.To).ToDictionary(x => x.Key, x => x.Select(xs => xs.From).ToArray());
+
+            var fromSource = new HashSet<int>();
+            var toDest = new HashSet<int>();
+
+            GetReachable(source, ref fromSource, ref forwards);
+            GetReachable(dest, ref toDest, ref reverses);
+
+            var edges = rawEdges
+                .Where(e => fromSource.Contains(e.From))
+                .Where(e => fromSource.Contains(e.To))
+                .Where(e => toDest.Contains(e.From))
+                .Where(e => toDest.Contains(e.To))
+                .ToArray();
+
+            // initialize distances
+            var vertices = new List<Vertex>();
+            for (int i = 0; i < vertexCount; i++)
+                vertices.Add(new Vertex());
+            vertices[source].Distance = 0L;
+
+            // update distances
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                foreach (var e in edges)
+                {
+                    var from = vertices[e.From];
+                    var to = vertices[e.To];
+
+                    if (from.Distance == long.MaxValue)
+                        continue;
+
+                    var newDistance = from.Distance + e.Weight;
+                    if (to.Distance > newDistance)
+                    {
+                        to.Distance = newDistance;
+                    }
+                }
+            }
+
+            // check negative cycle
+            foreach (var e in edges)
+            {
+                var from = vertices[e.From];
+                var to = vertices[e.To];
+
+                if (from.Distance + e.Weight < to.Distance)
+                    return null;
+            }
+
+            return vertices[dest].Distance;
+        }
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
