@@ -14,8 +14,8 @@ namespace A
             if (args?.Any() == true)
             {
                 var assembly = Assembly.GetEntryAssembly();
-                var resourceName = "AtCoderCSharp.In.txt";
-                var stream = assembly.GetManifestResourceStream(resourceName);
+                var path = "../../../../In.txt";
+                var stream = new FileStream(path, FileMode.Open);
                 var streamReader = new StreamReader(stream, Encoding.UTF8);
                 var str = streamReader.ReadToEnd();
                 var textReader = new StringReader(str);
@@ -108,62 +108,11 @@ namespace A
 
         public HashSet<T> ToHashSet<T>(IEnumerable<T> ts) => new HashSet<T>(ts);
 
-        bool Slv(long n, long k)
-        {
-            if (n < k)
-                return n == 1;
-
-            if (n % k == 0)
-                return Slv(n / k, k);
-            else
-                return Slv(n % k, k);
-        }
-
-        long Slv2(long n)
-        {
-            var d = n;
-            var dic = new Dictionary<long, long>();
-            for (long i = 2; i * i <= n; i++)
-            {
-                while (d % i == 0)
-                {
-                    d /= i;
-                    if (dic.ContainsKey(i))
-                        dic[i]++;
-                    else
-                        dic.Add(i, 1);
-                }
-            }
-
-            var res = 1L;
-            foreach (var p in dic.Values)
-                res *= (p + 1);
-
-            if (d > 1)
-                res *= 2;
-
-            return res;
-
-        }
 
         public IEnumerable<string> Solve()
         {
             var n = Scan;
-            var n1 = n - 1;
             var res = 0L;
-
-            for (long i = 2; i * i <= n; i++)
-            {
-                if (n % i == 0)
-                {
-                    if (Slv(n, i))
-                        res++;
-                }
-            }
-
-            res++;
-            res += Slv2(n1) - 1;
-
             yield return res.ToString();
         }
     }
