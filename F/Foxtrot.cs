@@ -26,7 +26,7 @@ namespace A
         public long Long => long.Parse(this.Str);
         public double Double => double.Parse(this.Str);
 
-        public string[] StrArray => Str.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        public string[] StrArray => Str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
         public int[] IntArray => StrArray.Select(int.Parse).ToArray();
         public long[] LongArray => StrArray.Select(long.Parse).ToArray();
         public double[] DoubleArray => StrArray.Select(double.Parse).ToArray();
@@ -77,9 +77,9 @@ namespace A
     {
         private readonly TextWriter writer;
         public Printer(TextWriter writer) { this.writer = writer; }
-        public void Out(object obj) { writer.WriteLine(obj.ToString()); }
-        public void Out<T>(IEnumerable<T> ts) { writer.WriteLine(string.Join(" ", ts)); }
-        public void Out(params object[] objs) { writer.WriteLine(string.Join(" ", objs)); }
+        public void Write(object obj) { writer.WriteLine(obj.ToString()); }
+        public void Write<T>(IEnumerable<T> ts) { writer.WriteLine(string.Join(" ", ts)); }
+        public void Write(params object[] objs) { writer.WriteLine(string.Join(" ", objs)); }
     }
 
     class StartingPoint
@@ -88,10 +88,13 @@ namespace A
         {
             try
             {
-                var scanner = new Scanner(Console.In);
-                var printer = new Printer(Console.Out);
+                var streamReader = args.Any() ? new StreamReader(args[0]) : new StreamReader(Console.OpenStandardInput());
+                var streamWriter = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = false };
+                var scanner = new Scanner(streamReader);
+                var printer = new Printer(streamWriter);
                 var solver = new Solver(scanner, printer);
                 solver.Solve();
+                streamWriter.Flush();
             }
             catch (Exception e)
             {
