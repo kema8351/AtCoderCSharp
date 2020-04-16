@@ -2,118 +2,102 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace A
 {
+    class Solver
+    {
+        public void Solve()
+        {
+        }
+
+        public Solver(Scanner sc, Printer sw) { this.sc = sc; this.sw = sw; }
+        private readonly Scanner sc;
+        private readonly Printer sw;
+    }
+
+    class Scanner
+    {
+        private readonly TextReader reader;
+        public Scanner(TextReader reader) { this.reader = reader; }
+
+        public string Str => reader.ReadLine().Trim();
+        public int Int => int.Parse(this.Str);
+        public long Long => long.Parse(this.Str);
+        public double Double => double.Parse(this.Str);
+
+        public string[] StrArray => Str.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        public int[] IntArray => StrArray.Select(int.Parse).ToArray();
+        public long[] LongArray => StrArray.Select(long.Parse).ToArray();
+        public double[] DoubleArray => StrArray.Select(double.Parse).ToArray();
+
+        public static bool TypeEquals<T1, T2>() => typeof(T1).Equals(typeof(T2));
+        public static T1 ChangeTypes<T1, T2>(T2 t2) => (T1)System.Convert.ChangeType(t2, typeof(T1));
+        public static T1 Convert<T1>(string s) =>
+            TypeEquals<T1, int>() ? ChangeTypes<T1, int>(int.Parse(s)) :
+            TypeEquals<T1, long>() ? ChangeTypes<T1, long>(long.Parse(s)) :
+            TypeEquals<T1, double>() ? ChangeTypes<T1, double>(int.Parse(s)) :
+            TypeEquals<T1, char>() ? ChangeTypes<T1, char>(s[0]) : ChangeTypes<T1, string>(s);
+
+        public P2<TX, TY> P2<TX, TY>() => new P2<TX, TY>(Convert<TX>(this.Str), Convert<TY>(this.Str));
+        public P3<TX, TY, TZ> P3<TX, TY, TZ>() => new P3<TX, TY, TZ>(Convert<TX>(this.Str), Convert<TY>(this.Str), Convert<TZ>(this.Str));
+        public P4<TX, TY, TZ, TW> P4<TX, TY, TZ, TW>() => new P4<TX, TY, TZ, TW>(Convert<TX>(this.Str), Convert<TY>(this.Str), Convert<TZ>(this.Str), Convert<TW>(this.Str));
+    }
+
+    static class ScannerExtension
+    {
+        public static int[] EInts(this Scanner scanner, int n) => scanner.EInts((long)n);
+        public static int[] EInts(this Scanner scanner, long n) => scanner.ScanLines<int>(n).ToArray();
+        public static long[] ELongs(this Scanner scanner, int n) => scanner.ELongs((long)n);
+        public static long[] ELongs(this Scanner scanner, long n) => scanner.ScanLines<long>(n).ToArray();
+        public static double[] EDoubles(this Scanner scanner, int n) => scanner.EDoubles((long)n);
+        public static double[] EDoubles(this Scanner scanner, long n) => scanner.ScanLines<double>(n).ToArray();
+        public static string[] EStrs(this Scanner scanner, int n) => scanner.EStrs((long)n);
+        public static string[] EStrs(this Scanner scanner, long n) => scanner.ScanLines<string>(n).ToArray();
+        private static IEnumerable<T> ScanLines<T>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return Scanner.Convert<T>(scanner.Str); }
+
+        public static P2<TX, TY>[] EP2<TX, TY>(this Scanner scanner, int n) => scanner.EP2<TX, TY>((long)n);
+        public static P2<TX, TY>[] EP2<TX, TY>(this Scanner scanner, long n) => scanner.ScanLines<TX, TY>(n).ToArray();
+        private static IEnumerable<P2<TX, TY>> ScanLines<TX, TY>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return scanner.P2<TX, TY>(); }
+
+        public static P3<TX, TY, TZ>[] EP3<TX, TY, TZ>(this Scanner scanner, int n) => scanner.EP3<TX, TY, TZ>((long)n);
+        public static P3<TX, TY, TZ>[] EP3<TX, TY, TZ>(this Scanner scanner, long n) => scanner.ScanLines<TX, TY, TZ>(n).ToArray();
+        private static IEnumerable<P3<TX, TY, TZ>> ScanLines<TX, TY, TZ>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return scanner.P3<TX, TY, TZ>(); }
+
+        public static P4<TX, TY, TZ, TW>[] EP4<TX, TY, TZ, TW>(this Scanner scanner, int n) => scanner.EP4<TX, TY, TZ, TW>((long)n);
+        public static P4<TX, TY, TZ, TW>[] EP4<TX, TY, TZ, TW>(this Scanner scanner, long n) => scanner.ScanLines<TX, TY, TZ, TW>(n).ToArray();
+        private static IEnumerable<P4<TX, TY, TZ, TW>> ScanLines<TX, TY, TZ, TW>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return scanner.P4<TX, TY, TZ, TW>(); }
+    }
+
+    class P2<TX, TY> { public TX X { get; } public TY Y { get; } public P2(TX x, TY y) { this.X = x; this.Y = y; } }
+    class P3<TX, TY, TZ> { public TX X { get; } public TY Y { get; } public TZ Z { get; } public P3(TX x, TY y, TZ z) { this.X = x; this.Y = y; this.Z = z; } }
+    class P4<TX, TY, TZ, TW> { public TX X { get; } public TY Y { get; } public TZ Z { get; } public TW W { get; } public P4(TX x, TY y, TZ z, TW w) { this.X = x; this.Y = y; this.Z = z; this.W = w; } }
+
+    class Printer
+    {
+        private readonly TextWriter writer;
+        public Printer(TextWriter writer) { this.writer = writer; }
+        public void Out(object obj) { writer.WriteLine(obj.ToString()); }
+        public void Out<T>(IEnumerable<T> ts) { writer.WriteLine(string.Join(" ", ts)); }
+        public void Out(params object[] objs) { writer.WriteLine(string.Join(" ", objs)); }
+    }
+
     class StartingPoint
     {
         static void Main(string[] args)
         {
-            if (args?.Any() == true)
-            {
-                var assembly = Assembly.GetEntryAssembly();
-                var path = "../../../../In.txt";
-                var stream = new FileStream(path, FileMode.Open);
-                var streamReader = new StreamReader(stream, Encoding.UTF8);
-                var str = streamReader.ReadToEnd();
-                var textReader = new StringReader(str);
-                Console.SetIn(textReader);
-            }
-
             try
             {
-                foreach (var s in new Program().Solve())
-                {
-                    Console.WriteLine(s);
-                }
+                var scanner = new Scanner(Console.In);
+                var printer = new Printer(Console.Out);
+                var solver = new Solver(scanner, printer);
+                solver.Solve();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                if (args?.Any() != true)
-                    throw e;
+                throw e;
             }
-
-            if (args?.Any() == true)
-                Console.ReadKey();
-        }
-    }
-
-    class Program
-    {
-        public List<int> ScanInts(int count) => Enumerable.Range(0, count).Select(_ => ScanInt).ToList();
-        public List<int> ScanInts(long count) => ScanInts((int)count);
-        public List<long> ScanLongs(int count) => Enumerable.Range(0, count).Select(_ => Scan).ToList();
-        public List<long> ScanLongs(long count) => ScanLongs((int)count);
-        public int ScanInt => int.Parse(Str);
-        public long Scan => long.Parse(Str);
-        public double ScanDouble => (double)Scan;
-
-        StringBuilder sb = new StringBuilder();
-
-        public string Str => ScanStr();
-        public string ScanStr()
-        {
-            sb.Clear();
-
-            int r = 0;
-            bool? b = null;
-            do
-            {
-                r = Console.Read();
-                b = IsBreak(r);
-            } while (b == true);
-
-            if (b == null)
-                throw new Exception("input error: unexpected end of stream");
-
-            do
-            {
-                sb.Append((char)r);
-                r = Console.Read();
-                b = IsBreak(r);
-            } while (b == false);
-
-            return sb.ToString();
-        }
-
-        bool? IsBreak(int c)
-        {
-            switch (c)
-            {
-                case -1:
-                    return null;
-                case (int)' ':
-                case (int)'\n':
-                case (int)'\r':
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        public IEnumerable<int> Loop(int count) => Enumerable.Range(0, count);
-        public IEnumerable<int> Loop(int from, int to) => Enumerable.Range(from, to - from + 1);
-
-        public IEnumerable<long> Loop(long count) => Loop(0, count - 1);
-        public IEnumerable<long> Loop(long from, long to)
-        {
-            for (long i = from; i <= to; i++)
-                yield return i;
-        }
-
-        public string YesNo(bool isYes) => isYes ? "Yes" : "No";
-
-        public HashSet<T> ToHashSet<T>(IEnumerable<T> ts) => new HashSet<T>(ts);
-
-
-        public IEnumerable<string> Solve()
-        {
-            var n = Scan;
-            var res = 0L;
-            yield return res.ToString();
         }
     }
 }
