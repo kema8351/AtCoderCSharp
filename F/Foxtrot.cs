@@ -9,6 +9,20 @@ namespace V
     {
         public void Solve()
         {
+            //Write(SolveLong());
+            //YesNo(SolveBool());
+        }
+
+        public long SolveLong()
+        {
+            var n = Scan;
+            return 0;
+        }
+
+        public bool SolveBool()
+        {
+            var n = Scan;
+            return false;
         }
     }
 }
@@ -44,33 +58,43 @@ namespace V
 {
     partial class Solver
     {
-        public Solver(Scanner sc, Printer sw) { this.sc = sc; this.sw = sw; }
-        private readonly Scanner sc;
-        private readonly Printer sw;
+        public Solver(Scanner sc, Printer sw) { this.scanner = sc; this.printer = sw; }
+        private readonly Scanner scanner;
+        private readonly Printer printer;
 
         private IEnumerable<int> Loop(int n) => C.Loop(n);
         private IEnumerable<long> Loop(long n) => C.Loop(n);
 
-        private int Rint => sc.Int;
-        private long Read => sc.Long;
-        private long Rlong => sc.Long;
-        private double Rdouble => sc.Double;
-        private string Rstr => sc.Str;
-        private int[] Aint(int n) => sc.Ints(n);
-        private int[] Aint(long n) => sc.Ints(n);
-        private long[] Arr(int n) => sc.Longs(n);
-        private long[] Arr(long n) => sc.Longs(n);
-        private long[] Along(int n) => sc.Longs(n);
-        private long[] Along(long n) => sc.Longs(n);
-        private double[] Adouble(int n) => sc.Doubles(n);
-        private double[] Adouble(long n) => sc.Doubles(n);
-        private string[] Astr(int n) => sc.Strs(n);
-        private string[] Astr(long n) => sc.Strs(n);
+        private int ScanInt => scanner.Int;
+        private long Sc => scanner.Long;
+        private long Scan => scanner.Long;
+        private long ScanLong => scanner.Long;
+        private double ScanDouble => scanner.Double;
+        private string Str => scanner.Str;
+        private string ScanStr => scanner.Str;
+        private int[] IntArr(int n) => scanner.Ints(n);
+        private int[] IntArr(long n) => scanner.Ints(n);
+        private long[] Scs(int n) => scanner.Longs(n);
+        private long[] Scs(long n) => scanner.Longs(n);
+        private long[] ScanArr(int n) => scanner.Longs(n);
+        private long[] ScanArr(long n) => scanner.Longs(n);
+        private long[] LongArr(int n) => scanner.Longs(n);
+        private long[] LongArr(long n) => scanner.Longs(n);
+        private double[] DoubleArr(int n) => scanner.Doubles(n);
+        private double[] DoubleArr(long n) => scanner.Doubles(n);
+        private string[] StrArr(int n) => scanner.Strs(n);
+        private string[] StrArr(long n) => scanner.Strs(n);
 
-        private void Write(string s) => sw.Write(s);
-        private void Write(object obj) => sw.Write(obj);
-        private void Write<T>(IEnumerable<T> ts) => sw.Write(ts);
-        private void Write(params object[] objs) => sw.Write(objs);
+        private void Wr(string s) => printer.Write(s);
+        private void Wr(object obj) => printer.Write(obj);
+        private void Wr<T>(IEnumerable<T> ts) => printer.Write(ts);
+        private void Wr(params object[] objs) => printer.Write(objs);
+        private void Write(string s) => printer.Write(s);
+        private void Write(object obj) => printer.Write(obj);
+        private void Write<T>(IEnumerable<T> ts) => printer.Write(ts);
+        private void Write(params object[] objs) => printer.Write(objs);
+        private void YesNo(bool b) => Write(b ? "Yes" : "No");
+        private void YESNO(bool b) => Write(b ? "YES" : "NO");
     }
     class Scanner
     {
@@ -422,14 +446,15 @@ namespace V
                 return vertices[dest].Distance;
             }
         }
-        public static int Gcd(int a, int b)
+        public static long Gcd(int a, int b) => Gcd((long)a, (long)b);
+        public static long Gcd(long a, long b)
         {
             if (a < b)
                 return GcdImpl(b, a);
             else
                 return GcdImpl(a, b);
         }
-        private static int GcdImpl(int a, int b)
+        private static long GcdImpl(long a, long b)
         {
             var remainder = a % b;
             if (remainder == 0)
@@ -437,9 +462,61 @@ namespace V
             else
                 return GcdImpl(b, remainder);
         }
-        public static int Lcm(int a, int b)
+        public static long Lcm(int a, int b) => Lcm((long)a, (long)b);
+        public static long Lcm(long a, long b)
         {
             return a / Gcd(a, b) * b;
+        }
+        public static long Pow(int n, int p) => Pow((long)n, (long)p);
+        public static long Pow(long n, long p)
+        {
+            var res = 1L;
+            for (long i = 0; i < p; i++)
+                res *= n;
+            return res;
+        }
+        public static Dictionary<long, long> Factorize(int n) => Factorize((long)n);
+        public static Dictionary<long, long> Factorize(long n)
+        {
+            var res = new Dictionary<long, long>();
+            var r = n;
+            for (long i = 2; i * i <= r; i++)
+            {
+                var c = 0L;
+                while (r % i == 0)
+                {
+                    c++;
+                    r /= i;
+                }
+                if (c > 0)
+                    res.Add(i, c);
+            }
+            if (r > 1)
+                res.Add(r, 1);
+            return res;
+        }
+        public static IEnumerable<long> Divisors(int n) => Divisors((long)n);
+        public static IEnumerable<long> Divisors(long n)
+        {
+            var cache = new Stack<long>();
+            for (long i = 1; i * i <= n; i++)
+            {
+                if (n % i == 0)
+                {
+                    yield return i;
+                    cache.Push(i);
+                }
+            }
+
+            var r = cache.Peek();
+            if (r * r == n)
+                cache.Pop();
+
+            while (cache.Count > 0)
+            {
+                var i = cache.Pop();
+                yield return n / i;
+            }
         }
         public static IEnumerable<int> Loop(int n)
         {
@@ -467,6 +544,8 @@ namespace V
         }
 
         public static Mint operator +(Mint a, Mint b) => new Mint((a.Value + b.Value) % divider);
+        public static Mint operator +(Mint a, long b) => a + new Mint(b);
+        public static Mint operator +(Mint a, int b) => a + new Mint(b);
 
         public static Mint operator -(Mint a, Mint b)
         {
@@ -475,10 +554,16 @@ namespace V
                 t += divider;
             return new Mint(t);
         }
+        public static Mint operator -(Mint a, long b) => a - new Mint(b);
+        public static Mint operator -(Mint a, int b) => a - new Mint(b);
 
         public static Mint operator *(Mint a, Mint b) => new Mint((a.Value * b.Value) % divider);
+        public static Mint operator *(Mint a, long b) => a * new Mint(b);
+        public static Mint operator *(Mint a, int b) => a * new Mint(b);
 
         public static Mint operator /(Mint a, Mint b) => new Mint((a.Value * InvImpl(b.Value)) % divider);
+        public static Mint operator /(Mint a, long b) => a / new Mint(b);
+        public static Mint operator /(Mint a, int b) => a / new Mint(b);
 
         public Mint Pow(long p) => new Mint(PowImpl(Value, p));
         private static long PowImpl(long a, long p)
