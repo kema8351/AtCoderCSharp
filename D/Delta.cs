@@ -5,33 +5,102 @@ using System.Linq;
 
 namespace V
 {
-    class Solver
+    partial class Solver
     {
         public void Solve()
         {
         }
-
-        public Solver(Scanner sc, Printer sw) { this.sc = sc; this.sw = sw; }
-        private readonly Scanner sc;
-        private readonly Printer sw;
     }
 }
 namespace V
 {
+    class StartingPoint
+    {
+        static void Main(string[] args)
+        {
+            try
+            {
+                var streamReader = args.Any() ? new StreamReader(args[0]) : new StreamReader(Console.OpenStandardInput());
+                var streamWriter = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = false };
+                var scanner = new Scanner(streamReader);
+                var printer = new Printer(streamWriter);
+                var solver = new Solver(scanner, printer);
+                solver.Solve();
+                streamWriter.Flush();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                if (args.Any() == false)
+                    throw e;
+            }
+
+            if (args.Any())
+                Console.ReadKey();
+        }
+    }
+}
+namespace V
+{
+    partial class Solver
+    {
+        public Solver(Scanner sc, Printer sw) { this.sc = sc; this.sw = sw; }
+        private readonly Scanner sc;
+        private readonly Printer sw;
+
+        private IEnumerable<int> Loop(int n) => C.Loop(n);
+        private IEnumerable<long> Loop(long n) => C.Loop(n);
+
+        private int Rint => sc.Int;
+        private long Read => sc.Long;
+        private long Rlong => sc.Long;
+        private double Rdouble => sc.Double;
+        private string Rstr => sc.Str;
+        private int[] Aint(int n) => sc.Ints(n);
+        private int[] Aint(long n) => sc.Ints(n);
+        private long[] Arr(int n) => sc.Longs(n);
+        private long[] Arr(long n) => sc.Longs(n);
+        private long[] Along(int n) => sc.Longs(n);
+        private long[] Along(long n) => sc.Longs(n);
+        private double[] Adouble(int n) => sc.Doubles(n);
+        private double[] Adouble(long n) => sc.Doubles(n);
+        private string[] Astr(int n) => sc.Strs(n);
+        private string[] Astr(long n) => sc.Strs(n);
+
+        private void Write(string s) => sw.Write(s);
+        private void Write(object obj) => sw.Write(obj);
+        private void Write<T>(IEnumerable<T> ts) => sw.Write(ts);
+        private void Write(params object[] objs) => sw.Write(objs);
+    }
     class Scanner
     {
         private readonly TextReader reader;
         public Scanner(TextReader reader) { this.reader = reader; }
+        private Queue<string> strQueue = new Queue<string>();
 
-        public string Str => reader.ReadLine().Trim();
+        public string Str
+        {
+            get
+            {
+                if (strQueue.Count > 0)
+                    return strQueue.Dequeue();
+
+                string[] strs = null;
+                do
+                {
+                    strs = reader.ReadLine().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                } while (strs.Any() == false);
+
+                foreach (var s in strs.Skip(1))
+                    strQueue.Enqueue(s);
+
+                return strs[0];
+            }
+        }
+
         public int Int => int.Parse(this.Str);
         public long Long => long.Parse(this.Str);
         public double Double => double.Parse(this.Str);
-
-        public string[] StrArray => Str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-        public int[] IntArray => StrArray.Select(int.Parse).ToArray();
-        public long[] LongArray => StrArray.Select(long.Parse).ToArray();
-        public double[] DoubleArray => StrArray.Select(double.Parse).ToArray();
 
         public static bool TypeEquals<T1, T2>() => typeof(T1).Equals(typeof(T2));
         public static T1 ChangeTypes<T1, T2>(T2 t2) => (T1)System.Convert.ChangeType(t2, typeof(T1));
@@ -41,42 +110,43 @@ namespace V
             TypeEquals<T1, double>() ? ChangeTypes<T1, double>(int.Parse(s)) :
             TypeEquals<T1, char>() ? ChangeTypes<T1, char>(s[0]) : ChangeTypes<T1, string>(s);
 
-        public P2<TX, TY> P2<TX, TY>() => new P2<TX, TY>(Convert<TX>(this.Str), Convert<TY>(this.Str));
-        public P3<TX, TY, TZ> P3<TX, TY, TZ>() => new P3<TX, TY, TZ>(Convert<TX>(this.Str), Convert<TY>(this.Str), Convert<TZ>(this.Str));
-        public P4<TX, TY, TZ, TW> P4<TX, TY, TZ, TW>() => new P4<TX, TY, TZ, TW>(Convert<TX>(this.Str), Convert<TY>(this.Str), Convert<TZ>(this.Str), Convert<TW>(this.Str));
+        public Pair<TX, TY> P2<TX, TY>() => new Pair<TX, TY>(Convert<TX>(this.Str), Convert<TY>(this.Str));
+        public Pair3<TX, TY, TZ> P3<TX, TY, TZ>() => new Pair3<TX, TY, TZ>(Convert<TX>(this.Str), Convert<TY>(this.Str), Convert<TZ>(this.Str));
+        public Pair4<TX, TY, TZ, TW> P4<TX, TY, TZ, TW>() => new Pair4<TX, TY, TZ, TW>(Convert<TX>(this.Str), Convert<TY>(this.Str), Convert<TZ>(this.Str), Convert<TW>(this.Str));
     }
     static class ScannerExtension
     {
-        public static int[] EInts(this Scanner scanner, int n) => scanner.EInts((long)n);
-        public static int[] EInts(this Scanner scanner, long n) => scanner.ScanLines<int>(n).ToArray();
-        public static long[] ELongs(this Scanner scanner, int n) => scanner.ELongs((long)n);
-        public static long[] ELongs(this Scanner scanner, long n) => scanner.ScanLines<long>(n).ToArray();
-        public static double[] EDoubles(this Scanner scanner, int n) => scanner.EDoubles((long)n);
-        public static double[] EDoubles(this Scanner scanner, long n) => scanner.ScanLines<double>(n).ToArray();
-        public static string[] EStrs(this Scanner scanner, int n) => scanner.EStrs((long)n);
-        public static string[] EStrs(this Scanner scanner, long n) => scanner.ScanLines<string>(n).ToArray();
-        private static IEnumerable<T> ScanLines<T>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return Scanner.Convert<T>(scanner.Str); }
+        public static int[] Ints(this Scanner scanner, int n) => scanner.Ints((long)n);
+        public static int[] Ints(this Scanner scanner, long n) => scanner.ScanStrs<int>(n).ToArray();
+        public static long[] Longs(this Scanner scanner, int n) => scanner.Longs((long)n);
+        public static long[] Longs(this Scanner scanner, long n) => scanner.ScanStrs<long>(n).ToArray();
+        public static double[] Doubles(this Scanner scanner, int n) => scanner.Doubles((long)n);
+        public static double[] Doubles(this Scanner scanner, long n) => scanner.ScanStrs<double>(n).ToArray();
+        public static string[] Strs(this Scanner scanner, int n) => scanner.Strs((long)n);
+        public static string[] Strs(this Scanner scanner, long n) => scanner.ScanStrs<string>(n).ToArray();
+        private static IEnumerable<T> ScanStrs<T>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return Scanner.Convert<T>(scanner.Str); }
 
-        public static P2<TX, TY>[] EP2<TX, TY>(this Scanner scanner, int n) => scanner.EP2<TX, TY>((long)n);
-        public static P2<TX, TY>[] EP2<TX, TY>(this Scanner scanner, long n) => scanner.ScanLines<TX, TY>(n).ToArray();
-        private static IEnumerable<P2<TX, TY>> ScanLines<TX, TY>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return scanner.P2<TX, TY>(); }
+        public static Pair<TX, TY>[] Pairs<TX, TY>(this Scanner scanner, int n) => scanner.Pairs<TX, TY>((long)n);
+        public static Pair<TX, TY>[] Pairs<TX, TY>(this Scanner scanner, long n) => scanner.ScanPairs<TX, TY>(n).ToArray();
+        private static IEnumerable<Pair<TX, TY>> ScanPairs<TX, TY>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return scanner.P2<TX, TY>(); }
 
-        public static P3<TX, TY, TZ>[] EP3<TX, TY, TZ>(this Scanner scanner, int n) => scanner.EP3<TX, TY, TZ>((long)n);
-        public static P3<TX, TY, TZ>[] EP3<TX, TY, TZ>(this Scanner scanner, long n) => scanner.ScanLines<TX, TY, TZ>(n).ToArray();
-        private static IEnumerable<P3<TX, TY, TZ>> ScanLines<TX, TY, TZ>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return scanner.P3<TX, TY, TZ>(); }
+        public static Pair3<TX, TY, TZ>[] Pairs3<TX, TY, TZ>(this Scanner scanner, int n) => scanner.Pairs3<TX, TY, TZ>((long)n);
+        public static Pair3<TX, TY, TZ>[] Pairs3<TX, TY, TZ>(this Scanner scanner, long n) => scanner.ScanPairs3<TX, TY, TZ>(n).ToArray();
+        private static IEnumerable<Pair3<TX, TY, TZ>> ScanPairs3<TX, TY, TZ>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return scanner.P3<TX, TY, TZ>(); }
 
-        public static P4<TX, TY, TZ, TW>[] EP4<TX, TY, TZ, TW>(this Scanner scanner, int n) => scanner.EP4<TX, TY, TZ, TW>((long)n);
-        public static P4<TX, TY, TZ, TW>[] EP4<TX, TY, TZ, TW>(this Scanner scanner, long n) => scanner.ScanLines<TX, TY, TZ, TW>(n).ToArray();
-        private static IEnumerable<P4<TX, TY, TZ, TW>> ScanLines<TX, TY, TZ, TW>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return scanner.P4<TX, TY, TZ, TW>(); }
+        public static Pair4<TX, TY, TZ, TW>[] Pairs4<TX, TY, TZ, TW>(this Scanner scanner, int n) => scanner.Pairs4<TX, TY, TZ, TW>((long)n);
+        public static Pair4<TX, TY, TZ, TW>[] Pairs4<TX, TY, TZ, TW>(this Scanner scanner, long n) => scanner.ScanPairs4<TX, TY, TZ, TW>(n).ToArray();
+        private static IEnumerable<Pair4<TX, TY, TZ, TW>> ScanPairs4<TX, TY, TZ, TW>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return scanner.P4<TX, TY, TZ, TW>(); }
     }
-    class P2<TX, TY> { public TX X { get; } public TY Y { get; } public P2(TX x, TY y) { this.X = x; this.Y = y; } }
-    class P3<TX, TY, TZ> { public TX X { get; } public TY Y { get; } public TZ Z { get; } public P3(TX x, TY y, TZ z) { this.X = x; this.Y = y; this.Z = z; } }
-    class P4<TX, TY, TZ, TW> { public TX X { get; } public TY Y { get; } public TZ Z { get; } public TW W { get; } public P4(TX x, TY y, TZ z, TW w) { this.X = x; this.Y = y; this.Z = z; this.W = w; } }
+    class Pair<TX, TY> { public TX X { get; } public TY Y { get; } public Pair(TX x, TY y) { this.X = x; this.Y = y; } }
+    class Pair3<TX, TY, TZ> { public TX X { get; } public TY Y { get; } public TZ Z { get; } public Pair3(TX x, TY y, TZ z) { this.X = x; this.Y = y; this.Z = z; } }
+    class Pair4<TX, TY, TZ, TW> { public TX X { get; } public TY Y { get; } public TZ Z { get; } public TW W { get; } public Pair4(TX x, TY y, TZ z, TW w) { this.X = x; this.Y = y; this.Z = z; this.W = w; } }
     class Printer
     {
         private readonly TextWriter writer;
         public Printer(TextWriter writer) { this.writer = writer; }
-        public void Write(object obj) { writer.WriteLine(obj.ToString()); }
+        public void Write(string obj) { writer.WriteLine(obj); }
+        public void Write(object obj) { writer.WriteLine(obj); }
         public void Write<T>(IEnumerable<T> ts) { writer.WriteLine(string.Join(" ", ts)); }
         public void Write(params object[] objs) { writer.WriteLine(string.Join(" ", objs)); }
     }
@@ -352,9 +422,6 @@ namespace V
                 return vertices[dest].Distance;
             }
         }
-    }
-    static class U
-    {
         public static int Gcd(int a, int b)
         {
             if (a < b)
@@ -374,12 +441,12 @@ namespace V
         {
             return a / Gcd(a, b) * b;
         }
-        public static IEnumerable<int> Range(int n)
+        public static IEnumerable<int> Loop(int n)
         {
             for (int i = 0; i < n; i++)
                 yield return i;
         }
-        public static IEnumerable<long> Range(long n)
+        public static IEnumerable<long> Loop(long n)
         {
             for (long i = 0L; i < n; i++)
                 yield return i;
@@ -493,27 +560,6 @@ namespace V
             var rr = FacImpl(r);
 
             return (nr * InvImpl(rr)) % divider;
-        }
-    }
-    class StartingPoint
-    {
-        static void Main(string[] args)
-        {
-            try
-            {
-                var streamReader = args.Any() ? new StreamReader(args[0]) : new StreamReader(Console.OpenStandardInput());
-                var streamWriter = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = false };
-                var scanner = new Scanner(streamReader);
-                var printer = new Printer(streamWriter);
-                var solver = new Solver(scanner, printer);
-                solver.Solve();
-                streamWriter.Flush();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw e;
-            }
         }
     }
 }
