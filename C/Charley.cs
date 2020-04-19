@@ -9,7 +9,7 @@ namespace V
     {
         public void Solve()
         {
-            //Write(SolveLong());
+            Write(SolveLong());
             //YesNo(SolveBool());
         }
 
