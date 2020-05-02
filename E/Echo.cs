@@ -9,13 +9,50 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
+            var n = Scan;
+            var m = Scan;
+
+            var pairs = new List<Pair<long, long>>();
+
+            if (n % 2 == 1)
+            {
+                var x = (n - 1) / 2;
+                for (long i = 0; i < m; i++)
+                {
+                    pairs.Add(new Pair<long, long>(i + 1, x * 2 - i));
+                }
+            }
+            else
+            {
+                var x = 1;
+                var y = n;
+                var b = true;
+
+                for (long i = 0; i < m; i++)
+                {
+                    if (y - x <= n / 2 && b)
+                    {
+                        y--;
+                        b = false;
+                    }
+
+                    pairs.Add(new Pair<long, long>(x, y));
+                    x++;
+                    y--;
+                }
+            }
+
+            foreach (var p in pairs)
+            {
+                Wr(p.X + " " + p.Y);
+
+            }
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
         public long SolveLong()
         {
-            var n = Scan;
             return 0;
         }
 

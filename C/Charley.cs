@@ -13,11 +13,55 @@ namespace V
             //YesNo(SolveBool());
         }
 
+        long n, m, q;
+        Pair4<int, int, int, int>[] a;
+        Stack<long> s = new Stack<long>();
+        long res = 0;
+
         public long SolveLong()
         {
-            var n = Scan;
-            return 0;
+            n = Scan;
+            m = Scan;
+            q = Scan;
+            a = scanner.Pairs4<int, int, int, int>(q);
+
+            Slv();
+
+            return res;
         }
+
+        void Slv()
+        {
+            if (s.Count == n)
+            {
+                var l = s.Reverse().ToArray();
+                var c = 0L;
+
+                foreach (var aa in a)
+                {
+                    if (l[aa.Y - 1] - l[aa.X - 1] == aa.Z)
+                        c += aa.W;
+                }
+
+                if (res < c)
+                    res = c;
+
+                //Write(string.Join(" ", l.Select(x => x.ToString())));
+                //Write(c);
+
+                return;
+            }
+
+            var pk = s.Any() ? s.Peek() : 1;
+            for (var i = pk; i <= m; i++)
+            {
+                s.Push(i);
+                Slv();
+                s.Pop();
+            }
+        }
+
+
 
         public bool SolveBool()
         {

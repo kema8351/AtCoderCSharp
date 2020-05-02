@@ -15,8 +15,16 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Scan;
-            return 0;
+            var x = Scan;
+            var d = 100L;
+            var n = 0;
+
+            while (d < x)
+            {
+                d += d / 100;
+                n++;
+            }
+            return n;
         }
 
         public bool SolveBool()

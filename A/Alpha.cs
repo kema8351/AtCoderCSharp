@@ -9,13 +9,25 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
+            var n = Scan;
+            var a = Scan;
+            var b = Scan;
+            for (var i = a; i <= b; i++)
+            {
+                if (i % n == 0)
+                {
+                    Write("OK");
+                    return;
+                }
+            }
+            Write("NG");
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
         public long SolveLong()
         {
-            var n = Scan;
             return 0;
         }
 

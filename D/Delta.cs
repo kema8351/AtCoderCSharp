@@ -15,8 +15,26 @@ namespace V
 
         public long SolveLong()
         {
+            var a = Scan;
+            var b = Scan;
             var n = Scan;
-            return 0;
+            var res = 0L;
+
+            //for (long i = 0; i <= n; i++)
+            //{
+            //    var c = a * i / b - a * (i / b);
+            //    res = Math.Max(c, res);
+
+            //    Write(i + " " + (a * i / b) + " - " + (a * (i / b)) + " = " + c);
+            //}
+            if (b == 1)
+                return 0;
+
+            var d = Math.Min(n, b - 1);
+
+            res = a * d / b - a * (d / b);
+
+            return res;
         }
 
         public bool SolveBool()

@@ -7,15 +7,78 @@ namespace V
 {
     partial class Solver
     {
+        HashSet<int> passed = new HashSet<int>();
+        Dictionary<int, List<int>> con = new Dictionary<int, List<int>>();
+        List<Stack<int>> mx = new List<Stack<int>>();
+        int[] res;
+        int[] a;
+
         public void Solve()
         {
-            Write(SolveLong());
+            var n = Scan;
+            a = IntArr(n);
+            var uv = scanner.Pairs<int, int>(n - 1).Select(x => new Pair<int, int>(x.X - 1, x.Y - 1));
+            foreach (var e in uv)
+            {
+                if (con.ContainsKey(e.X))
+                    con[e.X].Add(e.Y);
+                else
+                    con.Add(e.X, new List<int>() { e.Y });
+
+                if (con.ContainsKey(e.Y))
+                    con[e.Y].Add(e.X);
+                else
+                    con.Add(e.Y, new List<int>() { e.X });
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                var s = new Stack<int>();
+                s.Push(int.MaxValue);
+                mx.Add(s);
+            }
+
+            res = new int[(int)n];
+
+            Slv(0);
+
+            for (int i = 0; i < n; i++)
+            {
+                Wr(res[i]);
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
+        }
+
+        void Slv(int i)
+        {
+            var li = V.C.BinarySearch.GetLastIndexLess(a[i], ref mx);
+            mx[li + 1].Push(a[i]);
+
+            var val = V.C.BinarySearch.GetLastIndexLess(int.MaxValue, ref mx);
+            res[i] = val + 1;
+
+            passed.Add(i);
+
+            if (con.TryGetValue(i, out var next))
+            {
+
+                foreach (var j in next)
+                {
+                    if (passed.Contains(j))
+                        continue;
+
+                    Slv(j);
+                }
+            }
+
+            // Pop
+            mx[li + 1].Pop();
         }
 
         public long SolveLong()
         {
-            var n = Scan;
             return 0;
         }
 
@@ -294,14 +357,14 @@ namespace V
 
                 return low;
             }
-            public static int GetLastIndexLess(long x, ref List<long> listOrdered)
+            public static int GetLastIndexLess(long x, ref List<Stack<int>> listOrdered)
             {
                 var count = listOrdered.Count;
 
                 if (count == 0)
                     return -1;
 
-                if (listOrdered[0] >= x)
+                if (listOrdered[0].Peek() >= x)
                     return -1;
 
                 int low = 0;
@@ -311,7 +374,7 @@ namespace V
                 {
                     var mid = (low + high + 1) / 2;
 
-                    if (listOrdered[mid] < x)
+                    if (listOrdered[mid].Peek() < x)
                         low = mid;
                     else
                         high = mid - 1;
