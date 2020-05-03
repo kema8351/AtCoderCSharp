@@ -152,19 +152,37 @@ namespace V
 
         public static Pair<TX, TY>[] Pairs<TX, TY>(this Scanner scanner, int n) => scanner.Pairs<TX, TY>((long)n);
         public static Pair<TX, TY>[] Pairs<TX, TY>(this Scanner scanner, long n) => scanner.ScanPairs<TX, TY>(n).ToArray();
+        public static Pair<long, long>[] Pairs(this Scanner scanner, int n) => scanner.Pairs((long)n);
+        public static Pair<long, long>[] Pairs(this Scanner scanner, long n) => scanner.ScanPairs<long, long>(n).ToArray();
+        public static Pair<int, int>[] PairsInt(this Scanner scanner, int n) => scanner.PairsInt((long)n);
+        public static Pair<int, int>[] PairsInt(this Scanner scanner, long n) => scanner.ScanPairs<int, int>(n).ToArray();
         private static IEnumerable<Pair<TX, TY>> ScanPairs<TX, TY>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return scanner.P2<TX, TY>(); }
 
         public static Pair3<TX, TY, TZ>[] Pairs3<TX, TY, TZ>(this Scanner scanner, int n) => scanner.Pairs3<TX, TY, TZ>((long)n);
         public static Pair3<TX, TY, TZ>[] Pairs3<TX, TY, TZ>(this Scanner scanner, long n) => scanner.ScanPairs3<TX, TY, TZ>(n).ToArray();
+        public static Pair3<long, long, long>[] Pairs3(this Scanner scanner, int n) => scanner.Pairs3((long)n);
+        public static Pair3<long, long, long>[] Pairs3(this Scanner scanner, long n) => scanner.ScanPairs3<long, long, long>(n).ToArray();
+        public static Pair3<int, int, int>[] Pairs3Int(this Scanner scanner, int n) => scanner.Pairs3Int((long)n);
+        public static Pair3<int, int, int>[] Pairs3Int(this Scanner scanner, long n) => scanner.ScanPairs3<int, int, int>(n).ToArray();
         private static IEnumerable<Pair3<TX, TY, TZ>> ScanPairs3<TX, TY, TZ>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return scanner.P3<TX, TY, TZ>(); }
 
         public static Pair4<TX, TY, TZ, TW>[] Pairs4<TX, TY, TZ, TW>(this Scanner scanner, int n) => scanner.Pairs4<TX, TY, TZ, TW>((long)n);
         public static Pair4<TX, TY, TZ, TW>[] Pairs4<TX, TY, TZ, TW>(this Scanner scanner, long n) => scanner.ScanPairs4<TX, TY, TZ, TW>(n).ToArray();
+        public static Pair4<long, long, long, long>[] Pairs4(this Scanner scanner, int n) => scanner.Pairs4((long)n);
+        public static Pair4<long, long, long, long>[] Pairs4(this Scanner scanner, long n) => scanner.ScanPairs4<long, long, long, long>(n).ToArray();
+        public static Pair4<int, int, int, int>[] Pairs4Int(this Scanner scanner, int n) => scanner.Pairs4Int((long)n);
+        public static Pair4<int, int, int, int>[] Pairs4Int(this Scanner scanner, long n) => scanner.ScanPairs4<int, int, int, int>(n).ToArray();
         private static IEnumerable<Pair4<TX, TY, TZ, TW>> ScanPairs4<TX, TY, TZ, TW>(this Scanner scanner, long n) { for (long i = 0; i < n; i++) yield return scanner.P4<TX, TY, TZ, TW>(); }
     }
     class Pair<TX, TY> { public TX X { get; } public TY Y { get; } public Pair(TX x, TY y) { this.X = x; this.Y = y; } }
+    class Pair : Pair<long, long> { public Pair(long x, long y) : base(x, y) { } }
+    class PairInt : Pair<int, int> { public PairInt(int x, int y) : base(x, y) { } }
     class Pair3<TX, TY, TZ> { public TX X { get; } public TY Y { get; } public TZ Z { get; } public Pair3(TX x, TY y, TZ z) { this.X = x; this.Y = y; this.Z = z; } }
+    class Pair3 : Pair3<long, long, long> { public Pair3(long x, long y, long z) : base(x, y, z) { } }
+    class Pair3Int : Pair3<int, int, int> { public Pair3Int(int x, int y, int z) : base(x, y, z) { } }
     class Pair4<TX, TY, TZ, TW> { public TX X { get; } public TY Y { get; } public TZ Z { get; } public TW W { get; } public Pair4(TX x, TY y, TZ z, TW w) { this.X = x; this.Y = y; this.Z = z; this.W = w; } }
+    class Pair4 : Pair4<long, long, long, long> { public Pair4(long x, long y, long z, long w) : base(x, y, z, w) { } }
+    class Pair4Int : Pair4<int, int, int, int> { public Pair4Int(int x, int y, int z, int w) : base(x, y, z, w) { } }
     class Printer
     {
         private readonly TextWriter writer;
