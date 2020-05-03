@@ -9,7 +9,28 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
+            var x = Scan;
+            var a = 0L;
+
+            while (true)
+            {
+                var bb = C.Pow(a, 5) - x;
+                var s = bb < 0;
+                bb = Math.Abs(bb);
+                var rb = (long)Math.Round(Math.Pow(bb, 0.2));
+
+                if (bb == C.Pow(rb, 5))
+                {
+                    var b = s ? -rb : rb;
+                    Wr($"{a} {b}");
+                    return;
+                }
+
+                a++;
+            }
+
+
+            // Write(SolveLong());
             //YesNo(SolveBool());
         }
 

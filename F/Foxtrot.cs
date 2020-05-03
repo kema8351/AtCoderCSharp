@@ -7,9 +7,151 @@ namespace V
 {
     partial class Solver
     {
+        long n;
+        string[] s;
+        string[] res;
+        ABC[] abcs;
+
+
+        struct ABC
+        {
+            public long a;
+
+            public long b;
+
+            public long c;
+
+            public long Val(int i)
+            {
+                switch (i)
+                {
+                    case 0: return a;
+                    case 1: return b;
+                    case 2: return c;
+                    default: throw new Exception("unknown index");
+                }
+            }
+
+            public ABC Op(int add, int sub)
+            {
+                long a = this.a;
+                long b = this.b;
+                long c = this.c;
+
+                switch (add)
+                {
+                    case 0: a++; break;
+                    case 1: b++; break;
+                    case 2: c++; break;
+                    default: throw new Exception("unknown index");
+                }
+
+                switch (sub)
+                {
+                    case 0: a--; break;
+                    case 1: b--; break;
+                    case 2: c--; break;
+                    default: throw new Exception("unknown index");
+                }
+
+                return new ABC() { a = a, b = b, c = c };
+            }
+        }
+
+        bool Slv(int i)
+        {
+            if (i >= n)
+                return true;
+
+            var ss = s[i];
+            int x = 0;
+            int y = 0;
+
+            switch (ss)
+            {
+                case "AB":
+                    x = 0;
+                    y = 1;
+                    break;
+                case "BC":
+                    x = 1;
+                    y = 2;
+                    break;
+                case "AC":
+                    x = 2;
+                    y = 0;
+                    break;
+            }
+
+            var abc = abcs[i];
+
+            if (abc.Val(x) == 0 && abc.Val(y) == 0)
+                return false;
+
+            if (abc.Val(x) != 1 || abc.Val(y) != 1)
+            {
+                if (abc.Val(x) > abc.Val(y))
+                {
+                    Op(i, y, x);
+                    return Slv(i + 1);
+                }
+                else
+                {
+                    Op(i, x, y);
+                    return Slv(i + 1);
+                }
+            }
+
+            Op(i, x, y);
+            if (Slv(i + 1))
+                return true;
+
+            Op(i, y, x);
+            if (Slv(i + 1))
+                return true;
+
+            return false;
+        }
+
+        void Op(int i, int add, int sub)
+        {
+            abcs[i + 1] = abcs[i].Op(add, sub);
+            switch (add)
+            {
+                case 0: res[i] = "A"; break;
+                case 1: res[i] = "B"; break;
+                case 2: res[i] = "C"; break;
+                default: throw new Exception("unknown index");
+            }
+        }
+
         public void Solve()
         {
-            Write(SolveLong());
+            res = new string[100005];
+            abcs = new ABC[100005];
+
+            n = Scan;
+            var a = Scan;
+            var b = Scan;
+            var c = Scan;
+            abcs[0] = new ABC() { a = a, b = b, c = c };
+            s = StrArr(n);
+
+            if (Slv(0))
+            {
+                Write("Yes");
+
+                for (int i = 0; i < n; i++)
+                {
+                    Write(res[i]);
+                }
+            }
+            else
+            {
+                Write("No");
+            }
+
+            // Write(SolveLong());
             //YesNo(SolveBool());
         }
 

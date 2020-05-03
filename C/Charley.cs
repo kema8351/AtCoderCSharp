@@ -16,7 +16,29 @@ namespace V
         public long SolveLong()
         {
             var n = Scan;
-            return 0;
+            var m = Scan;
+            var h = ScanArr(n);
+            var e = scanner.Pairs(m);
+            e = e.Concat(e.Select(x => new Pair<long, long>(x.Y, x.X))).ToArray();
+            var d = e.GroupBy(x => x.X).ToDictionary(x => x.Key - 1, x => x.Select(xs => xs.Y - 1).ToArray());
+
+            var res = 0;
+            for (long i = 0; i < n; i++)
+            {
+                if (d.ContainsKey(i))
+                {
+                    var ds = d[i];
+                    var hh = h[i];
+                    if (ds.All(x => h[x] < hh))
+                        res++;
+                }
+                else
+                {
+                    res++;
+                }
+            }
+
+            return res;
         }
 
         public bool SolveBool()

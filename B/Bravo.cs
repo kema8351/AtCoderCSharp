@@ -16,7 +16,28 @@ namespace V
         public long SolveLong()
         {
             var n = Scan;
-            return 0;
+            var k = Scan;
+            var b = new bool[n + 1];
+
+            for (var i = 0L; i < k; i++)
+            {
+                var d = Scan;
+                var a = ScanArr(d);
+
+                foreach (var aa in a)
+                {
+                    b[aa - 1] = true;
+                }
+            }
+
+            var res = 0;
+            for (int i = 0; i < n; i++)
+            {
+                if (!b[i])
+                    res++;
+            }
+
+            return res;
         }
 
         public bool SolveBool()

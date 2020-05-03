@@ -16,7 +16,39 @@ namespace V
         public long SolveLong()
         {
             var n = Scan;
-            return 0;
+            var a = ScanArr(n);
+
+            var b = a.Select((x, i) => x - i).ToArray();
+            var bDic = b.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count());
+            var c = a.Select((x, i) => -x - i).ToArray();
+
+            var res = 0L;
+
+            for (int i = 0; i < n; i++)
+            {
+                bDic[b[i]]--;
+
+                if (bDic.TryGetValue(c[i], out var val))
+                    res += val;
+            }
+
+            //var t = 0;
+            //for (int i = 0; i < n; i++)
+            //{
+            //    for (int j = i + 1; j < n; j++)
+            //    {
+            //        var dif = Math.Abs(j - i);
+            //        if (dif == a[i] + a[j])
+            //        {
+            //            Wr($"{i} {j}");
+            //            t++;
+            //        }
+            //    }
+            //}
+            //Wr(t);
+
+            return res;
+
         }
 
         public bool SolveBool()
