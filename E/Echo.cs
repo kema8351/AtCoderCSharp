@@ -7,21 +7,140 @@ namespace V
 {
     partial class Solver
     {
+        struct Edge
+        {
+            public long to;
+            public long money;
+            public long time;
+        }
+
+        struct Exchange
+        {
+            public long money;
+            public long time;
+        }
+
+        struct State
+        {
+            public long city;
+            public long money;
+            public long time;
+        }
+
         public void Solve()
         {
-            Write(SolveLong());
+            long n = Read;
+            long m = Read;
+            long s = Read;
+
+            List<Edge>[] tree = new List<Edge>[n];
+            foreach (long i in C.Loop(n))
+            {
+                tree[i] = new List<Edge>();
+            }
+
+            long maxMoney = 0;
+            foreach (long i in C.Loop(m))
+            {
+                long u = Read - 1;
+                long v = Read - 1;
+                long a = Read;
+                long b = Read;
+
+                maxMoney += a;
+                tree[u].Add(new Edge() { to = v, money = a, time = b });
+                tree[v].Add(new Edge() { to = u, money = a, time = b });
+            }
+
+            Exchange[] exchanges = new Exchange[n];
+            foreach (long i in C.Loop(n))
+            {
+                long c = Read;
+                long d = Read;
+                exchanges[i] = new Exchange() { money = c, time = d };
+            }
+
+            long[,] dp = new long[n, maxMoney + 1];
+            long inf = long.MaxValue / 2;
+            foreach (long i in C.Loop(n))
+            {
+                foreach (long j in C.Loop(maxMoney + 1))
+                {
+                    dp[i, j] = inf;
+                }
+            }
+
+            s = Math.Min(s, maxMoney);
+
+            var pq = new C.PriorityQueue<long, State>(x => x.time);
+            pq.Enqueue(new State() { city = 0, money = s, time = 0 });
+
+            Action<long, long, long> push = (long time, long city, long money) =>
+            {
+                if (money < 0)
+                    return;
+
+                if (dp[city, money] != inf)
+                    return;
+
+                var state = new State() { city = city, money = money, time = time };
+                pq.Enqueue(state);
+            };
+
+            while (pq.Count > 0)
+            {
+                var state = pq.Dequeue();
+                var time = state.time;
+                var city = state.city;
+                var money = state.money;
+
+                if (dp[city, money] != inf)
+                    continue;
+
+                dp[city, money] = time;
+
+                if (money < maxMoney)
+                {
+                    var newMoney = Math.Min(maxMoney, money + exchanges[city].money);
+                    var newTime = time + exchanges[city].time;
+
+                    push.Invoke(newTime, city, newMoney);
+                }
+
+                foreach (var edge in tree[city])
+                {
+                    var newMoney = money - edge.money;
+                    var newTime = time + edge.time;
+                    var newCity = edge.to;
+
+                    push.Invoke(newTime, newCity, newMoney);
+                }
+            }
+
+            for (long i = 1; i < n; i++)
+            {
+                var res = long.MaxValue;
+                for (long j = 0; j <= maxMoney; j++)
+                {
+                    res = Math.Min(res, dp[i, j]);
+                }
+
+                Wr(res);
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
         public long SolveLong()
         {
-            var n = Scan;
+            var n = Read;
             return 0;
         }
 
         public bool SolveBool()
         {
-            var n = Scan;
+            var n = Read;
             return false;
         }
     }
@@ -58,41 +177,42 @@ namespace V
 {
     partial class Solver
     {
-        public Solver(Scanner sc, Printer sw) { this.scanner = sc; this.printer = sw; }
-        private readonly Scanner scanner;
-        private readonly Printer printer;
+        public Solver(Scanner sc, Printer pr) { this.sc = sc; this.pr = pr; }
+        private readonly Scanner sc;
+        private readonly Printer pr;
 
         private IEnumerable<int> Loop(int n) => C.Loop(n);
         private IEnumerable<long> Loop(long n) => C.Loop(n);
 
-        private int ScanInt => scanner.Int;
-        private long Sc => scanner.Long;
-        private long Scan => scanner.Long;
-        private long ScanLong => scanner.Long;
-        private double ScanDouble => scanner.Double;
-        private string Str => scanner.Str;
-        private string ScanStr => scanner.Str;
-        private int[] IntArr(int n) => scanner.Ints(n);
-        private int[] IntArr(long n) => scanner.Ints(n);
-        private long[] Scs(int n) => scanner.Longs(n);
-        private long[] Scs(long n) => scanner.Longs(n);
-        private long[] ScanArr(int n) => scanner.Longs(n);
-        private long[] ScanArr(long n) => scanner.Longs(n);
-        private long[] LongArr(int n) => scanner.Longs(n);
-        private long[] LongArr(long n) => scanner.Longs(n);
-        private double[] DoubleArr(int n) => scanner.Doubles(n);
-        private double[] DoubleArr(long n) => scanner.Doubles(n);
-        private string[] StrArr(int n) => scanner.Strs(n);
-        private string[] StrArr(long n) => scanner.Strs(n);
+        private int RdInt => sc.Int;
+        private int ReadInt => sc.Int;
+        private long Rd => sc.Long;
+        private long Read => sc.Long;
+        private long ReadLong => sc.Long;
+        private double RdDouble => sc.Double;
+        private double ReadDouble => sc.Double;
+        private string Str => sc.Str;
+        private string RdStr => sc.Str;
+        private string ReadStr => sc.Str;
+        private int[] ArrInt(int n) => sc.Ints(n);
+        private int[] ArrInt(long n) => sc.Ints(n);
+        private long[] Arr(int n) => sc.Longs(n);
+        private long[] Arr(long n) => sc.Longs(n);
+        private long[] ArrLong(int n) => sc.Longs(n);
+        private long[] ArrLong(long n) => sc.Longs(n);
+        private double[] ArrDouble(int n) => sc.Doubles(n);
+        private double[] ArrDouble(long n) => sc.Doubles(n);
+        private string[] ArrStr(int n) => sc.Strs(n);
+        private string[] ArrStr(long n) => sc.Strs(n);
 
-        private void Wr(string s) => printer.Write(s);
-        private void Wr(object obj) => printer.Write(obj);
-        private void Wr<T>(IEnumerable<T> ts) => printer.Write(ts);
-        private void Wr(params object[] objs) => printer.Write(objs);
-        private void Write(string s) => printer.Write(s);
-        private void Write(object obj) => printer.Write(obj);
-        private void Write<T>(IEnumerable<T> ts) => printer.Write(ts);
-        private void Write(params object[] objs) => printer.Write(objs);
+        private void Wr(string s) => pr.Write(s);
+        private void Wr(object obj) => pr.Write(obj);
+        private void Wr<T>(IEnumerable<T> ts) => pr.Write(ts);
+        private void Wr(params object[] objs) => pr.Write(objs);
+        private void Write(string s) => pr.Write(s);
+        private void Write(object obj) => pr.Write(obj);
+        private void Write<T>(IEnumerable<T> ts) => pr.Write(ts);
+        private void Write(params object[] objs) => pr.Write(objs);
         private void YesNo(bool b) => Write(b ? "Yes" : "No");
         private void YESNO(bool b) => Write(b ? "YES" : "NO");
     }
@@ -192,38 +312,138 @@ namespace V
         public void Write<T>(IEnumerable<T> ts) { writer.WriteLine(string.Join(" ", ts)); }
         public void Write(params object[] objs) { writer.WriteLine(string.Join(" ", objs)); }
     }
+    static class Extension
+    {
+        public static bool TryRemove<T>(this HashSet<T> ts, T t)
+        {
+            if (ts.Contains(t))
+            {
+                ts.Remove(t);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
     class C
     {
-        public class PriorityQueue<TKey, TValue>
+        public class Tree
         {
-            SortedDictionary<TKey, Queue<TValue>> dictionary = new SortedDictionary<TKey, Queue<TValue>>();
-            int count = 0;
-            public int Count
+            public Tree() { to = new Dictionary<long, long[]>(); }
+            public Tree(Scanner sc, long n, bool base1 = true, bool singleDirection = false) { Adjust(sc.Pairs(n), base1, singleDirection); }
+            public Tree(Pair<long, long>[] edges, bool base1 = true, bool singleDirection = false) { Adjust(edges, base1, singleDirection); }
+            public Tree(IEnumerable<long> ps, IEnumerable<long> qs, bool base1 = true, bool singleDirection = false) { Adjust(ps.Zip(qs, (p, q) => new Pair<long, long>(p, q)).ToArray(), base1, singleDirection); }
+
+            private void Adjust(Pair<long, long>[] edges, bool base1, bool singleDirection)
             {
-                get
-                {
-                    return count;
-                }
+                var arrows = base1
+                    ? edges.Select(x => new { from = x.X - 1, to = x.Y - 1 })
+                    : edges.Select(x => new { from = x.X, to = x.Y });
+                if (singleDirection == false)
+                    arrows = arrows.Concat(arrows.Select(x => new { from = x.to, to = x.from }));
+                to = arrows.GroupBy(x => x.from).ToDictionary(x => x.Key, x => x.Select(xs => xs.to).ToArray());
             }
-            public void Add(TKey key, TValue value)
+
+            private long[] empty = new long[0];
+            private Dictionary<long, long[]> to;
+            public long[] To(long from) => to.TryGetValue(from, out var val) ? val : empty;
+        }
+
+        public class PriorityQueue<TKey, TState> where TKey : IComparable<TKey>
+        {
+            public int Count { get; private set; }
+            private readonly Func<TState, TKey> keySelector;
+            private readonly bool desc;
+            private TState[] states = new TState[65536];
+            private TKey[] keys = new TKey[65536];
+            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public PriorityQueue(Func<TState, TKey> keySelector, bool desc = false) { this.keySelector = keySelector; this.desc = desc; }
+            public TState Top
             {
-                if (!dictionary.ContainsKey(key))
+                //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+                get { ValidateNonEmpty(); return states[1]; }
+            }
+            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public TState Dequeue()
+            {
+                var top = Top;
+                var item = states[Count];
+                var key = keys[Count];
+                Count--;
+                int index = 1;
+
+                while (true)
                 {
-                    dictionary[key] = new Queue<TValue>();
+                    if ((index << 1) >= Count)
+                    {
+                        if (index << 1 > Count)
+                            break;
+
+                        if (key.CompareTo(keys[index << 1]) <= 0 ^ desc)
+                            break;
+
+                        states[index] = states[index << 1];
+                        keys[index] = keys[index << 1];
+                        index <<= 1;
+                    }
+                    else
+                    {
+                        var nextIndex = keys[index << 1].CompareTo(keys[(index << 1) + 1]) <= 0 ^ desc
+                            ? (index << 1)
+                            : (index << 1) + 1;
+
+                        if (key.CompareTo(keys[nextIndex]) <= 0 ^ desc)
+                            break;
+
+                        states[index] = states[nextIndex];
+                        keys[index] = keys[nextIndex];
+                        index = nextIndex;
+                    }
                 }
 
-                dictionary[key].Enqueue(value);
-                count++;
+                states[index] = item;
+                keys[index] = key;
+
+                return top;
             }
-            public KeyValuePair<TKey, TValue> Dequeue()
+            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void Enqueue(TState state)
             {
-                var queue = dictionary.First();
-                if (queue.Value.Count <= 1)
+                var key = keySelector.Invoke(state);
+                Count++;
+                int index = Count;
+                if (states.Length == Count)
+                    Extend(states.Length * 2);
+
+                while ((index >> 1) != 0)
                 {
-                    dictionary.Remove(queue.Key);
+                    if (keys[index >> 1].CompareTo(key) <= 0 ^ desc)
+                        break;
+
+                    states[index] = states[index >> 1];
+                    keys[index] = keys[index >> 1];
+                    index >>= 1;
                 }
-                count--;
-                return new KeyValuePair<TKey, TValue>(queue.Key, queue.Value.Dequeue());
+
+                states[index] = state;
+                keys[index] = key;
+            }
+            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private void Extend(int newSize)
+            {
+                TState[] newStates = new TState[newSize];
+                TKey[] newKeys = new TKey[newSize];
+                states.CopyTo(newStates, 0);
+                keys.CopyTo(newKeys, 0);
+                states = newStates;
+                keys = newKeys;
+            }
+            private void ValidateNonEmpty()
+            {
+                if (Count == 0)
+                    throw new IndexOutOfRangeException();
             }
         }
         public class BinaryIndexTree
