@@ -685,6 +685,7 @@ namespace V
         public static Mint operator /(Mint a, int b) => a / new Mint(b);
 
         public Mint Pow(long p) => new Mint(PowImpl(Value, p));
+        public static Mint Pow(long a, long p) => new Mint(PowImpl(a, p));
         private static long PowImpl(long a, long p)
         {
             if (p == 0)
