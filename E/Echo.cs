@@ -7,15 +7,65 @@ namespace V
 {
     partial class Solver
     {
+        long n, k, c;
+        bool[] bs;
+        List<long> res = new List<long>();
+        Dictionary<long, bool> cache = new Dictionary<long, bool>();
+
         public void Solve()
         {
-            Write(SolveLong());
+            n = Read;
+            k = Read;
+            c = Read;
+            bs = Str.Select(x => x == 'o').ToArray();
+            res = new List<long>();
+
+            Slv(0, 0, true);
+
+            foreach (var r in res.OrderBy(x => x))
+            {
+                Wr(r + 1);
+            }
+            //    Write(SolveLong());
             //YesNo(SolveBool());
+        }
+
+        bool Slv(long i, long count, bool first)
+        {
+            var key = i * int.MaxValue + count;
+            var result = false;
+            if (cache.TryGetValue(key, out result))
+                return result;
+
+            result = SlvImpl(i, count, first);
+            cache[key] = result;
+            return result;
+        }
+
+        bool SlvImpl(long i, long count, bool first)
+        {
+            if (i >= n)
+                return count == k;
+
+            if (count > k)
+                return false;
+
+            if (!bs[i])
+            {
+                return Slv(i + 1, count, first);
+            }
+
+            if (!Slv(i + c + 1, count + 1, first))
+                return false;
+
+            if (first && !Slv(i + 1, count, false))
+                res.Add(i);
+
+            return true;
         }
 
         public long SolveLong()
         {
-            var n = Read;
             return 0;
         }
 
@@ -229,7 +279,14 @@ namespace V
 
             private long[] empty = new long[0];
             private Dictionary<long, long[]> to;
-            public long[] To(long from) => to.TryGetValue(from, out var val) ? val : empty;
+            public long[] To(long from)
+            {
+                long[] res = null;
+                if (to.TryGetValue(from, out res))
+                    return res;
+                else
+                    return empty;
+            }
         }
 
         public class PriorityQueue<TKey, TState> where TKey : IComparable<TKey>
