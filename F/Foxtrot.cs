@@ -16,7 +16,56 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var a = Arr(n);
+            long?[,] dp = new long?[n + 1, 3];
+            var maxSkip = n % 2 == 0 ? 1 : 2;
+
+            long? getDp(int final, int skip)
+            {
+                if (final < 0)
+                    return null;
+                if (skip < 0)
+                    return null;
+                if (skip > maxSkip)
+                    return null;
+
+                return dp[final, skip];
+            }
+
+            var candidates = new List<long?>();
+
+            for (var i = 1; i <= n; i++)
+            {
+                for (var j = 0; j <= maxSkip; j++)
+                {
+                    candidates.Clear();
+
+                    // no skip
+                    if (j < i)
+                    {
+                        var prev = getDp(i - 2, j);
+                        candidates.Add((prev ?? 0) + a[i - 1]);
+
+                    }
+
+                    // skip
+                    {
+                        var prev = getDp(i - 1, j - 1);
+                        if (prev.HasValue)
+                            candidates.Add(prev);
+                    }
+
+                    dp[i, j] = candidates.Where(x => x.HasValue).OrderByDescending(x => x.Value).FirstOrDefault();
+                }
+            }
+
+            var res = long.MinValue;
+            for (var i = 0; i <= maxSkip; i++)
+            {
+                res = Math.Max(res, dp[n - maxSkip + i, i].Value);
+            }
+
+            return res;
         }
 
         public bool SolveBool()
