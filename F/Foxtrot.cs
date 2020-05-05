@@ -7,9 +7,91 @@ namespace V
 {
     partial class Solver
     {
+        class Edge
+        {
+            public long from;
+            public long to;
+            public long vertexCount = 0;
+            public Mint alignmentCount = new Mint();
+        }
+
+        Dictionary<long, Dictionary<long, Edge>> map;
+
+        Mint GetAlignmentCount(Edge edge)
+        {
+            if (edge.alignmentCount.Value != 0)
+                return edge.alignmentCount;
+
+            var to = edge.to;
+            var toEdges = map[to].Where(x => x.Key != edge.from).Select(x => x.Value);
+            var alignmentCount = ComputeAlignmentCount(toEdges);
+            edge.alignmentCount = alignmentCount;
+
+            return edge.alignmentCount;
+        }
+
+        long GetVertextCount(Edge edge)
+        {
+            if (edge.vertexCount != 0)
+                return edge.vertexCount;
+
+            var to = edge.to;
+            var toEdges = map[to].Where(x => x.Key != edge.from).Select(x => x.Value);
+            var vertexCount = toEdges.Select(x => GetVertextCount(x)).Sum() + 1;
+            edge.vertexCount = vertexCount;
+
+            return edge.vertexCount;
+        }
+
+        Mint ComputeAlignmentCount(IEnumerable<Edge> edges)
+        {
+            var totalVertexCount = edges.Select(x => GetVertextCount(x)).Sum();
+
+            var res = new Mint(1);
+            var remainingVertexCount = totalVertexCount;
+            foreach (var pair in edges)
+            {
+                var vertexCount = GetVertextCount(pair);
+                var alignmentCount = GetAlignmentCount(pair);
+
+                res *= alignmentCount;
+                res *= Mint.Comb(remainingVertexCount, vertexCount);
+
+                remainingVertexCount -= vertexCount;
+            }
+
+            return res;
+        }
+
+        Mint Slv(long i)
+        {
+            var edges = map[i];
+
+            return ComputeAlignmentCount(edges.Values);
+        }
+
         public void Solve()
         {
-            Write(SolveLong());
+            var n = Read;
+            var edges = new List<Edge>();
+
+            foreach (long i in C.Loop(n - 1))
+            {
+                var a = Read - 1;
+                var b = Read - 1;
+
+                edges.Add(new Edge() { from = a, to = b });
+                edges.Add(new Edge() { from = b, to = a });
+            }
+
+            map = edges.GroupBy(x => x.from).ToDictionary(x => x.Key, x => x.ToDictionary(xs => xs.to, xs => xs));
+
+            foreach (long i in C.Loop(n))
+            {
+                Write(Slv(i));
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
