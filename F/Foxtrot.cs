@@ -17,53 +17,37 @@ namespace V
         {
             var n = Read;
             var a = Arr(n);
-            long?[,] dp = new long?[n + 1, 3];
+            long[,] dp = new long[n + 2, 4];
             var maxSkip = n % 2 == 0 ? 1 : 2;
 
-            long? getDp(int final, int skip)
+            for (int i = 0; i < n + 2; i++)
             {
-                if (final < 0)
-                    return null;
-                if (skip < 0)
-                    return null;
-                if (skip > maxSkip)
-                    return null;
-
-                return dp[final, skip];
-            }
-
-            var candidates = new List<long?>();
-
-            for (var i = 1; i <= n; i++)
-            {
-                for (var j = 0; j <= maxSkip; j++)
+                for (int j = 0; j < 4; j++)
                 {
-                    candidates.Clear();
-
-                    // no skip
-                    if (j < i)
-                    {
-                        var prev = getDp(i - 2, j);
-                        candidates.Add((prev ?? 0) + a[i - 1]);
-
-                    }
-
-                    // skip
-                    {
-                        var prev = getDp(i - 1, j - 1);
-                        if (prev.HasValue)
-                            candidates.Add(prev);
-                    }
-
-                    dp[i, j] = candidates.Where(x => x.HasValue).OrderByDescending(x => x.Value).FirstOrDefault();
+                    dp[i, j] = long.MinValue;
                 }
             }
 
-            var res = long.MinValue;
-            for (var i = 0; i <= maxSkip; i++)
+            dp[0, 0] = 0;
+
+            for (int i = 0; i < n; i++)
             {
-                res = Math.Max(res, dp[n - maxSkip + i, i].Value);
+                for (int j = 0; j <= maxSkip; j++)
+                {
+                    if (dp[i, j] == long.MinValue)
+                        continue;
+
+                    var skipped = dp[i, j];
+                    dp[i + 1, j + 1] = Math.Max(dp[i + 1, j + 1], skipped);
+
+                    var noSkip = dp[i, j];
+                    if ((i + j) % 2 == 0)
+                        noSkip += a[i];
+                    dp[i + 1, j] = Math.Max(dp[i + 1, j], noSkip);
+                }
             }
+
+            var res = dp[n, maxSkip];
 
             return res;
         }
