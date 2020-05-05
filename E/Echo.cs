@@ -16,7 +16,26 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var k = Read;
+            var res = new Mint[k + 1];
+
+            for (long i = k; i >= 1; i--)
+            {
+                res[i] = Mint.Pow(k / i, n);
+
+                for (long j = i * 2; j <= k; j += i)
+                {
+                    res[i] -= res[j];
+                }
+            }
+
+            var ans = new Mint();
+            for (long i = 1; i <= k; i++)
+            {
+                ans += res[i] * i;
+            }
+
+            return ans.Value;
         }
 
         public bool SolveBool()
@@ -685,6 +704,7 @@ namespace V
         public static Mint operator /(Mint a, int b) => a / new Mint(b);
 
         public Mint Pow(long p) => new Mint(PowImpl(Value, p));
+        public static Mint Pow(long n, long p) => new Mint(PowImpl(n, p));
         private static long PowImpl(long a, long p)
         {
             if (p == 0)
