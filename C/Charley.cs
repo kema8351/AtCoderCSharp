@@ -15,13 +15,13 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
+            long n = Read;
             return 0;
         }
 
         public bool SolveBool()
         {
-            var n = Read;
+            long n = Read;
             return false;
         }
     }
@@ -229,9 +229,15 @@ namespace V
 
             private long[] empty = new long[0];
             private Dictionary<long, long[]> to;
-            public long[] To(long from) => to.TryGetValue(from, out var val) ? val : empty;
+            public long[] To(long from)
+            {
+                long[] res = null;
+                if (to.TryGetValue(from, out res))
+                    return res;
+                else
+                    return empty;
+            }
         }
-
         public class PriorityQueue<TKey, TState> where TKey : IComparable<TKey>
         {
             public int Count { get; private set; }
