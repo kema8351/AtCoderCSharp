@@ -7,68 +7,8 @@ namespace V
 {
     partial class Solver
     {
-        class Edge
-        {
-            public long from;
-            public long to;
-            public long vertexCount = 0;
-            public Mint alignmentCount = new Mint();
-        }
-
-        Dictionary<long, Dictionary<long, Edge>> map;
-
-        Mint GetAlignmentCount(Edge edge)
-        {
-            if (edge.alignmentCount.Value != 0)
-                return edge.alignmentCount;
-
-            var to = edge.to;
-            var toEdges = map[to].Where(x => x.Key != edge.from).Select(x => x.Value);
-            var alignmentCount = ComputeAlignmentCount(toEdges);
-            edge.alignmentCount = alignmentCount;
-
-            return edge.alignmentCount;
-        }
-
-        long GetVertextCount(Edge edge)
-        {
-            if (edge.vertexCount != 0)
-                return edge.vertexCount;
-
-            var to = edge.to;
-            var toEdges = map[to].Where(x => x.Key != edge.from).Select(x => x.Value);
-            var vertexCount = toEdges.Select(x => GetVertextCount(x)).Sum() + 1;
-            edge.vertexCount = vertexCount;
-
-            return edge.vertexCount;
-        }
-
-        Mint ComputeAlignmentCount(IEnumerable<Edge> edges)
-        {
-            var totalVertexCount = edges.Select(x => GetVertextCount(x)).Sum();
-
-            var res = new Mint(1);
-            var remainingVertexCount = totalVertexCount;
-            foreach (var pair in edges)
-            {
-                var vertexCount = GetVertextCount(pair);
-                var alignmentCount = GetAlignmentCount(pair);
-
-                res *= alignmentCount;
-                res *= Mint.Comb(remainingVertexCount, vertexCount);
-
-                remainingVertexCount -= vertexCount;
-            }
-
-            return res;
-        }
-
-        Mint Slv(long i)
-        {
-            var edges = map[i];
-
-            return ComputeAlignmentCount(edges.Values);
-        }
+        Node[] nodes;
+        Node[] orderedNodes;
 
         public void Solve()
         {
@@ -80,31 +20,175 @@ namespace V
                 var a = Read - 1;
                 var b = Read - 1;
 
-                edges.Add(new Edge() { from = a, to = b });
-                edges.Add(new Edge() { from = b, to = a });
+                var edge1 = new Edge() { from = a, to = b };
+                var edge2 = new Edge() { from = b, to = a };
+                edge1.reverseEdge = edge2;
+                edge2.reverseEdge = edge1;
+
+                edges.Add(edge1);
+                edges.Add(edge2);
             }
 
-            map = edges.GroupBy(x => x.from).ToDictionary(x => x.Key, x => x.ToDictionary(xs => xs.to, xs => xs));
+            //edges = GetStarTree();
+            //edges = GetLineTree();
 
-            foreach (long i in C.Loop(n))
+            nodes = edges.GroupBy(x => x.from)
+                .OrderBy(x => x.Key)
+                .Select(x => new Node() { index = x.Key, edges = x.ToDictionary(xs => xs.to, xs => xs) })
+                .ToArray();
+
+            ComputeNodeDepth();
+            ComputeNodeCount();
+            ComputeWayCount();
+
+            foreach (var node in nodes)
             {
-                Write(Slv(i));
+                Write(node.wayCount);
+            }
+        }
+
+        List<Edge> GetStarTree()
+        {
+            var edges = new List<Edge>();
+
+            foreach (long i in C.Loop(200000))
+            {
+                var edge1 = new Edge() { from = 0, to = i + 1 };
+                var edge2 = new Edge() { from = i + 1, to = 0 };
+                edge1.reverseEdge = edge2;
+                edge2.reverseEdge = edge1;
+                edges.Add(edge1);
+                edges.Add(edge2);
             }
 
-            //Write(SolveLong());
-            //YesNo(SolveBool());
+            return edges;
         }
 
-        public long SolveLong()
+        List<Edge> GetLineTree()
         {
-            long n = Read;
-            return 0;
+            var edges = new List<Edge>();
+
+            foreach (long i in C.Loop(200000))
+            {
+                var edge1 = new Edge() { from = i, to = i + 1 };
+                var edge2 = new Edge() { from = i + 1, to = i };
+                edge1.reverseEdge = edge2;
+                edge2.reverseEdge = edge1;
+                edges.Add(edge1);
+                edges.Add(edge2);
+            }
+
+            return edges;
         }
 
-        public bool SolveBool()
+        void ComputeNodeDepth()
         {
-            long n = Read;
-            return false;
+            var queue = new Queue<Node>();
+            queue.Enqueue(nodes[0]);
+            nodes[0].depth = 1;
+
+            while (queue.Count > 0)
+            {
+                var node = queue.Dequeue();
+                foreach (var edge in node.edges.Values)
+                {
+                    var child = nodes[edge.to];
+                    if (child.depth > 0)
+                        continue;
+
+                    child.depth = node.depth + 1;
+                    child.parent = node;
+                    queue.Enqueue(child);
+                }
+            }
+
+            orderedNodes = nodes.OrderBy(x => x.depth).ToArray();
+        }
+
+        void ComputeNodeCount()
+        {
+            foreach (var node in orderedNodes.Reverse())
+            {
+                if (node.parent == null)
+                    continue;
+
+                var parentEdge = node.edges[node.parent.index];
+                var childNodeCount = node.edges.Values.Where(x => x.to != node.parent.index).Sum(x => x.nodeCount);
+                parentEdge.reverseEdge.nodeCount = childNodeCount + 1;
+                parentEdge.nodeCount = nodes.LongLength - parentEdge.reverseEdge.nodeCount;
+            }
+        }
+
+        void ComputeWayCount()
+        {
+            foreach (var node in orderedNodes.Reverse())
+            {
+                if (node.parent == null)
+                    continue;
+
+                var parentEdge = node.edges[node.parent.index];
+                var childEdges = node.edges.Values.Where(x => x.to != node.parent.index);
+                var childNodeCount = childEdges.Sum(x => x.nodeCount);
+
+                var wayCount = new Mint(1);
+                var remainingNodeCount = childNodeCount;
+                foreach (var edge in childEdges)
+                {
+                    wayCount *= Mint.Comb(remainingNodeCount, edge.nodeCount);
+                    wayCount *= edge.wayCount;
+
+                    remainingNodeCount -= edge.nodeCount;
+                }
+
+                parentEdge.reverseEdge.wayCount = wayCount;
+            }
+
+            foreach (var node in orderedNodes)
+            {
+                if (node.parent != null)
+                {
+                    var parentEdge = node.edges[node.parent.index];
+                    var parentNode = node.parent;
+                    var parentReverseEdge = parentEdge.reverseEdge;
+                    var comb = Mint.Comb(nodes.LongLength - 1, parentReverseEdge.nodeCount);
+
+                    parentEdge.wayCount = parentNode.wayCount / parentReverseEdge.wayCount / comb;
+                }
+
+                var childEdges = node.edges.Values;
+                var childNodeCount = nodes.LongLength - 1;
+
+                var wayCount = new Mint(1);
+                var remainingNodeCount = childNodeCount;
+                foreach (var edge in childEdges)
+                {
+                    wayCount *= Mint.Comb(remainingNodeCount, edge.nodeCount);
+                    wayCount *= edge.wayCount;
+
+                    remainingNodeCount -= edge.nodeCount;
+                }
+
+                node.wayCount = wayCount;
+            }
+        }
+
+        class Edge
+        {
+            public long from;
+            public long to;
+            public long nodeCount;
+            public Mint wayCount;
+            public Edge reverseEdge;
+        }
+
+        class Node
+        {
+            public long index;
+            public Dictionary<long, Edge> edges;
+            public Mint wayCount;
+            public Edge checkedEdge;
+            public long depth;
+            public Node parent;
         }
     }
 }
@@ -802,20 +886,42 @@ namespace V
         }
 
         public static Mint Fac(long a) => new Mint(FacImpl(a));
-        private static readonly List<long> facCache = new List<long>() { 1L };
+        private static long[] facCache = new long[262144];
+        private static long cachedFac = 0;
         private static long FacImpl(long a)
         {
             if (a >= divider)
                 return 0;
 
-            var val = 1L;
-            var start = 1;
-            for (int i = start; i <= a; i++)
+            facCache[0] = 1;
+            if (facCache.LongLength <= a)
             {
-                val = (val * i) % divider;
+                long newSize = facCache.LongLength;
+                while (newSize <= a)
+                {
+                    newSize *= 2;
+                }
+
+                ExtendFacCache(newSize);
             }
 
-            return val;
+            var val = facCache[cachedFac];
+            var start = cachedFac + 1;
+            for (long i = start; i <= a; i++)
+            {
+                val = (val * i) % divider;
+                facCache[i] = val;
+            }
+
+            cachedFac = Math.Max(cachedFac, a);
+
+            return facCache[a];
+        }
+        private static void ExtendFacCache(long newSize)
+        {
+            long[] newFacCache = new long[newSize];
+            facCache.CopyTo(newFacCache, 0);
+            facCache = newFacCache;
         }
 
         public static Mint Perm(long n, long r) => new Mint(PermImpl(n, r));
@@ -844,15 +950,12 @@ namespace V
             if (n - r < r)
                 return CombImpl(n, n - r);
 
-            var nr = 1L;
-            for (var i = n; i > n - r; i--)
-            {
-                nr *= i;
-                nr %= divider;
-            }
+            var nn = FacImpl(n);
+            var nr = FacImpl(n - r);
             var rr = FacImpl(r);
 
-            return (nr * InvImpl(rr)) % divider;
+            var nrrr = (nr * rr) % divider;
+            return (nn * InvImpl(nrrr)) % divider;
         }
     }
 }
