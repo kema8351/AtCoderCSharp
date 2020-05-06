@@ -720,20 +720,42 @@ namespace V
         }
 
         public static Mint Fac(long a) => new Mint(FacImpl(a));
-        private static readonly List<long> facCache = new List<long>() { 1L };
+        private static long[] facCache = new long[262144];
+        private static long cachedFac = 0;
         private static long FacImpl(long a)
         {
             if (a >= divider)
                 return 0;
 
-            var val = 1L;
-            var start = 1;
-            for (int i = start; i <= a; i++)
+            facCache[0] = 1;
+            if (facCache.LongLength <= a)
             {
-                val = (val * i) % divider;
+                long newSize = facCache.LongLength;
+                while (newSize <= a)
+                {
+                    newSize *= 2;
+                }
+
+                ExtendFacCache(newSize);
             }
 
-            return val;
+            var val = facCache[cachedFac];
+            var start = cachedFac + 1;
+            for (long i = start; i <= a; i++)
+            {
+                val = (val * i) % divider;
+                facCache[i] = val;
+            }
+
+            cachedFac = Math.Max(cachedFac, a);
+
+            return facCache[a];
+        }
+        private static void ExtendFacCache(long newSize)
+        {
+            long[] newFacCache = new long[newSize];
+            facCache.CopyTo(newFacCache, 0);
+            facCache = newFacCache;
         }
 
         public static Mint Perm(long n, long r) => new Mint(PermImpl(n, r));
@@ -762,15 +784,12 @@ namespace V
             if (n - r < r)
                 return CombImpl(n, n - r);
 
-            var nr = 1L;
-            for (var i = n; i > n - r; i--)
-            {
-                nr *= i;
-                nr %= divider;
-            }
+            var nn = FacImpl(n);
+            var nr = FacImpl(n - r);
             var rr = FacImpl(r);
 
-            return (nr * InvImpl(rr)) % divider;
+            var nrrr = (nr * rr) % divider;
+            return (nn * InvImpl(nrrr)) % divider;
         }
     }
 }
