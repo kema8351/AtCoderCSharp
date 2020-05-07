@@ -16,7 +16,46 @@ namespace V
         public long SolveLong()
         {
             long n = Read;
-            return 0;
+            long p = Read;
+            string s = Str;
+            n = s.LongCount();
+
+            if (p == 2 || p == 5)
+            {
+                var r25 = 0L;
+                var cand = n;
+
+                foreach (var c in s.Reverse())
+                {
+                    var dig = c.ToDigit();
+                    if (dig % p == 0)
+                    {
+                        r25 += cand;
+                    }
+
+                    cand--;
+                }
+
+                return r25;
+            }
+
+            List<long> cs = new List<long>() { 0L };
+            long current = 0;
+            long baseMod = 1;
+            foreach (var c in s.Reverse())
+            {
+                var dig = c.ToDigit();
+                current += dig * baseMod;
+                current %= p;
+                cs.Add(current);
+
+                baseMod *= 10;
+                baseMod %= p;
+            }
+
+            var res = cs.GroupBy(x => x).Select(x => x.Count()).Select(x => x * (x - 1) / 2).Sum();
+
+            return res;
         }
 
         public bool SolveBool()
@@ -210,6 +249,7 @@ namespace V
         public static long ToDigit(this char c) => (long)(c - '0');
         public static long ToSmallAbcIndex(this char c) => (long)(c - 'a');
         public static long ToLargeAbcIndex(this char c) => (long)(c - 'A');
+        public static long Count<T1, T2>(this IGrouping<T1, T2> gs) => gs.LongCount();
     }
     class C
     {
