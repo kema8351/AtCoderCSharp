@@ -374,7 +374,7 @@ namespace V
         }
         public static class BinarySearch
         {
-            public static int GetFirstIndexGreater(long x, ref List<long> listOrdered)
+            public static long GetFirstIndexGreater(long x, IReadOnlyList<long> listOrdered)
             {
                 var count = listOrdered.Count;
 
@@ -399,7 +399,7 @@ namespace V
 
                 return low;
             }
-            public static int GetFirstIndexGreater(int x, ref List<int> listOrdered)
+            public static long GetFirstIndexGreater(int x, IReadOnlyList<int> listOrdered)
             {
                 var count = listOrdered.Count;
 
@@ -424,7 +424,7 @@ namespace V
 
                 return low;
             }
-            public static int GetLastIndexLess(long x, ref List<long> listOrdered)
+            public static long GetLastIndexLess(long x, IReadOnlyList<long> listOrdered)
             {
                 var count = listOrdered.Count;
 
@@ -449,7 +449,7 @@ namespace V
 
                 return low;
             }
-            public static int GetLastIndexLess(int x, ref List<int> listOrdered)
+            public static long GetLastIndexLess(int x, IReadOnlyList<int> listOrdered)
             {
                 var count = listOrdered.Count;
 
