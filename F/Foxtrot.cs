@@ -207,6 +207,7 @@ namespace V
                 return false;
             }
         }
+        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> ts) => new HashSet<T>(ts.Distinct());
         public static long ToDigit(this char c) => (long)(c - '0');
         public static long ToSmallAbcIndex(this char c) => (long)(c - 'a');
         public static long ToLargeAbcIndex(this char c) => (long)(c - 'A');
