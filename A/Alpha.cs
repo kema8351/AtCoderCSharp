@@ -207,6 +207,9 @@ namespace V
                 return false;
             }
         }
+        public static long ToDigit(this char c) => (long)(c - '0');
+        public static long ToSmallAbcIndex(this char c) => (long)(c - 'a');
+        public static long ToLargeAbcIndex(this char c) => (long)(c - 'A');
     }
     class C
     {
@@ -657,16 +660,19 @@ namespace V
     struct Mint
     {
         public static long Divider { set { divider = value; } }
-        private static long divider = 1000000007;
-        public static void Set998244353() { divider = 998244353; }
+        private static long divider = 1000000007L;
+        public static void Set998244353() { divider = 998244353L; }
+        public static void Set1000000009() { divider = 1000000009L; }
 
         public long Value { get; }
         public override string ToString() => this.Value.ToString();
 
-        public Mint(long value)
-        {
-            this.Value = value;
-        }
+        public Mint(long value) { this.Value = value; }
+
+        //public static implicit operator Mint(long a) => new Mint(a % divider);
+        //public static implicit operator Mint(int a) => new Mint(a % divider);
+        //public static explicit operator long(Mint a) => a.Value;
+        //public static explicit operator int(Mint a) => (int)a.Value;
 
         public static Mint operator +(Mint a, Mint b) => new Mint((a.Value + b.Value) % divider);
         public static Mint operator +(Mint a, long b) => a + new Mint(b);
@@ -675,7 +681,7 @@ namespace V
         public static Mint operator -(Mint a, Mint b)
         {
             var t = (a.Value - b.Value) % divider;
-            if (t < 0)
+            if (t < 0L)
                 t += divider;
             return new Mint(t);
         }
@@ -689,45 +695,44 @@ namespace V
         public static Mint operator /(Mint a, Mint b) => new Mint((a.Value * InvImpl(b.Value)) % divider);
         public static Mint operator /(Mint a, long b) => a / new Mint(b);
         public static Mint operator /(Mint a, int b) => a / new Mint(b);
-
         public Mint Pow(long p) => new Mint(PowImpl(Value, p));
         public static Mint Pow(long a, long p) => new Mint(PowImpl(a, p));
         private static long PowImpl(long a, long p)
         {
-            if (p == 0)
+            if (p == 0L)
                 return 1L;
 
-            if (p == 1)
+            if (p == 1L)
                 return a;
 
-            var halfP = p / 2;
+            var halfP = p / 2L;
             var halfPowered = PowImpl(a, halfP);
             var powered = halfPowered * halfPowered % divider;
-            return p % 2 == 0 ? powered : powered * a % divider;
+            return p % 2L == 0L ? powered : powered * a % divider;
         }
 
         public static Mint Inv(long a) => new Mint(InvImpl(a));
         private static readonly Dictionary<long, long> invCache = new Dictionary<long, long>();
         private static long InvImpl(long a)
         {
-            long cache = 0L;
+            long cache;
             if (invCache.TryGetValue(a, out cache))
                 return cache;
 
-            var result = PowImpl(a, divider - 2);
+            var result = PowImpl(a, divider - 2L);
             invCache.Add(a, result);
             return result;
         }
 
         public static Mint Fac(long a) => new Mint(FacImpl(a));
         private static long[] facCache = new long[262144];
-        private static long cachedFac = 0;
+        private static long cachedFac = 0L;
         private static long FacImpl(long a)
         {
             if (a >= divider)
-                return 0;
+                return 0L;
 
-            facCache[0] = 1;
+            facCache[0] = 1L;
             if (facCache.LongLength <= a)
             {
                 long newSize = facCache.LongLength;
@@ -739,15 +744,18 @@ namespace V
                 ExtendFacCache(newSize);
             }
 
-            var val = facCache[cachedFac];
-            var start = cachedFac + 1;
-            for (long i = start; i <= a; i++)
+            if (cachedFac < a)
             {
-                val = (val * i) % divider;
-                facCache[i] = val;
-            }
+                var val = facCache[cachedFac];
+                var start = cachedFac + 1L;
+                for (long i = start; i <= a; i++)
+                {
+                    val = (val * i) % divider;
+                    facCache[i] = val;
+                }
 
-            cachedFac = Math.Max(cachedFac, a);
+                cachedFac = a;
+            }
 
             return facCache[a];
         }
@@ -764,7 +772,7 @@ namespace V
             if (n < r)
                 return 0L;
 
-            if (r <= 0)
+            if (r <= 0L)
                 return 1L;
 
             var nn = FacImpl(n);
