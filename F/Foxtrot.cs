@@ -210,6 +210,7 @@ namespace V
         public static long ToDigit(this char c) => (long)(c - '0');
         public static long ToSmallAbcIndex(this char c) => (long)(c - 'a');
         public static long ToLargeAbcIndex(this char c) => (long)(c - 'A');
+        public static long Count<T1, T2>(this IGrouping<T1, T2> gs) => gs.LongCount();
     }
     class C
     {
