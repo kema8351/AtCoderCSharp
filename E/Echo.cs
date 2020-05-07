@@ -9,7 +9,42 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
+            long n = Read;
+            char[] s = Str.ToArray();
+            long q = Read;
+
+            var st = Enumerable.Range(0, 26).Select(x => (char)('a' + x)).ToDictionary(x => x, x => new C.BinaryIndexTree(n));
+            var idx = 0;
+            foreach (var c in s)
+            {
+                st[c].Add(idx, 1);
+                idx++;
+            }
+
+
+            foreach (var _ in C.Loop(q))
+            {
+                var type = Read;
+                if (type == 1)
+                {
+                    var i = Read - 1;
+                    var newC = Str[0];
+                    var oldC = s[i];
+                    s[i] = newC;
+
+                    st[oldC].Add(i, -1);
+                    st[newC].Add(i, 1);
+                }
+                else
+                {
+                    var l = Read - 1;
+                    var r = Read - 1;
+
+                    var res = st.Values.Select(x => x.Sum(r) - x.Sum(l - 1)).Where(x => x > 0).Count();
+                    Wr(res);
+                }
+            }
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
