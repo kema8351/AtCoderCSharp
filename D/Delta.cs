@@ -16,8 +16,103 @@ namespace V
         public long SolveLong()
         {
             long n = Read;
-            return 0;
+            long k = Read - 1;
+            var a = Arr(n).OrderBy(x => x).ToArray();
+
+            var aMinus = a.Where(x => x < 0).Select(x => -x).Reverse().ToArray();
+            var aZero = a.Where(x => x == 0).ToArray();
+            var aPlus = a.Where(x => x > 0).ToArray();
+
+            var cMinus = aMinus.LongLength * aPlus.LongLength;
+            var cPlus = aMinus.LongLength * (aMinus.LongLength - 1) / 2 + aPlus.LongLength * (aPlus.LongLength - 1) / 2;
+            var cZero = a.LongLength * (a.LongLength - 1) / 2 - cMinus - cPlus;
+
+            if (cMinus > k)
+            {
+                var order = cMinus - k;
+                var min = 0L;
+                var max = aMinus.LastOrDefault() * aPlus.LastOrDefault();
+
+                while (min < max)
+                {
+                    var mid = (min + max) / 2;
+                    var midCount = GetCountInAll(aMinus, aPlus, mid);
+                    if (midCount >= order)
+                    {
+                        max = mid;
+                    }
+                    else if (midCount < order)
+                    {
+                        min = mid + 1;
+                    }
+                }
+
+                return -min;
+
+            }
+            else if (cMinus + cZero > k)
+            {
+                return 0;
+            }
+            else
+            {
+                var order = k - cMinus - cZero + 1;
+                var min = 0L;
+                var max = Math.Max(aMinus.LastOrDefault() * aMinus.LastOrDefault(), aPlus.LastOrDefault() * aPlus.LastOrDefault());
+
+                while (min < max)
+                {
+                    var mid = (min + max) / 2;
+                    var midCount = GetCountInHalf(aMinus, aPlus, mid);
+                    if (midCount >= order)
+                    {
+                        max = mid;
+                    }
+                    else if (midCount < order)
+                    {
+                        min = mid + 1;
+                    }
+                }
+
+                return min;
+            }
         }
+
+        long GetCountInAll(long[] a, long[] b, long max)
+        {
+            var res = 0L;
+
+            foreach (var aa in a)
+            {
+                var th = max / aa;
+                var r = C.BinarySearch.GetFirstIndexGreater(th, b);
+                res += r;
+            }
+
+            return res;
+        }
+
+        long GetCountInHalf(long[] a, long[] b, long max)
+        {
+            return GetCountInHalf(a, max) + GetCountInHalf(b, max);
+        }
+
+        long GetCountInHalf(long[] a, long max)
+        {
+            var res = 0L;
+
+            for (long i = 0; i < a.LongLength; i++)
+            {
+                var th = max / a[i];
+                var r = C.BinarySearch.GetFirstIndexGreater(th, a) - 1 - i;
+
+                if (r > 0)
+                    res += r;
+            }
+
+            return res;
+        }
+
 
         public bool SolveBool()
         {
@@ -374,7 +469,7 @@ namespace V
         }
         public static class BinarySearch
         {
-            public static int GetFirstIndexGreater(long x, ref List<long> listOrdered)
+            public static long GetFirstIndexGreater(long x, IReadOnlyList<long> listOrdered)
             {
                 var count = listOrdered.Count;
 
@@ -399,7 +494,7 @@ namespace V
 
                 return low;
             }
-            public static int GetFirstIndexGreater(int x, ref List<int> listOrdered)
+            public static long GetFirstIndexGreater(int x, IReadOnlyList<int> listOrdered)
             {
                 var count = listOrdered.Count;
 
@@ -424,7 +519,7 @@ namespace V
 
                 return low;
             }
-            public static int GetLastIndexLess(long x, ref List<long> listOrdered)
+            public static long GetLastIndexLess(long x, IReadOnlyList<long> listOrdered)
             {
                 var count = listOrdered.Count;
 
@@ -449,7 +544,7 @@ namespace V
 
                 return low;
             }
-            public static int GetLastIndexLess(int x, ref List<int> listOrdered)
+            public static long GetLastIndexLess(int x, IReadOnlyList<int> listOrdered)
             {
                 var count = listOrdered.Count;
 
