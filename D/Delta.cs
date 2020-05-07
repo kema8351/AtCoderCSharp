@@ -9,8 +9,72 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            int n = ReadInt;
+            int m = ReadInt;
+            int k = ReadInt;
+
+            HashSet<int>[] fs = Enumerable.Repeat(0, n).Select(x => new HashSet<int>()).ToArray();
+            HashSet<int>[] bs = Enumerable.Repeat(0, n).Select(x => new HashSet<int>()).ToArray();
+
+            foreach (var i in C.Loop(m))
+            {
+                var a = ReadInt - 1;
+                var b = ReadInt - 1;
+                fs[a].Add(b);
+                fs[b].Add(a);
+            }
+
+            foreach (var i in C.Loop(k))
+            {
+                var c = ReadInt - 1;
+                var d = ReadInt - 1;
+                bs[c].Add(d);
+                bs[d].Add(c);
+            }
+
+            var gs = new int[n];
+            var gt = 1;
+
+            foreach (var i in C.Loop(n))
+            {
+                if (gs[i] > 0)
+                    continue;
+
+                gs[i] = gt;
+                var q = new Queue<int>(fs[i]);
+
+                while (q.Count > 0)
+                {
+                    var next = q.Dequeue();
+                    if (gs[next] > 0)
+                        continue;
+
+                    gs[next] = gt;
+                    foreach (var x in fs[next])
+                        q.Enqueue(x);
+                }
+
+                gt++;
+            }
+
+            var clusters = gs.Select((x, i) => new { x, i }).GroupBy(x => x.x).ToDictionary(x => x.Key, x => x.Select(xs => xs.i).ToHashSet());
+
+
+            foreach (var i in C.Loop(n))
+            {
+                var cluster = clusters[gs[i]];
+                var res = cluster.Count;
+                res--;
+                res -= fs[i].Count;
+
+                foreach (var x in bs[i])
+                {
+                    if (cluster.Contains(x))
+                        res--;
+                }
+
+                Wr(res);
+            }
         }
 
         public long SolveLong()
@@ -207,6 +271,7 @@ namespace V
                 return false;
             }
         }
+        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> ts) => new HashSet<T>(ts.Distinct());
         public static long ToDigit(this char c) => (long)(c - '0');
         public static long ToSmallAbcIndex(this char c) => (long)(c - 'a');
         public static long ToLargeAbcIndex(this char c) => (long)(c - 'A');
