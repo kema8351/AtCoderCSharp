@@ -207,6 +207,41 @@ namespace V
                 return false;
             }
         }
+        public static void SafeSet<T>(this Dictionary<T, long> ts, T t, long value)
+        {
+            if (ts.ContainsKey(t))
+                ts[t] = value;
+            else
+                ts.Add(t, value);
+        }
+        public static void SafeAdd<T>(this Dictionary<T, long> ts, T t, long value)
+        {
+            if (ts.ContainsKey(t))
+                ts[t] += value;
+            else
+                ts.Add(t, value);
+        }
+        public static void SafeSub<T>(this Dictionary<T, long> ts, T t, long value)
+        {
+            if (ts.ContainsKey(t))
+                ts[t] -= value;
+            else
+                ts.Add(t, value);
+        }
+        public static void SafeMult<T>(this Dictionary<T, long> ts, T t, long value)
+        {
+            if (ts.ContainsKey(t))
+                ts[t] *= value;
+            else
+                ts.Add(t, value);
+        }
+        public static void SafeDiv<T>(this Dictionary<T, long> ts, T t, long value)
+        {
+            if (ts.ContainsKey(t))
+                ts[t] /= value;
+            else
+                ts.Add(t, value);
+        }
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> ts) => new HashSet<T>(ts.Distinct());
         public static long ToDigit(this char c) => (long)(c - '0');
         public static long ToSmallAbcIndex(this char c) => (long)(c - 'a');
@@ -217,7 +252,7 @@ namespace V
     {
         public class Tree
         {
-            public Tree() { to = new Dictionary<long, long[]>(); }
+            public Tree() { toNodes = new Dictionary<long, long[]>(); }
             public Tree(Scanner sc, long n, bool base1 = true, bool singleDirection = false) { Adjust(sc.Pairs(n), base1, singleDirection); }
             public Tree(Pair<long, long>[] edges, bool base1 = true, bool singleDirection = false) { Adjust(edges, base1, singleDirection); }
             public Tree(IEnumerable<long> ps, IEnumerable<long> qs, bool base1 = true, bool singleDirection = false) { Adjust(ps.Zip(qs, (p, q) => new Pair<long, long>(p, q)).ToArray(), base1, singleDirection); }
@@ -229,18 +264,63 @@ namespace V
                     : edges.Select(x => new { from = x.X, to = x.Y });
                 if (singleDirection == false)
                     arrows = arrows.Concat(arrows.Select(x => new { from = x.to, to = x.from }));
-                to = arrows.GroupBy(x => x.from).ToDictionary(x => x.Key, x => x.Select(xs => xs.to).ToArray());
+                toNodes = arrows.GroupBy(x => x.from).ToDictionary(x => x.Key, x => x.Select(xs => xs.to).ToArray());
             }
 
             private long[] empty = new long[0];
-            private Dictionary<long, long[]> to;
+            private Dictionary<long, long[]> toNodes;
             public long[] To(long from)
             {
                 long[] res = null;
-                if (to.TryGetValue(from, out res))
+                if (toNodes.TryGetValue(from, out res))
                     return res;
                 else
                     return empty;
+            }
+
+            public IEnumerable<Pair<long, long>> GetRouteEdges(long from, long to)
+            {
+                return GetRouteEdgesImpl(from, to).Skip(1);
+            }
+            private IEnumerable<Pair<long, long>> GetRouteEdgesImpl(long from, long to)
+            {
+                var routeNodes = GetRouteNodes(from, to);
+                var current = -1L;
+                foreach (var next in routeNodes)
+                {
+                    yield return new Pair<long, long>(current, next);
+                    current = next;
+                }
+
+            }
+            public IEnumerable<long> GetRouteNodes(long from, long to)
+            {
+                Stack<long> routeNodes = new Stack<long>();
+                HashSet<long> checkedNodes = new HashSet<long>();
+
+                GetRouteNodes(from, to, routeNodes, checkedNodes);
+
+                return routeNodes.Reverse();
+            }
+            private bool GetRouteNodes(long current, long dest, Stack<long> routeNodes, HashSet<long> checkedNodes)
+            {
+                routeNodes.Push(current);
+                checkedNodes.Add(current);
+
+                if (current == dest)
+                    return true;
+
+                foreach (var next in toNodes[current])
+                {
+                    if (checkedNodes.Contains(next))
+                        continue;
+
+                    if (GetRouteNodes(next, dest, routeNodes, checkedNodes))
+                        return true;
+                }
+
+                routeNodes.Pop();
+                return false;
             }
         }
         public class PriorityQueue<TKey, TState> where TKey : IComparable<TKey>
