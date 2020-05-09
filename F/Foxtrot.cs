@@ -9,8 +9,93 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            long n = Read;
+            var cs = sc.Pairs(n);
+
+            if (n == 2)
+            {
+                var x = cs[0].X - cs[1].X;
+                var y = cs[0].Y - cs[1].Y;
+                Write(Math.Sqrt(x * x + y * y) / 2d);
+                return;
+            }
+
+            var res = 0d;
+            foreach (var abc in C.IterTools.Combinations(cs, 3))
+            {
+                var p = abc[0];
+                var q = abc[1];
+                var r = abc[2];
+
+                long cc = (p.X - q.X) * (p.X - q.X) + (p.Y - q.Y) * (p.Y - q.Y);
+                long aa = (r.X - q.X) * (r.X - q.X) + (r.Y - q.Y) * (r.Y - q.Y);
+                long bb = (p.X - r.X) * (p.X - r.X) + (p.Y - r.Y) * (p.Y - r.Y);
+
+                bool isThree =
+                    cc < aa + bb &&
+                    aa < cc + bb &&
+                    bb < aa + cc;
+
+
+                double rr = 0d;
+                if (isThree)
+                {
+                    double x1 = 2 * p.X - 2 * q.X;
+                    double y1 = 2 * p.Y - 2 * q.Y;
+                    double e1 = p.X * p.X - q.X * q.X + p.Y * p.Y - q.Y * q.Y;
+
+                    double x2 = 2 * p.X - 2 * r.X;
+                    double y2 = 2 * p.Y - 2 * r.Y;
+                    double e2 = p.X * p.X - r.X * r.X + p.Y * p.Y - r.Y * r.Y;
+
+                    double x = 0d;
+                    double y = 0d;
+
+                    if (x1 == 0)
+                    {
+                        y = e1 / y1;
+                        x = (e2 - y * y2) / x2;
+                    }
+                    else if (x2 == 0)
+                    {
+                        y = e2 / y2;
+                        x = (e1 - y * y1) / x1;
+                    }
+                    else if (y1 == 0)
+                    {
+                        x = e1 / x1;
+                        y = (e2 - x * x2) / y2;
+                    }
+                    else if (y2 == 0)
+                    {
+                        x = e2 / x2;
+                        y = (e1 - x * x1) / y1;
+                    }
+                    else
+                    {
+                        double ratio = x1 / x2;
+                        var y2r = y2 * ratio;
+                        var e2r = e2 * ratio;
+
+                        var y0 = y1 - y2r;
+                        var e0 = e1 - e2r;
+
+                        y = e0 / y0;
+                        x = (e1 - y * y1) / x1;
+                    }
+
+                    rr = (p.X - x) * (p.X - x) + (p.Y - y) * (p.Y - y);
+                }
+                else
+                {
+                    rr = new double[] { cc, aa, bb }.Max() / 4d;
+                }
+
+
+                res = Math.Max(res, Math.Sqrt(rr));
+            }
+
+            Wr(res);
         }
 
         public long SolveLong()
@@ -250,6 +335,260 @@ namespace V
     }
     class C
     {
+        public class IterTools
+        {
+            /// <summary>
+            /// 組み合わせ（重複なし）
+            /// n = 4, k = 3 => (0,1,2) (0,1,3) (0,2,3) (1,2,3)
+            /// </summary>
+            public static IEnumerable<IReadOnlyList<long>> Combinations(long n, long k)
+            {
+                if (k <= 0)
+                    yield break;
+
+                long[] indices = new long[k];
+                long pointer = 0;
+
+                while (pointer >= 0)
+                {
+                    if (indices[pointer] < n)
+                    {
+                        if (pointer >= k - 1)
+                        {
+                            yield return indices;
+                            indices[pointer]++;
+                        }
+                        else
+                        {
+                            indices[pointer + 1] = indices[pointer] + 1;
+                            pointer++;
+                        }
+                    }
+                    else
+                    {
+                        pointer--;
+
+                        if (pointer >= 0)
+                            indices[pointer]++;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// 組み合わせ（重複なし）
+            /// n = 4, k = 3 => (0,1,2) (0,1,3) (0,2,3) (1,2,3)
+            /// </summary>
+            public static IEnumerable<IReadOnlyList<T>> Combinations<T>(T[] ts, long k)
+            {
+                if (k <= 0)
+                    yield break;
+
+                long[] indices = new long[k];
+                T[] container = new T[k];
+                long pointer = 0;
+                long n = ts.LongLength;
+
+                while (pointer >= 0)
+                {
+                    if (indices[pointer] < n)
+                    {
+                        container[pointer] = ts[indices[pointer]];
+
+                        if (pointer >= k - 1)
+                        {
+                            yield return container;
+                            indices[pointer]++;
+                        }
+                        else
+                        {
+                            indices[pointer + 1] = indices[pointer] + 1;
+                            pointer++;
+                        }
+                    }
+                    else
+                    {
+                        pointer--;
+
+                        if (pointer >= 0)
+                            indices[pointer]++;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// 組み合わせ（重複あり）
+            /// n = 3, k = 2 => (0,0) (0,1) (0,2) (1,0) (1,1) (1,2) (2,0) (2,1) (2,2) 
+            /// </summary>
+            public static IEnumerable<IReadOnlyList<long>> CombinationsWithReplacement(long n, long k)
+            {
+                if (k <= 0)
+                    yield break;
+
+                long[] container = new long[k];
+                long pointer = 0;
+
+                while (pointer >= 0)
+                {
+                    if (container[pointer] < n)
+                    {
+                        if (pointer >= k - 1)
+                        {
+                            yield return container;
+                            container[pointer]++;
+                        }
+                        else
+                        {
+                            container[pointer + 1] = 0;
+                            pointer++;
+                        }
+                    }
+                    else
+                    {
+                        pointer--;
+
+                        if (pointer >= 0)
+                            container[pointer]++;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// 組み合わせ（重複あり）
+            /// n = 3, k = 2 => (0,0) (0,1) (0,2) (1,0) (1,1) (1,2) (2,0) (2,1) (2,2) 
+            /// </summary>
+            public static IEnumerable<IReadOnlyList<T>> CombinationsWithReplacement<T>(T[] ts, long k)
+            {
+                if (k <= 0)
+                    yield break;
+
+                long[] indices = new long[k];
+                T[] container = new T[k];
+                long pointer = 0;
+                long n = ts.LongLength;
+
+                while (pointer >= 0)
+                {
+                    if (indices[pointer] < n)
+                    {
+                        container[pointer] = ts[indices[pointer]];
+
+                        if (pointer >= k - 1)
+                        {
+                            yield return container;
+                            indices[pointer]++;
+                        }
+                        else
+                        {
+                            indices[pointer + 1] = 0;
+                            pointer++;
+                        }
+                    }
+                    else
+                    {
+                        pointer--;
+
+                        if (pointer >= 0)
+                            indices[pointer]++;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// 順列
+            /// n = 3, k = 2 => (0,1) (0,2) (1,0) (1,2) (2,0) (2,1) 
+            /// </summary>
+            public static IEnumerable<IReadOnlyList<long>> Permutations(long n, long k)
+            {
+                if (k <= 0)
+                    yield break;
+
+                HashSet<long> enumed = new HashSet<long>();
+                long[] container = new long[k];
+                long pointer = 0;
+
+                while (pointer >= 0)
+                {
+                    if (container[pointer] < n)
+                    {
+                        if (enumed.Contains(container[pointer]))
+                        {
+                            container[pointer]++;
+                        }
+                        else if (pointer >= k - 1)
+                        {
+                            yield return container;
+                            container[pointer]++;
+                        }
+                        else
+                        {
+                            enumed.Add(container[pointer]);
+                            container[pointer + 1] = 0;
+                            pointer++;
+                        }
+                    }
+                    else
+                    {
+                        pointer--;
+
+                        if (pointer >= 0)
+                        {
+                            enumed.Remove(container[pointer]);
+                            container[pointer]++;
+                        }
+                    }
+                }
+            }
+
+            /// <summary>
+            /// 順列
+            /// n = 3, k = 2 => (0,1) (0,2) (1,0) (1,2) (2,0) (2,1) 
+            /// </summary>
+            public static IEnumerable<IReadOnlyList<T>> Permutations<T>(T[] ts, long k)
+            {
+                if (k <= 0)
+                    yield break;
+
+                HashSet<long> enumed = new HashSet<long>();
+                long[] indices = new long[k];
+                T[] container = new T[k];
+                long pointer = 0;
+                long n = ts.LongLength;
+
+                while (pointer >= 0)
+                {
+                    if (indices[pointer] < n)
+                    {
+                        if (enumed.Contains(indices[pointer]))
+                        {
+                            indices[pointer]++;
+                        }
+                        else if (pointer >= k - 1)
+                        {
+                            container[pointer] = ts[indices[pointer]];
+                            yield return container;
+                            indices[pointer]++;
+                        }
+                        else
+                        {
+                            container[pointer] = ts[indices[pointer]];
+                            enumed.Add(indices[pointer]);
+                            indices[pointer + 1] = 0;
+                            pointer++;
+                        }
+                    }
+                    else
+                    {
+                        pointer--;
+
+                        if (pointer >= 0)
+                        {
+                            enumed.Remove(indices[pointer]);
+                            indices[pointer]++;
+                        }
+                    }
+                }
+            }
+        }
         public class Tree
         {
             public Tree() { toNodes = new Dictionary<long, long[]>(); }
