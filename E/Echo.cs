@@ -15,8 +15,26 @@ namespace V
 
         public long SolveLong()
         {
-            long n = Read;
-            return 0;
+            var s = Str;
+            var res = new Mint(1);
+
+            for (long i = 0; i < s.Length - 1; i++)
+            {
+                res += Mint.Pow(3, i) * 2;
+            }
+
+            var add = new Mint(2);
+            for (long i = 1; i < s.Length; i++)
+            {
+                if (s[(int)i] == '1')
+                {
+                    res += Mint.Pow(3, s.Length - i - 1) * add;
+                    add *= 2;
+                }
+            }
+            res += add;
+
+            return res.Value;
         }
 
         public bool SolveBool()
@@ -1044,7 +1062,7 @@ namespace V
             var halfP = p / 2L;
             var halfPowered = PowImpl(a, halfP);
             var powered = halfPowered * halfPowered % divider;
-            return p % 2L == 0L ? powered : powered * a % divider;
+            return p % 2L == 0L ? powered : (powered * a) % divider;
         }
 
         public static Mint Inv(long a) => new Mint(InvImpl(a));
