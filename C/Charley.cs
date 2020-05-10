@@ -250,6 +250,260 @@ namespace V
     }
     class C
     {
+        public class IterTools
+        {
+            /// <summary>
+            /// 組み合わせ（重複なし）
+            /// n = 4, k = 3 => (0,1,2) (0,1,3) (0,2,3) (1,2,3)
+            /// </summary>
+            public static IEnumerable<IReadOnlyList<long>> Combinations(long n, long k)
+            {
+                if (k <= 0)
+                    yield break;
+
+                long[] indices = new long[k];
+                long pointer = 0;
+
+                while (pointer >= 0)
+                {
+                    if (indices[pointer] < n)
+                    {
+                        if (pointer >= k - 1)
+                        {
+                            yield return indices;
+                            indices[pointer]++;
+                        }
+                        else
+                        {
+                            indices[pointer + 1] = indices[pointer] + 1;
+                            pointer++;
+                        }
+                    }
+                    else
+                    {
+                        pointer--;
+
+                        if (pointer >= 0)
+                            indices[pointer]++;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// 組み合わせ（重複なし）
+            /// n = 4, k = 3 => (0,1,2) (0,1,3) (0,2,3) (1,2,3)
+            /// </summary>
+            public static IEnumerable<IReadOnlyList<T>> Combinations<T>(T[] ts, long k)
+            {
+                if (k <= 0)
+                    yield break;
+
+                long[] indices = new long[k];
+                T[] container = new T[k];
+                long pointer = 0;
+                long n = ts.LongLength;
+
+                while (pointer >= 0)
+                {
+                    if (indices[pointer] < n)
+                    {
+                        container[pointer] = ts[indices[pointer]];
+
+                        if (pointer >= k - 1)
+                        {
+                            yield return container;
+                            indices[pointer]++;
+                        }
+                        else
+                        {
+                            indices[pointer + 1] = indices[pointer] + 1;
+                            pointer++;
+                        }
+                    }
+                    else
+                    {
+                        pointer--;
+
+                        if (pointer >= 0)
+                            indices[pointer]++;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// 組み合わせ（重複あり）
+            /// n = 3, k = 2 => (0,0) (0,1) (0,2) (1,0) (1,1) (1,2) (2,0) (2,1) (2,2) 
+            /// </summary>
+            public static IEnumerable<IReadOnlyList<long>> CombinationsWithReplacement(long n, long k)
+            {
+                if (k <= 0)
+                    yield break;
+
+                long[] container = new long[k];
+                long pointer = 0;
+
+                while (pointer >= 0)
+                {
+                    if (container[pointer] < n)
+                    {
+                        if (pointer >= k - 1)
+                        {
+                            yield return container;
+                            container[pointer]++;
+                        }
+                        else
+                        {
+                            container[pointer + 1] = 0;
+                            pointer++;
+                        }
+                    }
+                    else
+                    {
+                        pointer--;
+
+                        if (pointer >= 0)
+                            container[pointer]++;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// 組み合わせ（重複あり）
+            /// n = 3, k = 2 => (0,0) (0,1) (0,2) (1,0) (1,1) (1,2) (2,0) (2,1) (2,2) 
+            /// </summary>
+            public static IEnumerable<IReadOnlyList<T>> CombinationsWithReplacement<T>(T[] ts, long k)
+            {
+                if (k <= 0)
+                    yield break;
+
+                long[] indices = new long[k];
+                T[] container = new T[k];
+                long pointer = 0;
+                long n = ts.LongLength;
+
+                while (pointer >= 0)
+                {
+                    if (indices[pointer] < n)
+                    {
+                        container[pointer] = ts[indices[pointer]];
+
+                        if (pointer >= k - 1)
+                        {
+                            yield return container;
+                            indices[pointer]++;
+                        }
+                        else
+                        {
+                            indices[pointer + 1] = 0;
+                            pointer++;
+                        }
+                    }
+                    else
+                    {
+                        pointer--;
+
+                        if (pointer >= 0)
+                            indices[pointer]++;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// 順列
+            /// n = 3, k = 2 => (0,1) (0,2) (1,0) (1,2) (2,0) (2,1) 
+            /// </summary>
+            public static IEnumerable<IReadOnlyList<long>> Permutations(long n, long k)
+            {
+                if (k <= 0)
+                    yield break;
+
+                HashSet<long> enumed = new HashSet<long>();
+                long[] container = new long[k];
+                long pointer = 0;
+
+                while (pointer >= 0)
+                {
+                    if (container[pointer] < n)
+                    {
+                        if (enumed.Contains(container[pointer]))
+                        {
+                            container[pointer]++;
+                        }
+                        else if (pointer >= k - 1)
+                        {
+                            yield return container;
+                            container[pointer]++;
+                        }
+                        else
+                        {
+                            enumed.Add(container[pointer]);
+                            container[pointer + 1] = 0;
+                            pointer++;
+                        }
+                    }
+                    else
+                    {
+                        pointer--;
+
+                        if (pointer >= 0)
+                        {
+                            enumed.Remove(container[pointer]);
+                            container[pointer]++;
+                        }
+                    }
+                }
+            }
+
+            /// <summary>
+            /// 順列
+            /// n = 3, k = 2 => (0,1) (0,2) (1,0) (1,2) (2,0) (2,1) 
+            /// </summary>
+            public static IEnumerable<IReadOnlyList<T>> Permutations<T>(T[] ts, long k)
+            {
+                if (k <= 0)
+                    yield break;
+
+                HashSet<long> enumed = new HashSet<long>();
+                long[] indices = new long[k];
+                T[] container = new T[k];
+                long pointer = 0;
+                long n = ts.LongLength;
+
+                while (pointer >= 0)
+                {
+                    if (indices[pointer] < n)
+                    {
+                        if (enumed.Contains(indices[pointer]))
+                        {
+                            indices[pointer]++;
+                        }
+                        else if (pointer >= k - 1)
+                        {
+                            container[pointer] = ts[indices[pointer]];
+                            yield return container;
+                            indices[pointer]++;
+                        }
+                        else
+                        {
+                            container[pointer] = ts[indices[pointer]];
+                            enumed.Add(indices[pointer]);
+                            indices[pointer + 1] = 0;
+                            pointer++;
+                        }
+                    }
+                    else
+                    {
+                        pointer--;
+
+                        if (pointer >= 0)
+                        {
+                            enumed.Remove(indices[pointer]);
+                            indices[pointer]++;
+                        }
+                    }
+                }
+            }
+        }
         public class Tree
         {
             public Tree() { toNodes = new Dictionary<long, long[]>(); }
