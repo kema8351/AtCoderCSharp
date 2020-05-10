@@ -16,7 +16,25 @@ namespace V
         public long SolveLong()
         {
             long n = Read;
-            return 0;
+            long k = Read;
+            var a = Arr(n);
+            var s = new long[n + 1];
+            s[0] = 0;
+            for (long i = 0; i < n; i++)
+            {
+                s[i + 1] = s[i] + a[i];
+            }
+
+            long res = 0L;
+            for (long i = 0; i < n; i++)
+            {
+                var t = s[i] + k;
+                var b = C.BinarySearch.GetFirstIndexGreater(t - 1, s);
+
+                res += Math.Max(0l, n - b + 1);
+            }
+
+            return res;
         }
 
         public bool SolveBool()
