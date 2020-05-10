@@ -15,8 +15,25 @@ namespace V
 
         public long SolveLong()
         {
+            Mint.Set998244353();
+
             long n = Read;
-            return 0;
+            long m = Read;
+            long k = Read;
+
+            var res = new Mint();
+
+            for (long i = 0; i <= k; i++)
+            {
+                long cn = n - 1;
+                long cr = cn - i;
+                var choose = Mint.Comb(cn, cr);
+                var x = new Mint(m) * Mint.Pow(m - 1, cr);
+
+                res += x * choose;
+            }
+
+            return res.Value;
         }
 
         public bool SolveBool()

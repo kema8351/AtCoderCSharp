@@ -16,7 +16,44 @@ namespace V
         public long SolveLong()
         {
             long n = Read;
-            return 0;
+            long m = Read;
+            long x = Read;
+
+            long[] cs = new long[n];
+            List<long>[] a = new List<long>[n];
+            for (int i = 0; i < n; i++)
+            {
+                cs[i] = Read;
+                a[i] = Arr(m).ToList();
+
+            }
+
+            var res = long.MaxValue;
+            foreach (var xx in C.IterTools.CombinationsWithReplacement(2, n))
+            {
+                var xs = new long[m];
+                var cand = 0L;
+                for (int i = 0; i < n; i++)
+                {
+                    if (xx[i] == 1)
+                    {
+                        for (int j = 0; j < m; j++)
+                        {
+                            xs[j] += a[i][j];
+                        }
+                        cand += cs[i];
+                    }
+                }
+
+                if (xs.All(xxx => xxx >= x))
+                {
+                    res = Math.Min(res, cand);
+                }
+
+            }
+
+
+            return res == long.MaxValue ? -1 : res;
         }
 
         public bool SolveBool()

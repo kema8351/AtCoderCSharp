@@ -15,8 +15,23 @@ namespace V
 
         public long SolveLong()
         {
-            long n = Read;
-            return 0;
+            long a = Read;
+            long b = Read;
+            long c = Read;
+            long k = Read;
+
+            var aa = Math.Min(a, k);
+            k -= aa;
+            if (k <= 0)
+                return aa;
+
+            var bb = Math.Min(b, k);
+            k -= bb;
+            if (k <= 0)
+                return aa;
+
+
+            return aa - k;
         }
 
         public bool SolveBool()

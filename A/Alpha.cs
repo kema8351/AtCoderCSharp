@@ -9,8 +9,8 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            //Write(SolveLong());
+            YesNo(SolveBool());
         }
 
         public long SolveLong()
@@ -21,8 +21,11 @@ namespace V
 
         public bool SolveBool()
         {
-            long n = Read;
-            return false;
+            var s = Str;
+            var t = Str;
+
+
+            return s.Zip(t, (c1, c2) => c1 == c2).All(x => x);
         }
     }
 }

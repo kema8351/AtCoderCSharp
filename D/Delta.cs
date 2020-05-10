@@ -9,14 +9,45 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
+            Write(SolveLong() + 1);
             //YesNo(SolveBool());
         }
 
         public long SolveLong()
         {
             long n = Read;
-            return 0;
+            long k = Read;
+            var a = Arr(n).Select(x => x - 1).ToArray();
+            var st = new Dictionary<long, long>();
+            var d = new long[n];
+            d[0] = 0;
+            var pointer = 0L;
+
+            long loopBegin = -1L;
+            long loopDistance = 0L;
+
+            while (true)
+            {
+                if (st.ContainsKey(d[pointer]) == false)
+                    st.Add(d[pointer], pointer);
+                else
+                {
+                    loopBegin = st[d[pointer]];
+                    loopDistance = pointer - loopBegin;
+                    break;
+                }
+
+                var next = a[d[pointer]];
+                pointer++;
+                d[pointer] = next;
+            }
+
+            if (k < loopBegin)
+                return d[k];
+            else
+                return d[(k - loopBegin) % loopDistance + loopBegin];
+
+
         }
 
         public bool SolveBool()

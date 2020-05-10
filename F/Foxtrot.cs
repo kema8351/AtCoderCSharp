@@ -9,8 +9,8 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            //Write(SolveLong());
+            YesNo(SolveBool());
         }
 
         public long SolveLong()
@@ -22,8 +22,53 @@ namespace V
         public bool SolveBool()
         {
             long n = Read;
-            return false;
+            var s = ArrStr(n);
+            var p = s.Select(x => Convert(x)).ToArray();
+
+            if (p.Select(x => x.final).Sum() != 0)
+                return false;
+
+            var current = 0L;
+            var stage1 = p.Where(x => x.final > 0).OrderByDescending(x => x.min);
+            foreach (var x in stage1)
+            {
+                if (current + x.min < 0)
+                    return false;
+
+                current += x.final;
+            }
+
+
+            var stage2 = p.Where(x => x.final <= 0).OrderBy(x => x.min - x.final).ThenByDescending(x => x.min);
+            foreach (var x in stage2)
+            {
+                if (current + x.min < 0)
+                    return false;
+
+                current += x.final;
+            }
+
+            return true;
         }
+
+        (int min, int final) Convert(string s)
+        {
+            var min = 0;
+            var final = 0;
+
+            foreach (var c in s)
+            {
+                if (c == '(')
+                    final++;
+                else
+                    final--;
+
+                min = Math.Min(min, final);
+            }
+
+            return (min, final);
+        }
+
     }
 }
 namespace V
