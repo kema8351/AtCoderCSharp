@@ -16,7 +16,22 @@ namespace V
         public long SolveLong()
         {
             long n = Read;
-            return 0;
+            long m = Read;
+            var a = Arr(m).ToHashSet();
+            Mint[] ms = new Mint[n + 2];
+            ms[0] = new Mint(1);
+
+            for (long i = 0; i < n; i++)
+            {
+                for (long j = 0; j < 2; j++)
+                {
+                    var next = i + j + 1;
+                    if (a.Contains(next) == false)
+                        ms[next] += ms[i];
+                }
+            }
+
+            return ms[n].Value;
         }
 
         public bool SolveBool()
