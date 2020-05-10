@@ -15,8 +15,49 @@ namespace V
 
         public long SolveLong()
         {
-            long n = Read;
-            return 0;
+            var n = ReadInt;
+            string s = Str;
+            bool[,] bs = new bool[n, n];
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = i + 1; j < n; j++)
+                {
+                    bs[i, j] = s[i] == s[j];
+                }
+            }
+
+            var res = 0;
+
+            for (int ji = 1; ji < n; ji++)
+            {
+                int bgI = -1;
+                int bgJ = 0;
+                for (int i = 0; i < n - ji; i++)
+                {
+                    var j = ji + i;
+                    if (bs[i, j])
+                    {
+                        if (bgI < 0)
+                        {
+                            bgI = i;
+                            bgJ = j;
+                        }
+
+                        if (bgJ <= i)
+                            bgI++;
+
+                        var cand = i - bgI + 1;
+                        res = Math.Max(res, cand);
+
+                    }
+                    else
+                    {
+                        bgI = -1;
+                    }
+                }
+            }
+
+            return res;
         }
 
         public bool SolveBool()
