@@ -16,7 +16,50 @@ namespace V
         public long SolveLong()
         {
             long n = Read;
-            return 0;
+            long m = Read;
+            var s = Arr(n);
+            var t = Arr(m);
+
+            Mint[,,] dp = new Mint[n + 2, m + 2, 4];
+
+            for (long i = 0; i <= n; i++)
+                dp[i, 0, 0] = new Mint(1);
+
+            for (long i = 0; i <= m; i++)
+                dp[0, i, 0] = new Mint(1);
+
+            for (long ss = 0; ss <= n; ss++)
+            {
+                for (long tt = 0; tt <= m; tt++)
+                {
+                    dp[ss + 1, tt + 1, 0] += dp[ss, tt, 0];
+                    dp[ss + 1, tt + 1, 0] += dp[ss, tt, 1];
+                    dp[ss + 1, tt + 1, 0] += dp[ss, tt, 2];
+                    dp[ss + 1, tt + 1, 0] += dp[ss, tt, 3];
+
+                    dp[ss + 1, tt, 1] += dp[ss, tt, 1];
+                    dp[ss + 1, tt, 1] += dp[ss, tt, 3];
+
+                    dp[ss, tt + 1, 2] += dp[ss, tt, 2];
+                    dp[ss, tt + 1, 2] += dp[ss, tt, 3];
+
+                    if (ss < n && tt < m && s[ss] == t[tt])
+                    {
+                        dp[ss + 1, tt + 1, 3] += dp[ss, tt, 0];
+                        dp[ss + 1, tt + 1, 3] += dp[ss, tt, 1];
+                        dp[ss + 1, tt + 1, 3] += dp[ss, tt, 2];
+                        dp[ss + 1, tt + 1, 3] += dp[ss, tt, 3];
+                    }
+                }
+            }
+
+            var res = new Mint();
+            res += dp[n, m, 0];
+            res += dp[n, m, 1];
+            res += dp[n, m, 2];
+            res += dp[n, m, 3];
+
+            return res.Value;
         }
 
         public bool SolveBool()
