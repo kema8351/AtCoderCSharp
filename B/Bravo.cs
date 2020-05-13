@@ -16,7 +16,64 @@ namespace V
         public long SolveLong()
         {
             long n = Read;
-            return 0;
+            long m = Read;
+            long v = Read;
+            long p = Read;
+            var a = Arr(n);
+            var s = a.GroupBy(x => x).Select(x => new Step() { point = x.Key, count = x.Count() }).OrderByDescending(x => x.point).ToArray();
+
+            var cs = 0L;
+            var res = 0L;
+            var pointRankP = -1L;
+            var absorbable = 0L;
+
+            for (long i = 0; i < s.LongLength; i++)
+            {
+                var remaining = n - cs;
+
+                if (cs < p)
+                {
+                    res += s[i].count;
+                }
+                else if (s[i].point + m < pointRankP)
+                {
+                    // cannot select
+                }
+                else if (remaining + p - 1 >= v)
+                {
+                    res += s[i].count;
+                }
+                else
+                {
+                    var arrival = s[i].point + m;
+                    var midQuestion = n - remaining - (p - 1);
+                    var surplus = (v - (remaining + p - 1)) * m;
+                    var midAdditional = (surplus - absorbable) / midQuestion;
+                    if ((surplus - absorbable) % midQuestion > 0)
+                        midAdditional++;
+
+                    if (arrival >= midAdditional + pointRankP)
+                        res += s[i].count;
+                }
+
+                cs += s[i].count;
+                if (pointRankP >= 0)
+                {
+                    absorbable += (pointRankP - s[i].point) * s[i].count;
+                }
+                else if (/*pointRankP < 0 && */cs >= p)
+                {
+                    pointRankP = s[i].point;
+                }
+            }
+
+            return res;
+        }
+
+        public class Step
+        {
+            public long point;
+            public long count;
         }
 
         public bool SolveBool()
