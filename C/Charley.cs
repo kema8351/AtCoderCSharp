@@ -708,24 +708,29 @@ namespace V
         }
         public static class BinarySearch
         {
-            public static long GetFirstIndexGreater(long x, IReadOnlyList<long> listOrdered)
+            public static long GetFirstIndexGreater<T>(T x, IList<T> listOrdered) where T : IComparable
+            {
+                return GetFirstIndexGreater(x, listOrdered, 0, listOrdered.Count - 1);
+            }
+            public static long GetFirstIndexGreater<T, TValue>(T x, SortedList<T, TValue> sortedList) where T : IComparable
+            {
+                return GetFirstIndexGreater(x, sortedList.Keys);
+            }
+            public static long GetFirstIndexGreater<T>(T x, IList<T> listOrdered, int low, int high) where T : IComparable
             {
                 var count = listOrdered.Count;
 
                 if (count == 0)
-                    return 0;
+                    return low;
 
-                if (listOrdered[count - 1] <= x)
-                    return count;
-
-                int low = 0;
-                int high = listOrdered.Count - 1;
+                if (listOrdered[high].CompareTo(x) <= 0)
+                    return high + 1;
 
                 while (low < high)
                 {
                     var mid = (low + high) / 2;
 
-                    if (listOrdered[mid] > x)
+                    if (listOrdered[mid].CompareTo(x) > 0)
                         high = mid;
                     else
                         low = mid + 1;
@@ -733,74 +738,29 @@ namespace V
 
                 return low;
             }
-            public static long GetFirstIndexGreater(int x, IReadOnlyList<int> listOrdered)
+            public static long GetLastIndexLess<T>(T x, IList<T> listOrdered) where T : IComparable
             {
-                var count = listOrdered.Count;
-
-                if (count == 0)
-                    return 0;
-
-                if (listOrdered[count - 1] <= x)
-                    return count;
-
-                int low = 0;
-                int high = listOrdered.Count - 1;
-
-                while (low < high)
-                {
-                    var mid = (low + high) / 2;
-
-                    if (listOrdered[mid] > x)
-                        high = mid;
-                    else
-                        low = mid + 1;
-                }
-
-                return low;
+                return GetLastIndexLess(x, listOrdered, 0, listOrdered.Count - 1);
             }
-            public static long GetLastIndexLess(long x, IReadOnlyList<long> listOrdered)
+            public static long GetLastIndexLess<T, TValue>(T x, SortedList<T, TValue> sortedList) where T : IComparable
+            {
+                return GetLastIndexLess(x, sortedList.Keys);
+            }
+            public static long GetLastIndexLess<T>(T x, IList<T> listOrdered, int low, int high) where T : IComparable
             {
                 var count = listOrdered.Count;
 
                 if (count == 0)
-                    return -1;
+                    return low - 1;
 
-                if (listOrdered[0] >= x)
-                    return -1;
-
-                int low = 0;
-                int high = listOrdered.Count - 1;
+                if (listOrdered[0].CompareTo(x) >= 0)
+                    return low - 1;
 
                 while (low < high)
                 {
                     var mid = (low + high + 1) / 2;
 
-                    if (listOrdered[mid] < x)
-                        low = mid;
-                    else
-                        high = mid - 1;
-                }
-
-                return low;
-            }
-            public static long GetLastIndexLess(int x, IReadOnlyList<int> listOrdered)
-            {
-                var count = listOrdered.Count;
-
-                if (count == 0)
-                    return -1;
-
-                if (listOrdered[0] >= x)
-                    return -1;
-
-                int low = 0;
-                int high = listOrdered.Count - 1;
-
-                while (low < high)
-                {
-                    var mid = (low + high + 1) / 2;
-
-                    if (listOrdered[mid] < x)
+                    if (listOrdered[mid].CompareTo(x) < 0)
                         low = mid;
                     else
                         high = mid - 1;
