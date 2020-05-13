@@ -15,8 +15,95 @@ namespace V
 
         public long SolveLong()
         {
-            long n = Read;
-            return 0;
+            int n = ReadInt;
+            var ps = ArrInt(n);
+
+            // key = numeric, value = index
+            Dictionary<int, int> dic = ps.Select((x, i) => new { x, i }).ToDictionary(x => x.x, x => x.i);
+
+            int[] left = Enumerable.Repeat(-1, n).ToArray();
+            int[] right = Enumerable.Repeat(-1, n).ToArray();
+
+
+            int current = n - 1;
+            int[] summits = new int[n];
+            summits[n - 1] = ps[0];
+            for (int i = 1; i < n; i++)
+            {
+                var p = ps[i];
+
+                var firstUpper = C.BinarySearch.GetFirstIndexGreater(p, summits, current, n - 1);
+                if (firstUpper < n)
+                {
+                    left[i] = dic[summits[firstUpper]];
+                }
+
+                for (int j = current; j < n; j++)
+                {
+                    if (summits[j] < p)
+                        current++;
+                    else
+                        break;
+
+                }
+
+                current--;
+                summits[current] = p;
+            }
+
+            current = n - 1;
+            summits = new int[n];
+            summits[n - 1] = ps[n - 1];
+            for (int i = n - 2; i >= 0; i--)
+            {
+                var p = ps[i];
+
+                var firstUpper = C.BinarySearch.GetFirstIndexGreater(p, summits, current, n - 1);
+                if (firstUpper < n)
+                {
+                    right[i] = dic[summits[firstUpper]];
+                }
+
+                for (int j = current; j < n; j++)
+                {
+                    if (summits[j] < p)
+                        current++;
+                    else
+                        break;
+
+                }
+
+                current--;
+                summits[current] = p;
+            }
+
+            int first = dic[n];
+            int second = dic[n - 1];
+            long min12 = Math.Min(first, second);
+            long max12 = Math.Max(first, second);
+
+            long wayCount = (min12 + 1) * (n - max12);
+            long res = wayCount * (n - 1);
+            long full = n * (n - 1) / 2;
+
+            for (int i = n - 2; i >= 1; i--)
+            {
+                var idx = dic[i];
+                var l = left[idx];
+                var r = right[idx];
+                r = r < 0 ? n : r;
+
+                var notDis = (r - 1 - (l + 1) + 1);
+                var not = notDis * (notDis - 1) / 2;
+                var pos = full - not;
+
+                var w = pos - wayCount;
+
+                wayCount += w;
+                res += i * w;
+            }
+
+            return res;
         }
 
         public bool SolveBool()
@@ -708,24 +795,25 @@ namespace V
         }
         public static class BinarySearch
         {
-            public static long GetFirstIndexGreater(long x, IReadOnlyList<long> listOrdered)
+            public static long GetFirstIndexGreater<T>(T x, IReadOnlyList<T> listOrdered) where T : IComparable
+            {
+                return GetFirstIndexGreater(x, listOrdered, 0, listOrdered.Count - 1);
+            }
+            public static long GetFirstIndexGreater<T>(T x, IReadOnlyList<T> listOrdered, int low, int high) where T : IComparable
             {
                 var count = listOrdered.Count;
 
                 if (count == 0)
-                    return 0;
+                    return low;
 
-                if (listOrdered[count - 1] <= x)
-                    return count;
-
-                int low = 0;
-                int high = listOrdered.Count - 1;
+                if (listOrdered[high].CompareTo(x) <= 0)
+                    return high + 1;
 
                 while (low < high)
                 {
                     var mid = (low + high) / 2;
 
-                    if (listOrdered[mid] > x)
+                    if (listOrdered[mid].CompareTo(x) > 0)
                         high = mid;
                     else
                         low = mid + 1;
@@ -733,74 +821,25 @@ namespace V
 
                 return low;
             }
-            public static long GetFirstIndexGreater(int x, IReadOnlyList<int> listOrdered)
+            public static long GetLastIndexLess<T>(T x, IReadOnlyList<T> listOrdered) where T : IComparable
             {
-                var count = listOrdered.Count;
-
-                if (count == 0)
-                    return 0;
-
-                if (listOrdered[count - 1] <= x)
-                    return count;
-
-                int low = 0;
-                int high = listOrdered.Count - 1;
-
-                while (low < high)
-                {
-                    var mid = (low + high) / 2;
-
-                    if (listOrdered[mid] > x)
-                        high = mid;
-                    else
-                        low = mid + 1;
-                }
-
-                return low;
+                return GetLastIndexLess(x, listOrdered, 0, listOrdered.Count - 1);
             }
-            public static long GetLastIndexLess(long x, IReadOnlyList<long> listOrdered)
+            public static long GetLastIndexLess<T>(T x, IReadOnlyList<T> listOrdered, int low, int high) where T : IComparable
             {
                 var count = listOrdered.Count;
 
                 if (count == 0)
-                    return -1;
+                    return low - 1;
 
-                if (listOrdered[0] >= x)
-                    return -1;
-
-                int low = 0;
-                int high = listOrdered.Count - 1;
+                if (listOrdered[0].CompareTo(x) >= 0)
+                    return low - 1;
 
                 while (low < high)
                 {
                     var mid = (low + high + 1) / 2;
 
-                    if (listOrdered[mid] < x)
-                        low = mid;
-                    else
-                        high = mid - 1;
-                }
-
-                return low;
-            }
-            public static long GetLastIndexLess(int x, IReadOnlyList<int> listOrdered)
-            {
-                var count = listOrdered.Count;
-
-                if (count == 0)
-                    return -1;
-
-                if (listOrdered[0] >= x)
-                    return -1;
-
-                int low = 0;
-                int high = listOrdered.Count - 1;
-
-                while (low < high)
-                {
-                    var mid = (low + high + 1) / 2;
-
-                    if (listOrdered[mid] < x)
+                    if (listOrdered[mid].CompareTo(x) < 0)
                         low = mid;
                     else
                         high = mid - 1;

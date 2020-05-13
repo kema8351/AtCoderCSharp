@@ -9,7 +9,10 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
+            var s = Str;
+            Wr(new string(s.Select(x => x == '1' ? '9' : '1').ToArray()));
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
