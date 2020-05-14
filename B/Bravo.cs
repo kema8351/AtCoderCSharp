@@ -15,8 +15,17 @@ namespace V
 
         public long SolveLong()
         {
-            long n = Read;
-            return 0;
+            var s = Str;
+            long n = s.Length;
+            var dic = s.GroupBy(x => x).Select(x => x.Count()).ToArray();
+            var res = n * (n - 1) / 2 + 1;
+
+            foreach (var x in dic)
+            {
+                res -= x * (x - 1) / 2;
+            }
+
+            return res;
         }
 
         public bool SolveBool()
