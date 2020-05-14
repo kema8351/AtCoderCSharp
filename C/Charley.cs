@@ -712,10 +712,6 @@ namespace V
             {
                 return GetFirstIndexGreater(x, listOrdered, 0, listOrdered.Count - 1);
             }
-            public static long GetFirstIndexGreater<T, TValue>(T x, SortedList<T, TValue> sortedList) where T : IComparable
-            {
-                return GetFirstIndexGreater(x, sortedList.Keys);
-            }
             public static long GetFirstIndexGreater<T>(T x, IList<T> listOrdered, int low, int high) where T : IComparable
             {
                 var count = listOrdered.Count;
@@ -741,10 +737,6 @@ namespace V
             public static long GetLastIndexLess<T>(T x, IList<T> listOrdered) where T : IComparable
             {
                 return GetLastIndexLess(x, listOrdered, 0, listOrdered.Count - 1);
-            }
-            public static long GetLastIndexLess<T, TValue>(T x, SortedList<T, TValue> sortedList) where T : IComparable
-            {
-                return GetLastIndexLess(x, sortedList.Keys);
             }
             public static long GetLastIndexLess<T>(T x, IList<T> listOrdered, int low, int high) where T : IComparable
             {
