@@ -16,7 +16,65 @@ namespace V
         public long SolveLong()
         {
             long n = Read;
-            return 0;
+            long k = Read;
+            var p = Arr(n);
+
+            //n = 2000000;
+            //k = 1000000;
+            //p = Enumerable.Range(0, (int)n).Select(x => (long)x).ToArray();
+
+            long[] indices = new long[n];
+            for (long i = 0; i < n; i++)
+            {
+                indices[p[i]] = i;
+            }
+
+            bool[] noChanges = new bool[n];
+            {
+                var continued = 0L;
+
+                for (long i = 0; i < n - 1; i++)
+                {
+                    if (p[i] < p[i + 1])
+                        continued++;
+                    else
+                        continued = 0;
+
+                    if (continued >= k - 1)
+                        noChanges[i - (k - 2)] = true;
+                }
+            }
+
+            var partialSet = new SortedSet<long>();
+            for (long i = 0; i < k; i++)
+            {
+                partialSet.Add(p[i]);
+            }
+
+            long res = noChanges[0] ? 0 : 1;
+            for (long i = 1; i + k <= n; i++)
+            {
+                var p0 = p[i - 1];
+                var p0Min = partialSet.Min == p0;
+                partialSet.Remove(p0);
+
+                var pk = p[i + k - 1];
+                partialSet.Add(pk);
+                var pkMax = (partialSet.Max == pk);
+
+                if (p0Min && pkMax)
+                    continue;
+
+                if (noChanges[i])
+                    continue;
+
+                res++;
+            }
+
+            if (noChanges.Any(x => x))
+                res++;
+
+            return res;
         }
 
         public bool SolveBool()
@@ -712,10 +770,6 @@ namespace V
             {
                 return GetFirstIndexGreater(x, listOrdered, 0, listOrdered.Count - 1);
             }
-            public static long GetFirstIndexGreater<T, TValue>(T x, SortedList<T, TValue> sortedList) where T : IComparable
-            {
-                return GetFirstIndexGreater(x, sortedList.Keys);
-            }
             public static long GetFirstIndexGreater<T>(T x, IList<T> listOrdered, int low, int high) where T : IComparable
             {
                 var count = listOrdered.Count;
@@ -741,10 +795,6 @@ namespace V
             public static long GetLastIndexLess<T>(T x, IList<T> listOrdered) where T : IComparable
             {
                 return GetLastIndexLess(x, listOrdered, 0, listOrdered.Count - 1);
-            }
-            public static long GetLastIndexLess<T, TValue>(T x, SortedList<T, TValue> sortedList) where T : IComparable
-            {
-                return GetLastIndexLess(x, sortedList.Keys);
             }
             public static long GetLastIndexLess<T>(T x, IList<T> listOrdered, int low, int high) where T : IComparable
             {

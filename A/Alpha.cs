@@ -16,7 +16,78 @@ namespace V
         public long SolveLong()
         {
             long n = Read;
-            return 0;
+            long k = Read;
+            var p = Arr(n);
+
+            n = 2000000;
+            k = 1000000;
+            p = Enumerable.Range(0, (int)n).Select(x => (long)x).ToArray();
+
+            long[] indices = new long[n];
+            for (long i = 0; i < n; i++)
+            {
+                indices[p[i]] = i;
+            }
+
+
+            bool[] noChanges = new bool[n];
+            {
+                var continued = 0L;
+
+                for (long i = 0; i < n - 1; i++)
+                {
+                    if (p[i] < p[i + 1])
+                        continued++;
+                    else
+                        continued = 0;
+
+                    if (continued >= k - 1)
+                        noChanges[i - (k - 2)] = true;
+                }
+            }
+
+            var upperIndices = new SortedList<long, long>();
+            long[] leftUppers = new long[n];
+            for (long i = n - 1; i >= 0; i--)
+            {
+                upperIndices.Add(indices[i]);
+
+                var idx = C.BinarySearch.GetLastIndexLess(indices[i], upperIndices);
+                leftUppers[i] = (idx < 0 || idx >= upperIndices.Count) ? -1 : upperIndices.Keys[(int)idx];
+            }
+
+            var lowerIndices = new SortedList<long, long>();
+            long[] rightLowers = new long[n];
+            for (long i = 0; i < n; i++)
+            {
+                lowerIndices.Add(indices[i], i);
+
+                var idx = C.BinarySearch.GetFirstIndexGreater(indices[i], lowerIndices);
+                rightLowers[i] = (idx < 0 || idx >= lowerIndices.Count) ? n : lowerIndices.Keys[(int)idx];
+            }
+
+            long res = noChanges[0] ? 0 : 1;
+            for (long i = 1; i + k <= n; i++)
+            {
+                var p0 = p[i - 1];
+                var p0Min = (rightLowers[p0] >= i - 1 + k);
+
+                var pk = p[i + k - 1];
+                var pkMax = (leftUppers[pk] < i);
+
+                if (p0Min && pkMax)
+                    continue;
+
+                if (noChanges[i])
+                    continue;
+
+                res++;
+            }
+
+            if (noChanges.Any(x => x))
+                res++;
+
+            return res;
         }
 
         public bool SolveBool()
