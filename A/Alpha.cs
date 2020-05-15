@@ -9,20 +9,75 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var t = Read;
+            for (var i = 0; i < t; i++)
+            {
+                YesNo(Slv(new Query { initial = Read, buy = Read, threshold = Read, add = Read }));
+            }
+
         }
 
-        public long SolveLong()
+        bool Slv(Query q)
         {
-            long n = Read;
-            return 0;
+            if (q.initial < q.buy)
+                return false;
+
+            if (q.buy > q.add)
+                return false;
+
+            if (q.buy == q.add)
+            {
+                var rem = q.initial % q.buy;
+                return rem <= q.threshold;
+            }
+
+            if (q.threshold >= q.buy)
+            {
+                return true;
+                //return q.initial >= q.buy;
+            }
+
+            var dailyAdd = q.add - q.buy;
+            var firstAddBefore = q.initial % q.buy;
+            if (q.threshold < firstAddBefore)
+                return false;
+
+            var firstOverThreshold = firstAddBefore + (q.threshold - firstAddBefore) / dailyAdd * dailyAdd;
+            if (firstOverThreshold <= q.threshold)
+                firstOverThreshold += dailyAdd;
+
+            if (firstOverThreshold < q.buy)
+                return false;
+
+            var firstOverThresholdAfter = firstOverThreshold % q.buy;
+            var secondtOverThreshold = firstOverThresholdAfter + (q.threshold - firstOverThresholdAfter) / dailyAdd * dailyAdd;
+            if (secondtOverThreshold <= q.threshold)
+                secondtOverThreshold += dailyAdd;
+
+            if (secondtOverThreshold < q.buy)
+                return false;
+
+            var diff = Math.Abs(firstOverThreshold - secondtOverThreshold);
+            if (diff == 0)
+                return true;
+
+            var gcd = C.Gcd(diff, dailyAdd);
+
+            var re = firstOverThreshold - q.threshold;
+            var re1 = re / gcd;
+            var re2 = re - re1 * gcd;
+            if (re2 == q.threshold && re1 > 0)
+                re2 += gcd;
+
+            return re2 >= q.buy;
         }
 
-        public bool SolveBool()
+        public class Query
         {
-            long n = Read;
-            return false;
+            public long initial;
+            public long buy;
+            public long threshold;
+            public long add;
         }
     }
 }

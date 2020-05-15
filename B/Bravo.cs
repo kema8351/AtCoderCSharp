@@ -9,20 +9,50 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var t = Read;
+            for (var i = 0; i < t; i++)
+            {
+                YesNo(Slv(new Query { initial = Read, buy = Read, threshold = Read, add = Read }));
+            }
+
         }
 
-        public long SolveLong()
+        bool Slv(Query q)
         {
-            long n = Read;
-            return 0;
+            if (q.initial < q.buy)
+                return false;
+
+            if (q.buy > q.add)
+                return false;
+
+            if (q.buy == q.add)
+            {
+                var rem = q.initial % q.buy;
+                return rem <= q.threshold;
+            }
+
+            if (q.threshold >= q.buy)
+            {
+                return true;
+                //return q.initial >= q.buy;
+            }
+
+            var min = q.threshold + 1 - q.buy;
+            var max = min + q.add;
+            var gcd = C.Gcd(q.buy, q.add);
+            var first = q.initial % q.buy;
+            var diff = first - min;
+            var final = first - diff / gcd * gcd;
+
+            return final >= 0;
         }
 
-        public bool SolveBool()
+        public class Query
         {
-            long n = Read;
-            return false;
+            public long initial;
+            public long buy;
+            public long threshold;
+            public long add;
         }
     }
 }
