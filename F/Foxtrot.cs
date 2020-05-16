@@ -15,13 +15,13 @@ namespace V
 
         public long SolveLong()
         {
-            long n = Read;
+            var n = Read;
             return 0;
         }
 
         public bool SolveBool()
         {
-            long n = Read;
+            var n = Read;
             return false;
         }
     }
@@ -247,6 +247,19 @@ namespace V
         public static long ToSmallAbcIndex(this char c) => (long)(c - 'a');
         public static long ToLargeAbcIndex(this char c) => (long)(c - 'A');
         public static long Count<T1, T2>(this IGrouping<T1, T2> gs) => gs.LongCount();
+        public static string ToStr(this IEnumerable<char> cs) => new string(cs.ToArray());
+        public static long ToLong(this IEnumerable<char> s)
+        {
+            var basis = 1L;
+            var res = 0L;
+            foreach (var c in s)
+            {
+                var d = c.ToSmallAbcIndex() + 1;
+                res += d * basis;
+                basis *= 27;
+            }
+            return res;
+        }
     }
     class C
     {
