@@ -15,9 +15,47 @@ namespace V
 
         public long SolveLong()
         {
-            long n = Read;
-            return 0;
+            int n = ReadInt;
+            string s = Str;
+
+            var left = Enumerate(s.Substring(0, n)).GroupBy(x => x).ToDictionary(x => x.Key, x => x.LongCount());
+            var right = Enumerate(s.Substring(n, n).Reverse().ToStr()).GroupBy(x => x).ToDictionary(x => x.Key, x => x.LongCount());
+
+            var res = left.Sum(x => right.ContainsKey(x.Key) ? right[x.Key] * x.Value : 0L);
+
+            return res;
         }
+
+        IEnumerable<long> Enumerate(string s)
+        {
+            for (long i = 0; i < 1 << s.Length; i++)
+            {
+                List<char> cs = new List<char>();
+
+                for (int j = 0; j < s.Length; j++)
+                {
+                    if ((i & 1L << j) == 0)
+                    {
+                        cs.Add(s[j]);
+                    }
+                }
+
+                int first = cs.Count;
+
+                for (int j = s.Length; j >= 0; j--)
+                {
+                    if ((i & 1L << j) != 0)
+                    {
+                        cs.Add(s[j]);
+                    }
+                }
+
+                var res = cs.ToLong() * 17 + first;
+
+                yield return res;
+            }
+        }
+
 
         public bool SolveBool()
         {
@@ -247,6 +285,19 @@ namespace V
         public static long ToSmallAbcIndex(this char c) => (long)(c - 'a');
         public static long ToLargeAbcIndex(this char c) => (long)(c - 'A');
         public static long Count<T1, T2>(this IGrouping<T1, T2> gs) => gs.LongCount();
+        public static string ToStr(this IEnumerable<char> cs) => new string(cs.ToArray());
+        public static long ToLong(this IEnumerable<char> s)
+        {
+            var basis = 1L;
+            var res = 0L;
+            foreach (var c in s)
+            {
+                var d = c.ToSmallAbcIndex() + 1;
+                res += d * basis;
+                basis *= 27;
+            }
+            return res;
+        }
     }
     class C
     {

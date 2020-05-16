@@ -16,8 +16,70 @@ namespace V
         public long SolveLong()
         {
             long n = Read;
-            return 0;
+            string s = Str;
+
+            if (s.GroupBy(x => x).Any(x => x.Count() % 2 == 1))
+                return 0;
+
+            long res = 0;
+            var c = new long[2 * n];
+            Slv(s, -1, -1, c, 1, ref res);
+            return res;
         }
+
+        void Slv(string s, long blue, long red, long[] prevColors, long add, ref long res)
+        {
+            var colors = prevColors.ToArray();
+
+            if (blue >= 0)
+            {
+
+                colors[blue] = 1;
+                colors[red] = 2;
+
+                var last = s.Length - 1;
+                var first = 0;
+
+                while (last > red)
+                {
+                    if (colors[last] == 0)
+                    {
+                        colors[last] = 1;
+
+                        while (true)
+                        {
+                            if (colors[first] == 0)
+                            {
+                                if (s[last] != s[first])
+                                    return;
+
+                                colors[first] = 2;
+                                first++;
+                                break;
+                            }
+
+                            first++;
+                        }
+                    }
+
+                    last--;
+                }
+
+                if (colors.All(x => x != 0))
+                {
+                    res += add;
+                    return;
+                }
+            }
+
+            var firstEmpty = colors.Select((x, i) => new { x, i }).FirstOrDefault(x => x.x == 0).i;
+            for (int i = firstEmpty + 1; i < s.Length; i++)
+            {
+                if (s[firstEmpty] == s[i] && colors[i] == 0)
+                    Slv(s, firstEmpty, i, colors, add * 2, ref res);
+            }
+        }
+
 
         public bool SolveBool()
         {
