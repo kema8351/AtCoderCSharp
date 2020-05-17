@@ -16,7 +16,44 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var m = Read;
+            var s = new List<long[]>();
+
+            foreach (var i in C.Loop(m))
+            {
+                var k = Read;
+                s.Add(Arr(k).Select(x => x - 1).ToArray());
+            }
+
+            var p = Arr(m);
+
+            var res = 0L;
+
+            for (long i = 0; i < 1 << (int)n; i++)
+            {
+                HashSet<long> on = new HashSet<long>();
+                for (int j = 0; j < n; j++)
+                {
+                    if ((i & 1 << j) == 0)
+                        on.Add(j);
+                }
+
+                var b = true;
+                for (int j = 0; j < m; j++)
+                {
+                    if (s[j].Count(x => on.Contains(x)) % 2 != p[j])
+                    {
+                        b = false;
+                        break;
+                    }
+                }
+
+                if (b)
+                    res++;
+
+            }
+
+            return res;
         }
 
         public bool SolveBool()

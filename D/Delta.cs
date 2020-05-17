@@ -16,7 +16,81 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var k = Read;
+            var v = Arr(n);
+
+            var dp = new long?[k + 2, n + 1, n + 1];
+            dp[0, 0, 0] = 0;
+
+            foreach (var i in C.Loop(k))
+            {
+                foreach (var left in C.Loop(n))
+                {
+                    foreach (var right in C.Loop(n))
+                    {
+                        if (dp[i, left, right].HasValue == false)
+                            continue;
+
+                        if (left + right >= n)
+                            continue;
+
+                        var current = dp[i, left, right].Value;
+
+                        // left
+                        {
+                            var vv = v[left];
+                            if (dp[i + 1, left + 1, right].HasValue == false)
+                                dp[i + 1, left + 1, right] = current + vv;
+                            else
+                                dp[i + 1, left + 1, right] = Math.Max(current + vv, dp[i + 1, left + 1, right].Value);
+
+                            if (vv < 0)
+                            {
+                                if (dp[i + 2, left + 1, right].HasValue == false)
+                                    dp[i + 2, left + 1, right] = current;
+                                else
+                                    dp[i + 2, left + 1, right] = Math.Max(current, dp[i + 2, left + 1, right].Value);
+                            }
+                        }
+
+                        // right
+                        {
+                            var vv = v[n - right - 1];
+                            if (dp[i + 1, left, right + 1].HasValue == false)
+                                dp[i + 1, left, right + 1] = current + vv;
+                            else
+                                dp[i + 1, left, right + 1] = Math.Max(current + vv, dp[i + 1, left, right + 1].Value);
+
+                            if (vv < 0)
+                            {
+                                if (dp[i + 2, left, right + 1].HasValue == false)
+                                    dp[i + 2, left, right + 1] = current;
+                                else
+                                    dp[i + 2, left, right + 1] = Math.Max(current, dp[i + 2, left, right + 1].Value);
+                            }
+                        }
+                    }
+                }
+            }
+
+            var res = 0L;
+            foreach (var i in C.Loop(k + 1))
+            {
+                foreach (var left in C.Loop(n + 1))
+                {
+                    foreach (var right in C.Loop(n + 1))
+                    {
+                        var d = dp[i, left, right];
+
+                        if (d.HasValue)
+                        {
+                            res = Math.Max(d.Value, res);
+                        }
+                    }
+                }
+            }
+
+            return res;
         }
 
         public bool SolveBool()

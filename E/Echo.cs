@@ -9,13 +9,74 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var n = Read;
+            var q = Read;
+            var koujis = new List<Kouji>();
+
+            foreach (var i in C.Loop(n))
+            {
+                var s = Read;
+                var t = Read;
+                var x = Read;
+
+                koujis.Add(new Kouji() { index = i, start = s - 0.25, end = t + 0.25 - 1, x = x, isEnd = false });
+                koujis.Add(new Kouji() { index = i, start = s - 0.25, end = t + 0.25 - 1, x = x, isEnd = true });
+            }
+            koujis = koujis.OrderBy(x => x.point).ThenBy(x => !x.isEnd).ToList();
+
+            var d = Arr(q);
+
+            var pq = new C.PriorityQueue<double, Kouji>(x => x.x);
+            var processed = new HashSet<long>();
+
+            var terms = new List<double>();
+            var stops = new List<double>();
+
+            foreach (var x in koujis)
+            {
+                if (x.isEnd == false)
+                {
+                    pq.Enqueue(x);
+                }
+                else
+                {
+                    processed.Add(x.index);
+
+                    while (pq.Count > 0 && processed.Contains(pq.Top.index))
+                    {
+                        pq.Dequeue();
+                    }
+                }
+
+                terms.Add(x.point);
+                stops.Add(pq.Count > 0 ? pq.Top.x : -1);
+            }
+
+            foreach (var i in C.Loop(q))
+            {
+                var idx = C.BinarySearch.GetLastIndexLess(d[i], terms);
+                var res = idx < 0 ? -1 : idx >= stops.Count ? -1 : stops[(int)idx];
+
+                Write(res);
+            }
+        }
+
+        public class Kouji
+        {
+            public long index;
+            public double start;
+            public double end;
+            public double x;
+
+            public double dStart => start - x;
+            public double dEnd => end - x;
+
+            public bool isEnd;
+            public double point => isEnd ? dEnd : dStart;
         }
 
         public long SolveLong()
         {
-            var n = Read;
             return 0;
         }
 

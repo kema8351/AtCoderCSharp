@@ -16,6 +16,7 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var s = Arr(n);
             return 0;
         }
 

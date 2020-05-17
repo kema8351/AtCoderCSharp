@@ -9,7 +9,14 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
+            var n = Read;
+            var ps = sc.Pairs<string, long>(n);
+
+            foreach (var p in ps.Select((x, i) => new { x, i }).OrderBy(x => x.x.X).ThenByDescending(x => x.x.Y))
+            {
+                Wr(p.i + 1);
+            }
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
