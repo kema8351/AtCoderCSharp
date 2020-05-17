@@ -16,7 +16,32 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var m = Read;
+            var a = Arr(n);
+
+            var dic = a.GroupBy(x => x).ToDictionary(x => x.Key, x => x.LongCount());
+            foreach (var i in C.Loop(m))
+            {
+                var b = Read;
+                var c = Read;
+
+                dic.SafeAdd(c, b);
+            }
+
+            var res = 0L;
+            var rm = n;
+            foreach (var p in dic.OrderByDescending(x => x.Key))
+            {
+                var c = Math.Min(rm, p.Value);
+                res += p.Key * c;
+
+                rm -= c;
+                if (rm <= 0)
+                    break;
+
+            }
+
+            return res;
         }
 
         public bool SolveBool()

@@ -9,7 +9,58 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
+            var n = Read;
+            var pq1 = new C.PriorityQueue<long, long>(x => x);
+            var pq2 = new C.PriorityQueue<long, long>(x => x, true);
+            var min = 0L;
+
+            foreach (var i in C.Loop(n))
+            {
+                var q = Read;
+                if (q == 1)
+                {
+                    var a = Read;
+                    var b = Read;
+
+                    if (pq1.Count > 0)
+                    {
+                        var aMax = pq1.Top;
+                        var aMin = pq2.Top;
+
+                        if (a < aMin)
+                        {
+                            min += aMin - a;
+                        }
+                        else if (a < aMax)
+                        {
+                        }
+                        else
+                        {
+                            min += a - aMax;
+                        }
+
+                    }
+
+                    min += b;
+
+                    pq1.Enqueue(a);
+                    pq2.Enqueue(a);
+
+                    if (pq1.Top != pq2.Top)
+                    {
+                        var x1 = pq1.Dequeue();
+                        var x2 = pq2.Dequeue();
+                        pq1.Enqueue(x2);
+                        pq2.Enqueue(x1);
+                    }
+                }
+                else
+                {
+                    Write($"{pq2.Top} {min}");
+                }
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

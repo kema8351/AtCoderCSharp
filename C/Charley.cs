@@ -16,7 +16,23 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var m = Read;
+
+            var min = 1L;
+            var max = n;
+
+            foreach (var i in C.Loop(m))
+            {
+                var l = Read;
+                var r = Read;
+
+                min = Math.Max(min, l);
+                max = Math.Min(max, r);
+            }
+
+            var res = max - min + 1;
+
+            return res < 0 ? 0 : res;
         }
 
         public bool SolveBool()

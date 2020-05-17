@@ -15,7 +15,14 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
+            var a = Read;
+            var b = Read;
+
+            if (a >= 13)
+                return b;
+            else if (a >= 6)
+                return b / 2;
+
             return 0;
         }
 

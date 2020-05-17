@@ -16,7 +16,15 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var m = Read;
+            var k = Read;
+
+            var full =
+                (Mint.Pow(n, 3) - n) / 6 * Mint.Pow(m, 2)
+                + (Mint.Pow(m, 3) - m) / 6 * Mint.Pow(n, 2);
+
+            var res = full * Mint.Comb(n * m - 2, k - 2);
+            return res.Value;
         }
 
         public bool SolveBool()

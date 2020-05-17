@@ -9,7 +9,18 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
+            var r = Read;
+            var d = Read;
+            var x = Read;
+
+            for (long i = 1; i <= 10; i++)
+            {
+                x *= r;
+                x -= d;
+
+                Write(x);
+            }
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
