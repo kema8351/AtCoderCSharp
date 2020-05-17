@@ -16,7 +16,97 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var pairs = sc.Pairs(n);
+
+            //n = 200000;
+            //pairs = Enumerable.Range(0, 200000).Select(x => new Pair((1L << 60) * (x % 3 - 1), (1L << 60) * (x % 3 - 2))).ToArray();
+
+
+            var fish = pairs
+                .Select(x =>
+                {
+                    if (x.X == 0 && x.Y == 0)
+                        return new Fish();
+
+                    var a = x.X;
+                    var b = x.Y;
+
+                    var gn =
+                        a > 0 && b >= 0 ? 1
+                        : a <= 0 && b > 0 ? 2
+                        : a < 0 && b <= 0 ? 3
+                        : 4;
+
+                    long ga = 0L;
+                    long gb = 0L;
+                    switch (gn)
+                    {
+                        case 1: ga = a; gb = b; break;
+                        case 2: ga = b; gb = -a; break;
+                        case 3: ga = -a; gb = -b; break;
+                        case 4: ga = -b; gb = a; break;
+                    }
+
+                    if (ga == 0 || gb == 0)
+                    {
+                        ga = 1;
+                        gb = 0;
+                    }
+                    else
+                    {
+                        var gcd = C.Gcd(ga, gb);
+                        ga /= gcd;
+                        gb /= gcd;
+                    }
+
+
+
+                    return new Fish()
+                    {
+                        a = a,
+                        b = b,
+                        ga = ga,
+                        gb = gb,
+                        gn = gn,
+                    };
+                }).GroupBy(x => new { x.ga, x.gb });
+
+
+            var res = new Mint(1);
+            var resZero = new Mint();
+
+
+            foreach (var g in fish)
+            {
+                if (g.Key.ga == 0 && g.Key.gb == 0)
+                {
+                    resZero += g.Count();
+                    continue;
+                }
+
+                var fg = g.GroupBy(x => x.gn % 2)
+                    .Select(x => Mint.Pow(2, x.Count()) - 1);
+
+                var c = new Mint(1);
+                foreach (var fgc in fg)
+                    c += fgc;
+
+                res *= c;
+            }
+
+            res -= 1;
+            res += resZero;
+
+            return res.Value;
+        }
+
+        public class Fish
+        {
+            public long a;
+            public long b;
+            public long ga;
+            public long gb;
+            public long gn;
         }
 
         public bool SolveBool()

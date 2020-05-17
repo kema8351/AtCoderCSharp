@@ -9,14 +9,164 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var n = ReadInt;
+            var m = ReadInt;
+            var vs = Enumerable.Repeat(0, n).Select(x => new VLine() { x1 = Read, x2 = Read, y = Read }).ToArray();
+            var hs = Enumerable.Repeat(0, m).Select(x => new HLine() { x = Read, y1 = Read, y2 = Read }).ToArray();
+            var vLines = vs.GroupBy(x => x.y).Select(x => new VLineSet() { xEdges = x.Select(xs => new Edge() { from = xs.x1, to = xs.x2 }).ToArray(), y = x.Key }).OrderBy(x => x.y).ToArray();
+            var hLines = hs.GroupBy(x => x.x).Select(x => new HLineSet() { yEdges = x.Select(xs => new Edge() { from = xs.y1, to = xs.y2 }).ToArray(), x = x.Key }).OrderBy(x => x.x).ToArray();
+
+            if (vLines.All(x => x.y >= 0)
+                || vLines.All(x => x.y <= 0)
+                || hLines.All(x => x.x >= 0)
+                || hLines.All(x => x.x <= 0))
+            {
+                Wr("INF");
+                return;
+            }
+
+
+            var res = 0L;
+            var checkeds = new HashSet<VH>();
+            var checking = new HashSet<VH>();
+            var v0 = vLines.Select((x, i) => new { x.y, i }).FirstOrDefault(x => x.y >= 0).i - 1;
+            var h0 = hLines.Select((x, i) => new { x.x, i }).FirstOrDefault(x => x.x >= 0).i - 1;
+            var v1 = vLines.Select((x, i) => new { x.y, i }).FirstOrDefault(x => x.y > 0).i - 1;
+            var h1 = hLines.Select((x, i) => new { x.x, i }).FirstOrDefault(x => x.x > 0).i - 1;
+            checking.SageAdd(new VH { v = v0, h = h0 });
+            //checking.SageAdd(new VH { v = v0, h = h1 });
+            //checking.SageAdd(new VH { v = v1, h = h0 });
+            //checking.SageAdd(new VH { v = v1, h = h1 });
+
+            var isInf = false;
+
+            void Add(long v, long h)
+            {
+                if (h < 0 || v < 0 || h >= hLines.Length - 1 || v >= vLines.Length - 1)
+                {
+                    isInf = true;
+                    return;
+                }
+
+                res += (vLines[v + 1].y - vLines[v].y) * (hLines[h + 1].x - hLines[h].x);
+            }
+
+            while (checking.Count > 0)
+            {
+                var newChecking = new HashSet<VH>();
+
+                foreach (var vh in checking)
+                {
+                    if (checkeds.Contains(vh))
+                        continue;
+                    checkeds.Add(vh);
+
+                    Add(vh.v, vh.h);
+                    if (isInf)
+                        break;
+
+                    {
+                        var c = new VH { v = vh.v - 1, h = vh.h };
+                        if (checkeds.Contains(c) == false)
+                        {
+                            var vl = vLines[vh.v];
+                            if (vl.CanPass(hLines[vh.h].x, hLines[vh.h + 1].x))
+                                newChecking.SageAdd(c);
+                        }
+                    }
+
+                    {
+                        var c = new VH { v = vh.v, h = vh.h - 1 };
+                        if (checkeds.Contains(c) == false)
+                        {
+                            var hl = hLines[vh.h];
+                            if (hl.CanPass(vLines[vh.v].y, vLines[vh.v + 1].y))
+                                newChecking.SageAdd(c);
+                        }
+                    }
+
+                    {
+                        var c = new VH { v = vh.v + 1, h = vh.h };
+                        if (checkeds.Contains(c) == false)
+                        {
+                            var vl = vLines[vh.v + 1];
+                            if (vl.CanPass(hLines[vh.h].x, hLines[vh.h + 1].x))
+                                newChecking.SageAdd(c);
+                        }
+                    }
+
+                    {
+                        var c = new VH { v = vh.v, h = vh.h + 1 };
+                        if (checkeds.Contains(c) == false)
+                        {
+                            var hl = hLines[vh.h + 1];
+                            if (hl.CanPass(vLines[vh.v].y, vLines[vh.v + 1].y))
+                                newChecking.SageAdd(c);
+                        }
+                    }
+                }
+
+                checking = newChecking;
+            }
+
+            if (isInf)
+                Wr("INF");
+            else
+                Wr(res);
+
         }
 
         public long SolveLong()
         {
-            var n = Read;
             return 0;
+        }
+
+        public struct VH
+        {
+            public long v;
+            public long h;
+        }
+
+        public class VLine
+        {
+            public long x1;
+            public long x2;
+            public long y;
+        }
+
+        public class VLineSet
+        {
+            public Edge[] xEdges;
+            public long y;
+
+            public bool CanPass(long y1, long y2)
+            {
+                return xEdges.All(x => x.from >= y2 || x.to <= y1);
+            }
+        }
+
+        public class HLine
+        {
+            public long x;
+            public long y1;
+            public long y2;
+        }
+
+        public class HLineSet
+        {
+            public long x;
+            public Edge[] yEdges;
+
+            public bool CanPass(long x1, long x2)
+            {
+                return yEdges.All(x => x.from >= x2 || x.to <= x1);
+            }
+        }
+
+        public class Edge
+        {
+            public long from;
+            public long to;
         }
 
         public bool SolveBool()
@@ -195,6 +345,14 @@ namespace V
     }
     static class Extension
     {
+        public static bool SageAdd<T>(this HashSet<T> ts, T t)
+        {
+            if (ts.Contains(t))
+                return false;
+
+            ts.Add(t);
+            return true;
+        }
         public static bool TryRemove<T>(this HashSet<T> ts, T t)
         {
             if (ts.Contains(t))

@@ -9,7 +9,28 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
+            var n = Read % 10;
+            switch (n)
+            {
+                case 0:
+                case 1:
+                case 6:
+                case 8:
+                    Wr("pon");
+                    break;
+                case 2:
+                case 4:
+                case 5:
+                case 7:
+                case 9:
+                    Wr("hon");
+                    break;
+                case 3:
+                    Wr("bon");
+                    break;
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

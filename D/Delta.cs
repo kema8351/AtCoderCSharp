@@ -9,7 +9,38 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
+            var n = Read;
+            var m = Read;
+            var tree = new C.Tree(sc, m);
+            //var uncheck = Enumerable.Range(0, (int)n).ToHashSet();
+            var checking = new HashSet<long>();
+            var dic = new Dictionary<long, long>();
+            checking.Add(0);
+
+            while (checking.Count > 0)
+            {
+                var newChecking = new HashSet<long>();
+                foreach (var x in checking.SelectMany(xs => tree.To(xs).Select(xss => new { to = xss, from = xs })))
+                {
+                    if (dic.ContainsKey(x.to))
+                        continue;
+                    if (newChecking.Contains(x.to))
+                        continue;
+
+                    newChecking.Add(x.to);
+                    dic.Add(x.to, x.from);
+                }
+
+                checking = newChecking;
+            }
+
+            Wr("Yes");
+            for (long i = 1; i < n; i++)
+            {
+                Wr(dic[i] + 1);
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

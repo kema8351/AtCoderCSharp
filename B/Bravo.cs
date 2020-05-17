@@ -9,7 +9,13 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
+            var k = Read;
+            var s = Str;
+            if (s.Length <= k)
+                Wr(s);
+            else
+                Wr(s.Substring(0, (int)k) + "...");
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

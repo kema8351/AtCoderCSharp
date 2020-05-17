@@ -9,7 +9,20 @@ namespace V
     {
         public void Solve()
         {
-            Write(SolveLong());
+            double a = Read;
+            double b = Read;
+            double h = Read;
+            double m = Read;
+
+            var ax = Math.Cos(Math.PI * (double)(h * 60 + m) / 360d) * a;
+            var ay = Math.Sin(Math.PI * (double)(h * 60 + m) / 360d) * a;
+            var bx = Math.Cos(Math.PI * (double)(m) / 30d) * b;
+            var by = Math.Sin(Math.PI * (double)(m) / 30d) * b;
+
+
+            var res = Math.Sqrt((ax - bx) * (ax - bx) + (ay - by) * (ay - by));
+            Wr(res);
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
