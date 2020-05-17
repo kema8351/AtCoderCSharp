@@ -195,7 +195,19 @@ namespace V
     }
     static class Extension
     {
-        public static bool TryRemove<T>(this HashSet<T> ts, T t)
+        public static bool SafeAdd<T>(this HashSet<T> ts, T t)
+        {
+            if (ts.Contains(t))
+            {
+                return false;
+            }
+            else
+            {
+                ts.Add(t);
+                return false;
+            }
+        }
+        public static bool SafeRemove<T>(this HashSet<T> ts, T t)
         {
             if (ts.Contains(t))
             {
