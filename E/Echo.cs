@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace V
 {
@@ -9,6 +10,7 @@ namespace V
     {
         public void Solve()
         {
+            //var n = Read;
             Write(SolveLong());
             //YesNo(SolveBool());
         }
@@ -275,12 +277,58 @@ namespace V
     }
     class C
     {
+        public class UnionFind
+        {
+            private int[] parents;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public UnionFind(int count)
+            {
+                parents = Enumerable.Repeat(-1, count).ToArray();
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public bool TryUnite(int x, int y)
+            {
+                var rootX = GetRoot(x);
+                var rootY = GetRoot(y);
+
+                if (rootX == rootY)
+                    return false;
+
+                if (parents[rootY] < parents[rootX])
+                {
+                    var temp = rootX;
+                    rootX = rootY;
+                    rootY = temp;
+                }
+                parents[rootX] += parents[rootY];
+                parents[rootY] = rootX;
+
+                return true;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public bool Find(int x, int y) => GetRoot(x) == GetRoot(y);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public int GetRoot(int x)
+            {
+                while (parents[x] >= 0)
+                    x = parents[x];
+                return x;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public long GetSize(int x) => -parents[GetRoot(x)];
+        }
         public class IterTools
         {
             /// <summary>
             /// 組み合わせ（重複なし）
             /// n = 4, k = 3 => (0,1,2) (0,1,3) (0,2,3) (1,2,3)
             /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static IEnumerable<IReadOnlyList<long>> Combinations(long n, long k)
             {
                 if (k <= 0)
@@ -318,6 +366,7 @@ namespace V
             /// 組み合わせ（重複なし）
             /// n = 4, k = 3 => (0,1,2) (0,1,3) (0,2,3) (1,2,3)
             /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static IEnumerable<IReadOnlyList<T>> Combinations<T>(T[] ts, long k)
             {
                 if (k <= 0)
@@ -359,6 +408,7 @@ namespace V
             /// 組み合わせ（重複あり）
             /// n = 3, k = 2 => (0,0) (0,1) (0,2) (1,0) (1,1) (1,2) (2,0) (2,1) (2,2) 
             /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static IEnumerable<IReadOnlyList<long>> CombinationsWithReplacement(long n, long k)
             {
                 if (k <= 0)
@@ -396,6 +446,7 @@ namespace V
             /// 組み合わせ（重複あり）
             /// n = 3, k = 2 => (0,0) (0,1) (0,2) (1,0) (1,1) (1,2) (2,0) (2,1) (2,2) 
             /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static IEnumerable<IReadOnlyList<T>> CombinationsWithReplacement<T>(T[] ts, long k)
             {
                 if (k <= 0)
@@ -437,6 +488,7 @@ namespace V
             /// 順列
             /// n = 3, k = 2 => (0,1) (0,2) (1,0) (1,2) (2,0) (2,1) 
             /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static IEnumerable<IReadOnlyList<long>> Permutations(long n, long k)
             {
                 if (k <= 0)
@@ -483,6 +535,7 @@ namespace V
             /// 順列
             /// n = 3, k = 2 => (0,1) (0,2) (1,0) (1,2) (2,0) (2,1) 
             /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static IEnumerable<IReadOnlyList<T>> Permutations<T>(T[] ts, long k)
             {
                 if (k <= 0)
@@ -536,6 +589,7 @@ namespace V
             public Tree(Pair<long, long>[] edges, bool base1 = true, bool singleDirection = false) { Adjust(edges, base1, singleDirection); }
             public Tree(IEnumerable<long> ps, IEnumerable<long> qs, bool base1 = true, bool singleDirection = false) { Adjust(ps.Zip(qs, (p, q) => new Pair<long, long>(p, q)).ToArray(), base1, singleDirection); }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private void Adjust(Pair<long, long>[] edges, bool base1, bool singleDirection)
             {
                 var arrows = base1
@@ -561,6 +615,7 @@ namespace V
             {
                 return GetRouteEdgesImpl(from, to).Skip(1);
             }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private IEnumerable<Pair<long, long>> GetRouteEdgesImpl(long from, long to)
             {
                 var routeNodes = GetRouteNodes(from, to);
@@ -572,6 +627,7 @@ namespace V
                 }
 
             }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public IEnumerable<long> GetRouteNodes(long from, long to)
             {
                 Stack<long> routeNodes = new Stack<long>();
@@ -581,6 +637,7 @@ namespace V
 
                 return routeNodes.Reverse();
             }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private bool GetRouteNodes(long current, long dest, Stack<long> routeNodes, HashSet<long> checkedNodes)
             {
                 routeNodes.Push(current);
@@ -609,14 +666,14 @@ namespace V
             private readonly bool desc;
             private TState[] states = new TState[65536];
             private TKey[] keys = new TKey[65536];
-            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public PriorityQueue(Func<TState, TKey> keySelector, bool desc = false) { this.keySelector = keySelector; this.desc = desc; }
             public TState Top
             {
-                //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 get { ValidateNonEmpty(); return states[1]; }
             }
-            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public TState Dequeue()
             {
                 var top = Top;
@@ -659,7 +716,7 @@ namespace V
 
                 return top;
             }
-            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Enqueue(TState state)
             {
                 var key = keySelector.Invoke(state);
@@ -681,7 +738,7 @@ namespace V
                 states[index] = state;
                 keys[index] = key;
             }
-            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private void Extend(int newSize)
             {
                 TState[] newStates = new TState[newSize];
@@ -691,6 +748,7 @@ namespace V
                 states = newStates;
                 keys = newKeys;
             }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private void ValidateNonEmpty()
             {
                 if (Count == 0)
@@ -701,12 +759,14 @@ namespace V
         {
             long length;
             long[] binaryIndexedTree;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public BinaryIndexTree(long length)
             {
                 this.length = length;
                 binaryIndexedTree = new long[length + 1];
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Add(long indexZeroBase, long additional)
             {
                 // i += i & -i
@@ -717,6 +777,7 @@ namespace V
                 }
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public long Sum(long indexZeroBase)
             {
                 long result = 0;
@@ -733,10 +794,12 @@ namespace V
         }
         public static class BinarySearch
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static long GetFirstIndexGreater<T>(T x, IList<T> listOrdered) where T : IComparable
             {
                 return GetFirstIndexGreater(x, listOrdered, 0, listOrdered.Count - 1);
             }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static long GetFirstIndexGreater<T>(T x, IList<T> listOrdered, int low, int high) where T : IComparable
             {
                 var count = listOrdered.Count;
@@ -759,10 +822,12 @@ namespace V
 
                 return low;
             }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static long GetLastIndexLess<T>(T x, IList<T> listOrdered) where T : IComparable
             {
                 return GetLastIndexLess(x, listOrdered, 0, listOrdered.Count - 1);
             }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static long GetLastIndexLess<T>(T x, IList<T> listOrdered, int low, int high) where T : IComparable
             {
                 var count = listOrdered.Count;
@@ -812,6 +877,7 @@ namespace V
                 }
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private static void GetReachable(int origin, ref HashSet<int> reached, ref Dictionary<int, int[]> paths)
             {
                 if (reached.Contains(origin))
@@ -831,6 +897,7 @@ namespace V
             /// long.MaxValue: たどり着けない
             /// その他: 距離
             /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static long? RunBellmanFord(int vertexCount, List<Edge> rawEdges, int source, int dest)
             {
                 var forwards = rawEdges.GroupBy(x => x.From).ToDictionary(x => x.Key, x => x.Select(xs => xs.To).ToArray());
@@ -887,7 +954,9 @@ namespace V
                 return vertices[dest].Distance;
             }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Gcd(int a, int b) => Gcd((long)a, (long)b);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Gcd(long a, long b)
         {
             if (a < b)
@@ -895,6 +964,7 @@ namespace V
             else
                 return GcdImpl(a, b);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static long GcdImpl(long a, long b)
         {
             var remainder = a % b;
@@ -903,12 +973,16 @@ namespace V
             else
                 return GcdImpl(b, remainder);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Lcm(int a, int b) => Lcm((long)a, (long)b);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Lcm(long a, long b)
         {
             return a / Gcd(a, b) * b;
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Pow(int n, int p) => Pow((long)n, (long)p);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Pow(long n, long p)
         {
             var res = 1L;
@@ -916,7 +990,9 @@ namespace V
                 res *= n;
             return res;
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Dictionary<long, long> Factorize(int n) => Factorize((long)n);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Dictionary<long, long> Factorize(long n)
         {
             var res = new Dictionary<long, long>();
@@ -936,7 +1012,9 @@ namespace V
                 res.Add(r, 1);
             return res;
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<long> Divisors(int n) => Divisors((long)n);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<long> Divisors(long n)
         {
             var cache = new Stack<long>();
@@ -959,27 +1037,38 @@ namespace V
                 yield return n / i;
             }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<int> Loop(int n)
         {
             for (int i = 0; i < n; i++)
                 yield return i;
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<long> Loop(long n)
         {
             for (long i = 0L; i < n; i++)
                 yield return i;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<T> Repeat<T>(T t, long n)
+        {
+            for (long i = 0L; i < n; i++)
+                yield return t;
         }
     }
     struct Mint
     {
         public static long Divider { set { divider = value; } }
         private static long divider = 1000000007L;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Set998244353() { divider = 998244353L; }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Set1000000009() { divider = 1000000009L; }
 
         public long Value { get; }
         public override string ToString() => this.Value.ToString();
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Mint(long value) { this.Value = value; }
 
         //public static implicit operator Mint(long a) => new Mint(a % divider);
@@ -987,10 +1076,14 @@ namespace V
         //public static explicit operator long(Mint a) => a.Value;
         //public static explicit operator int(Mint a) => (int)a.Value;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint operator +(Mint a, Mint b) => new Mint((a.Value + b.Value) % divider);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint operator +(Mint a, long b) => a + new Mint(b);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint operator +(Mint a, int b) => a + new Mint(b);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint operator -(Mint a, Mint b)
         {
             var t = (a.Value - b.Value) % divider;
@@ -998,18 +1091,29 @@ namespace V
                 t += divider;
             return new Mint(t);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint operator -(Mint a, long b) => a - new Mint(b);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint operator -(Mint a, int b) => a - new Mint(b);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint operator *(Mint a, Mint b) => new Mint((a.Value * b.Value) % divider);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint operator *(Mint a, long b) => a * new Mint(b);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint operator *(Mint a, int b) => a * new Mint(b);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint operator /(Mint a, Mint b) => new Mint((a.Value * InvImpl(b.Value)) % divider);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint operator /(Mint a, long b) => a / new Mint(b);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint operator /(Mint a, int b) => a / new Mint(b);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Mint Pow(long p) => new Mint(PowImpl(Value, p));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint Pow(long a, long p) => new Mint(PowImpl(a, p));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static long PowImpl(long a, long p)
         {
             if (p == 0L)
@@ -1024,8 +1128,10 @@ namespace V
             return p % 2L == 0L ? powered : powered * a % divider;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint Inv(long a) => new Mint(InvImpl(a));
         private static readonly Dictionary<long, long> invCache = new Dictionary<long, long>();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static long InvImpl(long a)
         {
             long cache;
@@ -1037,9 +1143,11 @@ namespace V
             return result;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint Fac(long a) => new Mint(FacImpl(a));
         private static long[] facCache = new long[262144];
         private static long cachedFac = 0L;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static long FacImpl(long a)
         {
             if (a >= divider)
@@ -1072,6 +1180,7 @@ namespace V
 
             return facCache[a];
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ExtendFacCache(long newSize)
         {
             long[] newFacCache = new long[newSize];
@@ -1079,7 +1188,9 @@ namespace V
             facCache = newFacCache;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint Perm(long n, long r) => new Mint(PermImpl(n, r));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static long PermImpl(long n, long r)
         {
             if (n < r)
@@ -1093,7 +1204,9 @@ namespace V
             return (nn * InvImpl(nr)) % divider;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint Comb(long n, long r) => new Mint(CombImpl(n, r));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static long CombImpl(long n, long r)
         {
             if (n < r)
