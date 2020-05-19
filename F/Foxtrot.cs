@@ -62,64 +62,61 @@ namespace V
                 }
             }
 
-            var checking = new Queue<long>();
-            bool[,] passed = new bool[xCount + 1, yCount + 1];
-            var finished = new List<long>();
+            long Encode(long x, long y) => (x << 12) + y;
+            (long x, long y) Decode(long c) => (c >> 12, c & ((1L << 12) - 1));
 
-            long Encode(long x, long y) => (x << 16) + y;
-            (long x, long y) Decode(long c) => (c >> 16, c & ((1 << 16) - 1));
-            void Enqueue(long x, long y)
+            var unionFind = new C.UnionFind(1L << 24);
+
+            for (long i = 0; i < xCount + 1; i++)
             {
-                if (passed[x, y] == false)
+                for (long j = 1; j < yCount; j++)
                 {
-                    passed[x, y] = true;
-                    var c = Encode(x, y);
-                    checking.Enqueue(c);
-                    finished.Add(c);
+                    if (wallXX[i, j] == false)
+                    {
+                        unionFind.Union(Encode(i, j - 1), Encode(i, j));
+                    }
+                }
+            }
+
+            for (long i = 1; i < xCount; i++)
+            {
+                for (long j = 0; j < yCount + 1; j++)
+                {
+                    if (wallYY[i, j] == false)
+                    {
+                        unionFind.Union(Encode(i - 1, j), Encode(i, j));
+                    }
                 }
             }
 
             var x0 = C.BinarySearch.GetLastIndexLess(0, xs);
             var y0 = C.BinarySearch.GetLastIndexLess(0, ys);
-            Enqueue(x0, y0);
-
-            while (checking.Count > 0)
-            {
-                var c = checking.Dequeue();
-                (var x, var y) = Decode(c);
-
-                if (wallXX[x, y] == false)
-                    Enqueue(x, y - 1);
-
-                if (wallXX[x, y + 1] == false)
-                    Enqueue(x, y + 1);
-
-                if (wallYY[x, y] == false)
-                    Enqueue(x - 1, y);
-
-                if (wallYY[x + 1, y] == false)
-                    Enqueue(x + 1, y);
-            }
+            var c0 = Encode(x0, y0);
 
             var res = 0L;
-            foreach (var c in finished)
+            for (long x1 = 0; x1 < xCount + 1; x1++)
             {
-                (var x1, var y1) = Decode(c);
-                var x2 = x1 + 1;
-                var y2 = y1 + 1;
+                for (long y1 = 0; y1 < yCount + 1; y1++)
+                {
+                    if (unionFind.Find(c0, Encode(x1, y1)))
+                    {
+                        var x2 = x1 + 1;
+                        var y2 = y1 + 1;
 
-                var xx1 = xs[x1];
-                var xx2 = xs[x2];
-                var yy1 = ys[y1];
-                var yy2 = ys[y2];
+                        var xx1 = xs[x1];
+                        var xx2 = xs[x2];
+                        var yy1 = ys[y1];
+                        var yy2 = ys[y2];
 
-                if (xx1 == int.MinValue
-                    || yy1 == int.MinValue
-                    || xx2 == int.MaxValue
-                    || yy2 == int.MaxValue)
-                    return null;
+                        if (xx1 == int.MinValue
+                            || yy1 == int.MinValue
+                            || xx2 == int.MaxValue
+                            || yy2 == int.MaxValue)
+                            return null;
 
-                res += (xx2 - xx1) * (yy2 - yy1);
+                        res += (xx2 - xx1) * (yy2 - yy1);
+                    }
+                }
             }
 
             return res;
@@ -375,6 +372,61 @@ namespace V
     }
     class C
     {
+        public class UnionFind
+        {
+            private long[] parents;
+            private long[] heights;
+
+            public UnionFind(long capacity)
+            {
+                parents = C.Loop(capacity).ToArray();
+                heights = new long[capacity];
+            }
+
+            public void Union(long x, long y)
+            {
+                var rootX = TraceRoot(x);
+                var rootY = TraceRoot(y);
+
+                if (heights[rootX] > heights[rootY])
+                {
+                    parents[rootY] = rootX;
+                }
+                else if (heights[rootX] == heights[rootY])
+                {
+                    parents[rootX] = rootY;
+                    heights[rootX]++;
+                }
+                else
+                {
+                    parents[rootX] = rootY;
+                }
+            }
+
+            public bool Find(long x, long y)
+            {
+                return TraceRoot(x) == TraceRoot(y);
+            }
+
+            private long TraceRoot(long x)
+            {
+                temp.Clear();
+                var current = x;
+
+                while (parents[current] != current)
+                {
+                    temp.Add(current);
+                    current = parents[current];
+                }
+
+                foreach (var r in temp)
+                    parents[r] = current;
+
+                return current;
+            }
+
+            private List<long> temp = new List<long>();
+        }
         public class IterTools
         {
             /// <summary>
