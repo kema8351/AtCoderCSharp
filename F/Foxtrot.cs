@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace V
 {
@@ -62,43 +63,44 @@ namespace V
                 }
             }
 
-            long Encode(long x, long y) => (x << 12) + y;
-            (long x, long y) Decode(long c) => (c >> 12, c & ((1L << 12) - 1));
+            int Encode(int x, int y) => (x << 12) + y;
+            //(long x, long y) Decode(long c) => (c >> 12, c & ((1L << 12) - 1));
 
-            var unionFind = new C.UnionFind(1L << 24);
+            var unionFind = new C.UnionFind(1 << 24);
 
-            for (long i = 0; i < xCount + 1; i++)
+            for (int i = 0; i < xCount + 1; i++)
             {
-                for (long j = 1; j < yCount; j++)
+                for (int j = 1; j < yCount; j++)
                 {
                     if (wallXX[i, j] == false)
                     {
-                        unionFind.Union(Encode(i, j - 1), Encode(i, j));
+                        unionFind.TryUnite(Encode(i, j - 1), Encode(i, j));
                     }
                 }
             }
 
-            for (long i = 1; i < xCount; i++)
+            for (int i = 1; i < xCount; i++)
             {
-                for (long j = 0; j < yCount + 1; j++)
+                for (int j = 0; j < yCount + 1; j++)
                 {
                     if (wallYY[i, j] == false)
                     {
-                        unionFind.Union(Encode(i - 1, j), Encode(i, j));
+                        unionFind.TryUnite(Encode(i - 1, j), Encode(i, j));
                     }
                 }
             }
 
-            var x0 = C.BinarySearch.GetLastIndexLess(0, xs);
-            var y0 = C.BinarySearch.GetLastIndexLess(0, ys);
+            var x0 = (int)C.BinarySearch.GetLastIndexLess(0, xs);
+            var y0 = (int)C.BinarySearch.GetLastIndexLess(0, ys);
             var c0 = Encode(x0, y0);
+            var id0 = unionFind.GetRoot(c0);
 
             var res = 0L;
-            for (long x1 = 0; x1 < xCount + 1; x1++)
+            for (int x1 = 0; x1 < xCount + 1; x1++)
             {
-                for (long y1 = 0; y1 < yCount + 1; y1++)
+                for (int y1 = 0; y1 < yCount + 1; y1++)
                 {
-                    if (unionFind.Find(c0, Encode(x1, y1)))
+                    if (id0 == unionFind.GetRoot(Encode(x1, y1)))
                     {
                         var x2 = x1 + 1;
                         var y2 = y1 + 1;
@@ -374,58 +376,47 @@ namespace V
     {
         public class UnionFind
         {
-            private long[] parents;
-            private long[] heights;
+            private int[] parents;
 
-            public UnionFind(long capacity)
+            public UnionFind(int count)
             {
-                parents = C.Loop(capacity).ToArray();
-                heights = new long[capacity];
+                parents = Enumerable.Repeat(-1, count).ToArray();
             }
 
-            public void Union(long x, long y)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public bool TryUnite(int x, int y)
             {
-                var rootX = TraceRoot(x);
-                var rootY = TraceRoot(y);
+                var rootX = GetRoot(x);
+                var rootY = GetRoot(y);
 
-                if (heights[rootX] > heights[rootY])
+                if (rootX == rootY)
+                    return false;
+
+                if (parents[rootY] < parents[rootX])
                 {
-                    parents[rootY] = rootX;
+                    var temp = rootX;
+                    rootX = rootY;
+                    rootY = temp;
                 }
-                else if (heights[rootX] == heights[rootY])
-                {
-                    parents[rootX] = rootY;
-                    heights[rootX]++;
-                }
-                else
-                {
-                    parents[rootX] = rootY;
-                }
+                parents[rootX] += parents[rootY];
+                parents[rootY] = rootX;
+
+                return true;
             }
 
-            public bool Find(long x, long y)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public bool Find(int x, int y) => GetRoot(x) == GetRoot(y);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public int GetRoot(int x)
             {
-                return TraceRoot(x) == TraceRoot(y);
+                while (parents[x] >= 0)
+                    x = parents[x];
+                return x;
             }
 
-            private long TraceRoot(long x)
-            {
-                temp.Clear();
-                var current = x;
-
-                while (parents[current] != current)
-                {
-                    temp.Add(current);
-                    current = parents[current];
-                }
-
-                foreach (var r in temp)
-                    parents[r] = current;
-
-                return current;
-            }
-
-            private List<long> temp = new List<long>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public long GetSize(int x) => -parents[GetRoot(x)];
         }
         public class IterTools
         {
@@ -1120,6 +1111,11 @@ namespace V
         {
             for (long i = 0L; i < n; i++)
                 yield return i;
+        }
+        public static IEnumerable<T> Repeat<T>(T t, long n)
+        {
+            for (long i = 0L; i < n; i++)
+                yield return t;
         }
     }
     struct Mint
