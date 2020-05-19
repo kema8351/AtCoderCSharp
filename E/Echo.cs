@@ -16,7 +16,39 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var aa = Arr(n).Select((x, i) => new { x, i }).OrderByDescending(x => x.x).ToArray();
+            long[,] dp = new long[n + 1, n + 1];
+
+
+            for (int i = 0; i < n; i++)
+            {
+                var a = aa[i];
+
+                for (int j = 0; j <= i; j++)
+                {
+                    var left = j;
+                    var right = i - j;
+
+                    var nextLeft = left;
+                    var nextRight = (n - 1) - right;
+
+                    var current = dp[left, right];
+
+                    // left
+                    dp[left + 1, right] = Math.Max(dp[left + 1, right], current + Math.Abs(nextLeft - a.i) * a.x);
+
+                    // right
+                    dp[left, right + 1] = Math.Max(dp[left, right + 1], current + Math.Abs(nextRight - a.i) * a.x);
+                }
+            }
+
+            var res = 0L;
+            for (int i = 0; i <= n; i++)
+            {
+                res = Math.Max(res, dp[i, n - i]);
+            }
+
+            return res;
         }
 
         public bool SolveBool()
