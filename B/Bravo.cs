@@ -7,22 +7,123 @@ namespace V
 {
     partial class Solver
     {
+        // UnionFindを取り入れてないバージョン
         public void Solve()
         {
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            Write(SolveLong()?.ToString() ?? "INF");
         }
 
-        public long SolveLong()
+        public long? SolveLong()
         {
-            var n = Read;
-            return 0;
-        }
+            var n = ReadInt;
+            var m = ReadInt;
+            List<(long x1, long x2, long y)> xxs = Enumerable.Repeat(0, n).Select(x => (Read, Read, Read)).ToList();
+            List<(long x, long y1, long y2)> yys = Enumerable.Repeat(0, m).Select(x => (Read, Read, Read)).ToList();
 
-        public bool SolveBool()
-        {
-            var n = Read;
-            return false;
+            xxs.Add((int.MinValue, int.MaxValue, int.MinValue));
+            xxs.Add((int.MinValue, int.MaxValue, int.MaxValue));
+            yys.Add((int.MinValue, int.MinValue, int.MaxValue));
+            yys.Add((int.MaxValue, int.MinValue, int.MaxValue));
+
+            var xs = yys.Select(x => x.x)
+                .Concat(xxs.Select(x => x.x1))
+                .Concat(xxs.Select(x => x.x2))
+                .Distinct().OrderBy(x => x).ToArray();
+            var ys = xxs.Select(x => x.y)
+                .Concat(yys.Select(x => x.y1))
+                .Concat(yys.Select(x => x.y2))
+                .Distinct().OrderBy(x => x).ToArray();
+            var xCount = xs.Length;
+            var yCount = ys.Length;
+
+            bool[,] wallXX = new bool[xCount + 1, yCount];
+            bool[,] wallYY = new bool[xCount, yCount + 1];
+
+            foreach (var xx in xxs)
+            {
+                var x1 = C.BinarySearch.GetLastIndexLess(xx.x1, xs) + 1;
+                var x2 = C.BinarySearch.GetLastIndexLess(xx.x2, xs) + 1;
+                var y = C.BinarySearch.GetLastIndexLess(xx.y, ys) + 1;
+
+                for (var i = x1; i < x2; i++)
+                {
+                    wallXX[i, y] = true;
+                }
+            }
+
+            foreach (var yy in yys)
+            {
+                var x = C.BinarySearch.GetLastIndexLess(yy.x, xs) + 1;
+                var y1 = C.BinarySearch.GetLastIndexLess(yy.y1, ys) + 1;
+                var y2 = C.BinarySearch.GetLastIndexLess(yy.y2, ys) + 1;
+
+                for (var i = y1; i < y2; i++)
+                {
+                    wallYY[x, i] = true;
+                }
+            }
+
+            var checking = new Queue<long>();
+            bool[,] passed = new bool[xCount + 1, yCount + 1];
+            var finished = new List<long>();
+
+            long Encode(long x, long y) => (x << 16) + y;
+            (long x, long y) Decode(long c) => (c >> 16, c & ((1 << 16) - 1));
+            void Enqueue(long x, long y)
+            {
+                if (passed[x, y] == false)
+                {
+                    passed[x, y] = true;
+                    var c = Encode(x, y);
+                    checking.Enqueue(c);
+                    finished.Add(c);
+                }
+            }
+
+            var x0 = C.BinarySearch.GetLastIndexLess(0, xs);
+            var y0 = C.BinarySearch.GetLastIndexLess(0, ys);
+            Enqueue(x0, y0);
+
+            while (checking.Count > 0)
+            {
+                var c = checking.Dequeue();
+                (var x, var y) = Decode(c);
+
+                if (wallXX[x, y] == false)
+                    Enqueue(x, y - 1);
+
+                if (wallXX[x, y + 1] == false)
+                    Enqueue(x, y + 1);
+
+                if (wallYY[x, y] == false)
+                    Enqueue(x - 1, y);
+
+                if (wallYY[x + 1, y] == false)
+                    Enqueue(x + 1, y);
+            }
+
+            var res = 0L;
+            foreach (var c in finished)
+            {
+                (var x1, var y1) = Decode(c);
+                var x2 = x1 + 1;
+                var y2 = y1 + 1;
+
+                var xx1 = xs[x1];
+                var xx2 = xs[x2];
+                var yy1 = ys[y1];
+                var yy2 = ys[y2];
+
+                if (xx1 == int.MinValue
+                    || yy1 == int.MinValue
+                    || xx2 == int.MaxValue
+                    || yy2 == int.MaxValue)
+                    return null;
+
+                res += (xx2 - xx1) * (yy2 - yy1);
+            }
+
+            return res;
         }
     }
 }
