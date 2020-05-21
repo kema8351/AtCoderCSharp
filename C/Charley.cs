@@ -10,8 +10,23 @@ namespace V
     {
         public void Solve()
         {
+            var s = Str;
+            var k = ReadInt;
+
+            var ss = new HashSet<string>();
+
+            for (int i = 1; i <= k; i++)
+            {
+                for (int j = 0; j <= s.Length - i; j++)
+                {
+                    ss.SafeAdd(s.Substring(j, i));
+                }
+            }
+
+            Wr(ss.OrderBy(x => x).Skip(k - 1).First());
+
             //var n = Read;
-            Write(SolveLong());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
