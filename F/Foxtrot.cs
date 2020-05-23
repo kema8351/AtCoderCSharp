@@ -17,8 +17,29 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            return 0;
+            Mint.Set998244353();
+            var n = ReadInt;
+            var robots = sc.Pairs(n)
+                    .OrderByDescending(x => x.X)
+                    .ToArray();
+            var xs = robots.Select(x => -x.X).ToArray();
+            var dp = new Mint[n + 1];
+            var seg = new C.SegmentTree<int>(Enumerable.Range(0, (int)n).ToArray(), (x, y) => Math.Min(x, y), int.MaxValue);
+            var cdp = new long[n];
+
+            dp[0] = new Mint(1);
+
+            for (int i = 0; i < n; i++)
+            {
+                var r = robots[i];
+                var xd = r.X + r.Y - 1;
+                var idx = C.BinarySearch.GetLastIndexLess(-xd, xs) + 1;
+                var affected = seg.Query((int)idx, i + 1);
+                seg.Update(i, affected);
+                dp[i + 1] = dp[i] + dp[affected];
+            }
+
+            return dp[n].Value;
         }
 
         public bool SolveBool()
@@ -55,9 +76,6 @@ namespace V
                 Console.ReadKey();
         }
     }
-}
-namespace V
-{
     partial class Solver
     {
         public Solver(Scanner sc, Printer pr) { this.sc = sc; this.pr = pr; }
@@ -277,6 +295,67 @@ namespace V
     }
     class C
     {
+        public class SegmentTree<T>
+        {
+            private readonly int valueCount;
+            private readonly int baseCount;
+            private readonly int baseIndex;
+            private readonly T[] nodes;
+            private readonly Func<T, T, T> func;
+            private readonly T defaultValue;
+
+            public SegmentTree(IReadOnlyList<T> ts, Func<T, T, T> func, T filling = default(T))
+            {
+                this.func = func;
+                this.defaultValue = filling;
+                valueCount = ts.Count;
+                baseCount = 1;
+                while (valueCount > baseCount)
+                    baseCount <<= 1;
+                nodes = new T[baseCount * 2 - 1];
+                baseIndex = baseCount - 1;
+
+                for (int i = 0; i < ts.Count; i++)
+                    nodes[baseIndex + i] = ts[i];
+                for (int i = ts.Count; i < baseCount; i++)
+                    nodes[baseIndex + i] = filling;
+
+                for (int i = baseIndex - 1; i >= 0; i--)
+                    nodes[i] = func.Invoke(nodes[i * 2 + 1], nodes[i * 2 + 2]);
+            }
+
+            public void Update(int index, T t)
+            {
+                var i = baseIndex + index;
+                nodes[i] = t;
+                while (i > 0)
+                {
+                    i -= 1;
+                    i /= 2;
+                    nodes[i] = func.Invoke(nodes[i * 2 + 1], nodes[i * 2 + 2]);
+                }
+            }
+
+            public T Query(int leftIndex, int rightNextIndex)
+            {
+                T left = defaultValue;
+                T right = defaultValue;
+
+                int l = leftIndex + baseCount - 1;
+                int r = rightNextIndex + baseCount - 1;
+                for (; l < r; l >>= 1, r >>= 1)
+                {
+                    if ((l & 1) == 0)
+                        left = func.Invoke(left, nodes[l]);
+
+                    if ((r & 1) == 0)
+                        left = func.Invoke(left, nodes[l]);
+                }
+
+                return func.Invoke(left, right);
+            }
+        }
+
         public class UnionFind
         {
             private int[] parents;
