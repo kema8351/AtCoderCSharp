@@ -55,9 +55,6 @@ namespace V
                 Console.ReadKey();
         }
     }
-}
-namespace V
-{
     partial class Solver
     {
         public Solver(Scanner sc, Printer pr) { this.sc = sc; this.pr = pr; }
@@ -277,6 +274,92 @@ namespace V
     }
     class C
     {
+        public class SegmentTree<T>
+        {
+            private readonly int valueCount;
+            private readonly int baseCount;
+            private readonly int baseIndex;
+            private readonly T[] nodes;
+            private readonly Func<T, T, T> func;
+            private readonly T defaultValue;
+
+            public SegmentTree(IReadOnlyList<T> ts, Func<T, T, T> func, T filling = default(T))
+            {
+                this.func = func;
+                this.defaultValue = filling;
+                valueCount = ts.Count;
+                baseCount = 1;
+                while (valueCount > baseCount)
+                    baseCount <<= 1;
+                nodes = new T[baseCount * 2 - 1];
+                baseIndex = baseCount - 1;
+
+                for (int i = 0; i < ts.Count; i++)
+                    nodes[baseIndex + i] = ts[i];
+                for (int i = ts.Count; i < baseCount; i++)
+                    nodes[baseIndex + i] = filling;
+
+                for (int i = baseIndex - 1; i >= 0; i--)
+                    nodes[i] = func.Invoke(nodes[i * 2 + 1], nodes[i * 2 + 2]);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void Update(int index, T t)
+            {
+                var i = baseIndex + index;
+                nodes[i] = t;
+                while (i > 0)
+                {
+                    i -= 1;
+                    i /= 2;
+                    nodes[i] = func.Invoke(nodes[i * 2 + 1], nodes[i * 2 + 2]);
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public T Query(int leftIndex, int rightNextIndex)
+            {
+                T left = defaultValue;
+                T right = defaultValue;
+
+                int l = leftIndex + baseCount - 1;
+                int r = rightNextIndex + baseCount - 1;
+                for (; l < r; l >>= 1, r >>= 1)
+                {
+                    if ((l & 1) == 0)
+                    {
+                        left = func.Invoke(left, nodes[l]);
+                    }
+
+                    if ((r & 1) == 0)
+                    {
+                        r--;
+                        right = func.Invoke(right, nodes[r]);
+                    }
+                }
+
+                return func.Invoke(left, right);
+            }
+        }
+        public class SegmentTree
+        {
+            public static SegmentTree<int> Sum(IReadOnlyList<int> values) => new SegmentTree<int>(values, (x, y) => x + y);
+            public static SegmentTree<long> Sum(IReadOnlyList<long> values) => new SegmentTree<long>(values, (x, y) => x + y);
+            public static SegmentTree<double> Sum(IReadOnlyList<double> values) => new SegmentTree<double>(values, (x, y) => x + y);
+
+            public static SegmentTree<int> Mult(IReadOnlyList<int> values) => new SegmentTree<int>(values, (x, y) => x * y, 1);
+            public static SegmentTree<long> Mult(IReadOnlyList<long> values) => new SegmentTree<long>(values, (x, y) => x * y, 1);
+            public static SegmentTree<double> Mult(IReadOnlyList<double> values) => new SegmentTree<double>(values, (x, y) => x * y, 1);
+
+            public static SegmentTree<int> Min(IReadOnlyList<int> values) => new SegmentTree<int>(values, Math.Min, int.MaxValue);
+            public static SegmentTree<long> Min(IReadOnlyList<long> values) => new SegmentTree<long>(values, Math.Min, long.MaxValue);
+            public static SegmentTree<double> Min(IReadOnlyList<double> values) => new SegmentTree<double>(values, Math.Min, double.MaxValue);
+
+            public static SegmentTree<int> Max(IReadOnlyList<int> values) => new SegmentTree<int>(values, Math.Max, int.MinValue);
+            public static SegmentTree<long> Max(IReadOnlyList<long> values) => new SegmentTree<long>(values, Math.Max, long.MinValue);
+            public static SegmentTree<double> Max(IReadOnlyList<double> values) => new SegmentTree<double>(values, Math.Max, double.MinValue);
+        }
+
         public class UnionFind
         {
             private int[] parents;
