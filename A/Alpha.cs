@@ -10,15 +10,72 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var t = Read;
+            foreach (var i in C.Loop(t))
+                Write(SolveLong());
             //YesNo(SolveBool());
         }
+
 
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var a = Read;
+            var b = Read;
+            var c = Read;
+            var d = Read;
+
+            var dic = new Dictionary<long, long>() { { 0, 0 }, { 1, d } };
+            var pairs = new Pair[]
+            {
+                new Pair ( 2, a ),
+                new Pair ( 3, b ),
+                new Pair ( 5, c ),
+            };
+
+            long Slv(long val)
+            {
+                if (dic.TryGetValue(val, out var cache))
+                    return cache;
+
+                var r = long.MaxValue;
+
+                foreach (var p in pairs)
+                {
+                    var rem = val % p.X;
+                    {
+                        var next = val / p.X;
+                        r.TryMin(rem * d + p.Y + Slv(next));
+
+                        var diff = val - next;
+                        if (diff < long.MaxValue / d)
+                            r.TryMin(diff * d + Slv(next));
+                    }
+
+                    if (rem > 0)
+                    {
+                        var next = val / p.X + 1;
+                        r.TryMin((p.X - rem) * d + p.Y + Slv(next));
+
+                        var diff = val - next;
+                        if (diff < long.MaxValue / d)
+                            r.TryMin(diff * d + Slv(next));
+                    }
+                }
+
+                dic.Add(val, r);
+                return r;
+            }
+
+            var res = Slv(n);
+
+            return res;
+        }
+
+        public struct State
+        {
+            public long money;
+            public long n;
         }
 
         public bool SolveBool()
@@ -194,6 +251,7 @@ namespace V
     }
     static class Extension
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool SafeAdd<T>(this HashSet<T> ts, T t)
         {
             if (ts.Contains(t))
@@ -206,6 +264,7 @@ namespace V
                 return false;
             }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool SafeRemove<T>(this HashSet<T> ts, T t)
         {
             if (ts.Contains(t))
@@ -218,6 +277,7 @@ namespace V
                 return false;
             }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SafeSet<T>(this Dictionary<T, long> ts, T t, long value)
         {
             if (ts.ContainsKey(t))
@@ -225,6 +285,7 @@ namespace V
             else
                 ts.Add(t, value);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SafeAdd<T>(this Dictionary<T, long> ts, T t, long value)
         {
             if (ts.ContainsKey(t))
@@ -232,6 +293,7 @@ namespace V
             else
                 ts.Add(t, value);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SafeSub<T>(this Dictionary<T, long> ts, T t, long value)
         {
             if (ts.ContainsKey(t))
@@ -239,6 +301,7 @@ namespace V
             else
                 ts.Add(t, value);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SafeMult<T>(this Dictionary<T, long> ts, T t, long value)
         {
             if (ts.ContainsKey(t))
@@ -246,6 +309,7 @@ namespace V
             else
                 ts.Add(t, value);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SafeDiv<T>(this Dictionary<T, long> ts, T t, long value)
         {
             if (ts.ContainsKey(t))
@@ -253,12 +317,19 @@ namespace V
             else
                 ts.Add(t, value);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> ts) => new HashSet<T>(ts.Distinct());
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ToDigit(this char c) => (long)(c - '0');
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ToSmallAbcIndex(this char c) => (long)(c - 'a');
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ToLargeAbcIndex(this char c) => (long)(c - 'A');
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Count<T1, T2>(this IGrouping<T1, T2> gs) => gs.LongCount();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToStr(this IEnumerable<char> cs) => new string(cs.ToArray());
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ToLong(this IEnumerable<char> s)
         {
             var basis = 1L;
@@ -270,6 +341,24 @@ namespace V
                 basis *= 27;
             }
             return res;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryMin<T>(this ref T current, T newer) where T : struct, IComparable<T>
+        {
+            if (current.CompareTo(newer) < 0)
+                return false;
+
+            current = newer;
+            return true;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryMax<T>(this ref T current, T newer) where T : struct, IComparable<T>
+        {
+            if (current.CompareTo(newer) > 0)
+                return false;
+
+            current = newer;
+            return true;
         }
     }
     class C
