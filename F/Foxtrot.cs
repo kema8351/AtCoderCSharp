@@ -18,7 +18,70 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var k = Read;
+            var h = Arr(n);
+
+            Dictionary<long, long>[,] dp = new Dictionary<long, long>[n + 1, n + 1];
+            for (long i = 0; i <= n; i++)
+            {
+                for (long j = 0; j <= n; j++)
+                {
+                    dp[i, j] = new Dictionary<long, long>();
+                }
+            }
+
+            // 1st ここまでチェックした数
+            // 2nd チートを使った数
+            // 3rd 手前の列の高さ
+            // 値 チェックしたところまでのアートで必要な手順数
+            dp[0, 0].Add(0, 0);
+
+            for (long i = 0; i < n; i++)
+            {
+                for (long j = 0; j < n; j++)
+                {
+                    var d = dp[i, j];
+                    foreach (var p in d)
+                    {
+                        // チートを使わない場合
+                        // 追加される手順数は手前の列の高さから高くなった分
+                        // 下がる場合は手順数は増えない
+                        {
+                            var prev = h[i];
+                            var cd = p.Value + Math.Max(0, prev - p.Key);
+                            if (dp[i + 1, j].ContainsKey(prev))
+                                dp[i + 1, j][prev] = Math.Min(cd, dp[i + 1, j][prev]);
+                            else
+                                dp[i + 1, j].Add(prev, cd);
+                        }
+
+                        // チートを使う場合
+                        // 手前の列の高さと同じ列の高さにするのが最善
+                        // 手順数を増やさず、最も列を高くする方法が最善だから
+                        // 高くなった分だけ手順数が増えるので、手順数が増えないならなるべく高く構えるのが望ましい
+                        {
+                            var prev = p.Key;
+                            var cd = p.Value;
+                            if (dp[i + 1, j + 1].ContainsKey(prev))
+                                dp[i + 1, j + 1][prev] = Math.Min(cd, dp[i + 1, j + 1][prev]);
+                            else
+                                dp[i + 1, j + 1].Add(prev, cd);
+                        }
+                    }
+                }
+            }
+
+            var res = long.MaxValue;
+
+            for (long j = 0; j <= k; j++)
+            {
+                foreach (var p in dp[n, j])
+                {
+                    res = Math.Min(res, p.Value);
+                }
+            }
+
+            return res;
         }
 
         public bool SolveBool()
