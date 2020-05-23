@@ -10,8 +10,14 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = ReadInt;
+            var tree = new C.Graph(sc, n - 1);
+            if (tree.GetDiameter() % 3 == 1)
+                Wr("Second");
+            else
+                Wr("First");
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
@@ -665,12 +671,12 @@ namespace V
                 }
             }
         }
-        public class Tree
+        public class Graph
         {
-            public Tree() { toNodes = new Dictionary<long, long[]>(); }
-            public Tree(Scanner sc, long n, bool base1 = true, bool singleDirection = false) { Adjust(sc.Pairs(n), base1, singleDirection); }
-            public Tree(Pair<long, long>[] edges, bool base1 = true, bool singleDirection = false) { Adjust(edges, base1, singleDirection); }
-            public Tree(IEnumerable<long> ps, IEnumerable<long> qs, bool base1 = true, bool singleDirection = false) { Adjust(ps.Zip(qs, (p, q) => new Pair<long, long>(p, q)).ToArray(), base1, singleDirection); }
+            public Graph() { toNodes = new Dictionary<long, long[]>(); }
+            public Graph(Scanner sc, long n, bool base1 = true, bool singleDirection = false) { Adjust(sc.Pairs(n), base1, singleDirection); }
+            public Graph(Pair<long, long>[] edges, bool base1 = true, bool singleDirection = false) { Adjust(edges, base1, singleDirection); }
+            public Graph(IEnumerable<long> ps, IEnumerable<long> qs, bool base1 = true, bool singleDirection = false) { Adjust(ps.Zip(qs, (p, q) => new Pair<long, long>(p, q)).ToArray(), base1, singleDirection); }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private void Adjust(Pair<long, long>[] edges, bool base1, bool singleDirection)
@@ -740,6 +746,36 @@ namespace V
 
                 routeNodes.Pop();
                 return false;
+            }
+            /// <summary>
+            /// 木の直径（一番長い枝）を求める
+            /// </summary>
+            /// <returns>木の直径（一番長い枝）</returns>
+            public long GetDiameter()
+            {
+                long firstFarthest = 0;
+                long _1 = 0;
+                GetDiameterImpl(-1, 0, 0, ref _1, ref firstFarthest);
+                long maxDistance = 0;
+                long _2 = 0;
+                GetDiameterImpl(-1, firstFarthest, 0, ref maxDistance, ref _2);
+                return maxDistance;
+            }
+            private void GetDiameterImpl(long from, long current, long distance, ref long maxDistance, ref long farthest)
+            {
+                if (distance > maxDistance)
+                {
+                    maxDistance = distance;
+                    farthest = current;
+                }
+
+                foreach (var to in To(current))
+                {
+                    if (from == to)
+                        continue;
+
+                    GetDiameterImpl(current, to, distance + 1, ref maxDistance, ref farthest);
+                }
             }
         }
         public class PriorityQueue<TKey, TState> where TKey : IComparable<TKey>
