@@ -741,6 +741,36 @@ namespace V
                 routeNodes.Pop();
                 return false;
             }
+            /// <summary>
+            /// 木の直径（一番長い枝）を求める
+            /// </summary>
+            /// <returns>木の直径（一番長い枝）</returns>
+            public long GetDiameter()
+            {
+                long firstFarthest = 0;
+                long _1 = 0;
+                GetDiameterImpl(-1, 0, 0, ref _1, ref firstFarthest);
+                long maxDistance = 0;
+                long _2 = 0;
+                GetDiameterImpl(-1, firstFarthest, 0, ref maxDistance, ref _2);
+                return maxDistance;
+            }
+            private void GetDiameterImpl(long from, long current, long distance, ref long maxDistance, ref long farthest)
+            {
+                if (distance > maxDistance)
+                {
+                    maxDistance = distance;
+                    farthest = current;
+                }
+
+                foreach (var to in To(current))
+                {
+                    if (from == to)
+                        continue;
+
+                    GetDiameterImpl(current, to, distance + 1, ref maxDistance, ref farthest);
+                }
+            }
         }
         public class PriorityQueue<TKey, TState> where TKey : IComparable<TKey>
         {
