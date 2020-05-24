@@ -10,8 +10,63 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = ReadInt;
+            var q = Read;
+
+            long[] r = Enumerable.Range(0, n).Select(x => (long)x).ToArray();
+            long[] c = Enumerable.Range(0, n).Select(x => (long)x).ToArray();
+            var t = false;
+
+            void Process(bool isRow, int a, int b)
+            {
+                if (isRow)
+                {
+                    var temp = r[a];
+                    r[a] = r[b];
+                    r[b] = temp;
+                }
+                else
+                {
+                    var temp = c[a];
+                    c[a] = c[b];
+                    c[b] = temp;
+                }
+            }
+
+            foreach (var _ in C.Loop(q))
+            {
+                var tp = Read;
+                if (tp == 1)
+                {
+                    var a = ReadInt - 1;
+                    var b = ReadInt - 1;
+
+                    Process(!t, a, b);
+                }
+                else if (tp == 2)
+                {
+                    var a = ReadInt - 1;
+                    var b = ReadInt - 1;
+                    Process(t, a, b);
+                }
+                else if (tp == 3)
+                {
+                    t = !t;
+                }
+                else
+                {
+                    var a = ReadInt - 1;
+                    var b = ReadInt - 1;
+
+                    var rr = t ? b : a;
+                    var cc = t ? a : b;
+
+                    long res = r[rr] * n + c[cc];
+                    Wr(res);
+                }
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

@@ -10,9 +10,117 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var items = new List<Item>[n];
+
+            var first = new long[n];
+            var second = new long[n];
+            var pq1 = new C.PriorityQueue<long, Item>(x => x.value, true);
+            var pq2 = new C.PriorityQueue<long, Item>(x => x.value, true);
+
+            foreach (var i in C.Loop(n))
+            {
+                // first[i] = 0;
+                second[i] = 1;
+
+                var k = Read;
+                items[i] = new List<Item>();
+
+                foreach (var j in C.Loop(k))
+                {
+                    items[i].Add(new Item()
+                    {
+                        kIndex = i,
+                        tIndex = j,
+                        value = Read,
+                    });
+                }
+
+                pq1.Enqueue(items[i][0]);
+                pq2.Enqueue(items[i][0]);
+                if (k > 1)
+                    pq2.Enqueue(items[i][1]);
+            }
+
+            void TakeSecond(long k)
+            {
+                second[k]++;
+                if (items[k].Count > second[k])
+                {
+                    pq2.Enqueue(items[k][(int)second[k]]);
+                }
+            }
+
+            void TakeFirst(long k)
+            {
+                first[k] = second[k];
+                if (items[k].Count > first[k])
+                {
+                    pq1.Enqueue(items[k][(int)first[k]]);
+                }
+                TakeSecond(k);
+            }
+
+            var m = Read;
+            foreach (var i in C.Loop(m))
+            {
+                var a = Read;
+                if (a == 1)
+                {
+                    while (true)
+                    {
+                        var q = pq1.Dequeue();
+                        var k = q.kIndex;
+
+                        if (first[k] != q.tIndex)
+                            continue;
+
+                        var res = q.value;
+
+                        // Enqueue second
+                        TakeFirst(k);
+
+                        Wr(res);
+                        break;
+                    }
+                }
+                else
+                {
+                    while (true)
+                    {
+                        var q = pq2.Dequeue();
+                        var k = q.kIndex;
+
+                        if (first[k] != q.tIndex && second[k] != q.tIndex)
+                            continue;
+
+                        var res = q.value;
+
+                        // Enqueue second
+                        if (first[k] == q.tIndex)
+                        {
+                            TakeFirst(k);
+                        }
+                        else
+                        {
+                            TakeSecond(k);
+                        }
+
+                        Wr(res);
+                        break;
+                    }
+                }
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
+        }
+
+        public struct Item
+        {
+            public long kIndex;
+            public long tIndex;
+            public long value;
         }
 
         public long SolveLong()

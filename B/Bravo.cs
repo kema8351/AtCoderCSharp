@@ -18,7 +18,62 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var l = Read;
+            var xs = Arr(n).ToHashSet();
+            var ts = Arr(3);
+
+            var dp = new long[l + 1, 5];
+            foreach (var i in C.Loop(l + 1))
+            {
+                foreach (var j in C.Loop(5))
+                {
+                    dp[i, j] = int.MaxValue;
+                }
+            }
+            dp[0, 0] = 0;
+
+            foreach (var i in C.Loop(l))
+            {
+                foreach (var j in C.Loop(5))
+                {
+                    if (dp[i, j] >= int.MaxValue)
+                        continue;
+
+                    var cur = dp[i, j];
+
+                    if (j == 0)
+                    {
+                        cur += (xs.Contains(i) ? ts[2] : 0);
+                        dp[i + 1, 0].TryMin(cur + ts[0]);
+                        dp[i + 1, 4].TryMin(cur + ts[0] / 2 + ts[1] / 2);
+                        dp[i + 1, 1].TryMin(cur + ts[0] / 2 + ts[1] / 2);
+                    }
+                    else if (j == 4)
+                    {
+                        dp[i + 1, 0].TryMin(cur + ts[1] / 2 + ts[0] / 2);
+                    }
+                    else if (j == 1)
+                    {
+                        dp[i + 1, 2].TryMin(cur + ts[1]);
+                    }
+                    else if (j == 2)
+                    {
+                        dp[i + 1, 3].TryMin(cur + ts[1]);
+                    }
+                    else if (j == 3)
+                    {
+                        dp[i + 1, 0].TryMin(cur + ts[1] / 2 + ts[0] / 2);
+                    }
+                }
+            }
+
+            long res = int.MaxValue;
+            foreach (var j in C.Loop(5))
+            {
+                res.TryMin(dp[l, j]);
+            }
+
+            return res;
         }
 
         public bool SolveBool()

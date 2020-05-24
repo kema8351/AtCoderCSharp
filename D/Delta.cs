@@ -10,8 +10,25 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var m = Read;
+            var aa = Arr(m);
+            var cur = new long[n];
+
+            foreach (var a in aa)
+            {
+                var i = C.BinarySearch.GetLastIndexLess(-a + 1, cur);
+                if (i + 1 >= n)
+                {
+                    Wr(-1);
+                    continue;
+                }
+
+                cur[i + 1] = -a;
+                Wr(i + 2);
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

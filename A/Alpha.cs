@@ -15,10 +15,89 @@ namespace V
             //YesNo(SolveBool());
         }
 
+        public struct State
+        {
+            public long code;
+            public long dist;
+        }
+
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var gx = Read;
+            var gy = Read;
+            var pairs = sc.Pairs(n);
+
+            long Encode(long x, long y) => (x + 201) * 403 + (y + 201);
+            (long x, long y) Decode(long c) => (c / 403 - 201, c % 403 - 201);
+
+            var dists = new long[403 * 403];
+            for (long i = 0; i < 403 * 403; i++)
+                dists[i] = int.MaxValue;
+
+            var walls = new bool[403 * 403];
+            foreach (var p in pairs)
+            {
+                var c = Encode(p.X, p.Y);
+                walls[c] = true;
+            }
+
+            var pq = new C.PriorityQueue<long, State>(x => x.dist);
+
+            void Enqueue(long c, long d)
+            {
+                if (dists[c] <= d)
+                    return;
+
+                if (walls[c])
+                    return;
+
+                dists[c] = d;
+                pq.Enqueue(new State() { code = c, dist = d });
+            }
+
+            var s = Encode(0, 0);
+            Enqueue(s, 0);
+
+            var g = Encode(gx, gy);
+
+            var ops = new (long x, long y)[]
+            {
+                (1, 1),
+                (0, 1),
+                (-1, 1),
+                (1, 0),
+                (-1, 0),
+                (0, -1),
+            };
+
+            while (pq.Count > 0 && dists[g] >= int.MaxValue)
+            {
+                var q = pq.Dequeue();
+
+                if (q.dist != dists[q.code])
+                    continue;
+
+                (long x, long y) = Decode(q.code);
+                var newDist = q.dist + 1;
+
+                foreach (var op in ops)
+                {
+                    var nx = x + op.x;
+                    var ny = y + op.y;
+
+                    if (nx <= -202 || nx >= 202 || ny <= -202 || ny >= 202)
+                        continue;
+
+                    var nc = Encode(nx, ny);
+                    Enqueue(nc, newDist);
+                }
+            }
+
+            if (dists[g] >= int.MaxValue)
+                return -1;
+
+            return dists[g];
         }
 
         public bool SolveBool()

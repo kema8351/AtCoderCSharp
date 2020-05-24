@@ -10,8 +10,60 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var q = Read;
+
+            var bottoms = new long[n];
+            var tops = new long[n];
+            var summits = new long[n];
+            foreach (var i in C.Loop(n))
+            {
+                bottoms[i] = -1;
+                tops[i] = -1;
+                summits[i] = i;
+            }
+
+
+            foreach (var _ in C.Loop(q))
+            {
+                var from = Read - 1;
+                var to = Read - 1;
+                var x = Read - 1;
+
+                var temp = summits[from];
+
+                if (bottoms[x] >= 0)
+                {
+                    tops[bottoms[x]] = -1;
+                }
+                summits[from] = bottoms[x];
+
+                if (summits[to] >= 0)
+                {
+                    tops[summits[to]] = x;
+                }
+                bottoms[x] = summits[to];
+                summits[to] = temp;
+            }
+
+            var res = new long[n];
+            foreach (var i in C.Loop(n))
+            {
+                var x = summits[i];
+
+                while (x >= 0)
+                {
+                    res[x] = i;
+                    x = bottoms[x];
+                }
+            }
+
+            foreach (var i in C.Loop(n))
+            {
+                Wr(res[i] + 1);
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
