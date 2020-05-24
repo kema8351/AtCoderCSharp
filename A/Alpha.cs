@@ -18,7 +18,111 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0;
+            var m = Read;
+            var graph = new C.Tree(sc, m);
+            var s = Read - 1;
+            var k = Read;
+            var cities = new List<long>() { s };
+            var ts = ArrLong(k).Select(x => x - 1);
+            cities.AddRange(ts);
+
+            var dists = new long[cities.Count, cities.Count];
+
+            foreach (var ci in C.Loop(cities.Count))
+            {
+                var c = cities[ci];
+                var ds = new long[n];
+                foreach (var i in C.Loop(n))
+                {
+                    ds[i] = long.MaxValue;
+                }
+
+                var pq = new C.PriorityQueue<long, State>(x => x.dist);
+
+                void Enq(long city, long dist)
+                {
+                    if (ds[city] <= dist)
+                        return;
+
+                    ds[city] = dist;
+                    pq.Enqueue(new State() { city = city, dist = dist });
+                }
+                Enq(c, 0);
+
+                while (pq.Count > 0)
+                {
+                    var q = pq.Dequeue();
+
+                    if (q.dist != ds[q.city])
+                        continue;
+
+                    foreach (var to in graph.To(q.city))
+                        Enq(to, q.dist + 1);
+                }
+
+                foreach (var cj in C.Loop(cities.Count))
+                {
+                    dists[ci, cj] = ds[cities[cj]];
+                }
+            }
+
+
+            {
+                var dp = new long[1 << cities.Count, cities.Count];
+                foreach (var i in C.Loop(1 << cities.Count))
+                    foreach (var j in C.Loop(cities.Count))
+                        dp[i, j] = long.MaxValue;
+
+                var pq = new C.PriorityQueue<long, HighState>(x => x.dist);
+                dp[1, 0] = 0;
+                pq.Enqueue(new HighState() { city = 1, dist = 0, current = 0 });
+
+                var end = (1 << cities.Count) - 1;
+                var res = 0L;
+                while (true)
+                {
+                    var q = pq.Dequeue();
+
+                    if (q.city == end)
+                    {
+                        res = q.dist;
+                        break;
+                    }
+
+                    if (dp[q.city, q.current] != q.dist)
+                        continue;
+
+                    for (int i = 1; i < cities.Count; i++)
+                    {
+                        if (((q.city >> i) & 1) == 0)
+                        {
+                            var newCity = q.city + (1 << i);
+                            var newDist = q.dist + dists[q.current, i];
+
+                            if (dp[newCity, i] > newDist)
+                            {
+                                dp[newCity, i] = newDist;
+                                pq.Enqueue(new HighState() { city = newCity, dist = newDist, current = i });
+                            }
+                        }
+                    }
+                }
+
+                return res;
+            }
+        }
+
+        public class State
+        {
+            public long city;
+            public long dist;
+        }
+
+        public class HighState
+        {
+            public long city;
+            public long current;
+            public long dist;
         }
 
         public bool SolveBool()

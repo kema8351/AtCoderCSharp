@@ -10,8 +10,108 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = ReadInt;
+            var q = Read;
+            var xs = Enumerable.Range(0, n).ToArray();
+            var segSwapped = new C.SegmentTree<int>(new int[n - 1], (x, y) => x + y);
+            var segReversed = new C.SegmentTree<int>(new int[n - 1], (x, y) => x + y);
+
+            foreach (var _q in C.Loop(q))
+            {
+                var tp = Read;
+                if (tp == 1)
+                {
+                    var x = ReadInt - 1;
+                    var y = Read;
+                    var temp = xs[x];
+                    xs[x] = xs[x + 1];
+                    xs[x + 1] = temp;
+
+                    segSwapped.Update(x, 1);
+
+                    if (x > 0)
+                    {
+                        var reversed = xs[x] < xs[x - 1];
+                        segReversed.Update(x - 1, reversed ? 1 : 0);
+                    }
+                    {
+                        var reversed = xs[x + 1] < xs[x];
+                        segReversed.Update(x, reversed ? 1 : 0);
+                    }
+                    if (x + 2 < n)
+                    {
+                        var reversed = xs[x + 2] < xs[x + 1];
+                        segReversed.Update(x + 1, reversed ? 1 : 0);
+                    }
+                }
+                else
+                {
+                    var x = ReadInt - 1;
+                    var y = ReadInt - 1;
+                    var check = x;
+
+                    while (true)
+                    {
+                        var count = segReversed.Query(check, y);
+                        if (count == 0)
+                            break;
+
+                        var xx = check;
+                        var yy = y;
+
+                        while (true)
+                        {
+                            if (xx + 1 >= yy)
+                            {
+                                var term = xx;
+                                while (term < y && segSwapped.Get(term) > 0)
+                                    term++;
+
+                                var sorted = xs.Skip(xx).Take(term - xx + 1).OrderBy(_ => _).ToArray();
+                                for (int i = 0; i < sorted.Length; i++)
+                                {
+                                    xs[i + xx] = sorted[i];
+                                }
+
+                                for (int i = xx; i < term; i++)
+                                {
+                                    segSwapped.Update(i, 0);
+                                    segReversed.Update(i, 0);
+                                }
+                                check = term;
+
+                                break;
+                            }
+
+                            var mid = (xx + yy + 1) / 2;
+                            var c = segReversed.Query(xx, mid);
+                            if (c > 0)
+                            {
+                                yy = mid;
+                            }
+                            else
+                            {
+                                xx = mid;
+                            }
+                        }
+                    }
+
+                    if (x > 0)
+                    {
+                        var reversed = xs[x] < xs[x - 1];
+                        segReversed.Update(x - 1, reversed ? 1 : 0);
+                    }
+                    if (y + 1 < n)
+                    {
+                        var reversed = xs[y + 1] < xs[y];
+                        segReversed.Update(y, reversed ? 1 : 0);
+                    }
+                }
+            }
+
+            Wr(string.Join(" ", xs.Select(x => (x + 1).ToString())));
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
@@ -346,6 +446,13 @@ namespace V
                     i /= 2;
                     nodes[i] = func.Invoke(nodes[i * 2 + 1], nodes[i * 2 + 2]);
                 }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public T Get(int index)
+            {
+                var i = baseIndex + index;
+                return nodes[i];
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
