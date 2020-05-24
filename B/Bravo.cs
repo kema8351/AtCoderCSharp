@@ -17,8 +17,63 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            return 0;
+            var n = ReadInt;
+            var ps = ArrInt(n * n).Select(x => x - 1).ToArray();
+            var empty = new bool[n, n];
+            var cost = new int[n, n];
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    var x = i;
+                    x.TryMin(j);
+                    x.TryMin(n - 1 - i);
+                    x.TryMin(n - 1 - j);
+                    cost[i, j] = x;
+                }
+            }
+
+            var ops = new (int x, int y)[]
+            {
+                (-1, 0),
+                (0, -1),
+                (1, 0),
+                (0, 1)
+            };
+
+            //int Encode(int x, int y) => x * n + y;
+            (int x, int y) Decode(int p) => (p / n, p % n);
+
+            void Recalc(int x, int y)
+            {
+                var newCost = cost[x, y] + (empty[x, y] ? 0 : 1);
+
+                foreach (var op in ops)
+                {
+                    var nx = x + op.x;
+                    var ny = y + op.y;
+
+                    if (nx < 0 || nx >= n || ny < 0 || ny >= n)
+                        continue;
+
+                    if (cost[nx, ny].TryMin(newCost))
+                    {
+                        Recalc(nx, ny);
+                    }
+                }
+            }
+
+            var res = 0L;
+            foreach (var p in ps)
+            {
+                (var x, var y) = Decode(p);
+                res += cost[x, y];
+                empty[x, y] = true;
+
+                Recalc(x, y);
+            }
+
+            return res;
         }
 
         public bool SolveBool()
@@ -221,7 +276,7 @@ namespace V
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SafeSet<T>(this Dictionary<T, long> ts, T t, long value)
+        public static void SafeSet<TKey, TValue>(this Dictionary<TKey, TValue> ts, TKey t, TValue value)
         {
             if (ts.ContainsKey(t))
                 ts[t] = value;
@@ -237,7 +292,39 @@ namespace V
                 ts.Add(t, value);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SafePlus<T>(this Dictionary<T, int> ts, T t, int value)
+        {
+            if (ts.ContainsKey(t))
+                ts[t] += value;
+            else
+                ts.Add(t, value);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SafePlus<T>(this Dictionary<T, double> ts, T t, double value)
+        {
+            if (ts.ContainsKey(t))
+                ts[t] += value;
+            else
+                ts.Add(t, value);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SafeSub<T>(this Dictionary<T, long> ts, T t, long value)
+        {
+            if (ts.ContainsKey(t))
+                ts[t] -= value;
+            else
+                ts.Add(t, value);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SafeSub<T>(this Dictionary<T, int> ts, T t, int value)
+        {
+            if (ts.ContainsKey(t))
+                ts[t] -= value;
+            else
+                ts.Add(t, value);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SafeSub<T>(this Dictionary<T, double> ts, T t, double value)
         {
             if (ts.ContainsKey(t))
                 ts[t] -= value;
@@ -253,10 +340,64 @@ namespace V
                 ts.Add(t, value);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SafeMult<T>(this Dictionary<T, int> ts, T t, int value)
+        {
+            if (ts.ContainsKey(t))
+                ts[t] *= value;
+            else
+                ts.Add(t, value);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SafeMult<T>(this Dictionary<T, double> ts, T t, double value)
+        {
+            if (ts.ContainsKey(t))
+                ts[t] *= value;
+            else
+                ts.Add(t, value);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SafeDiv<T>(this Dictionary<T, long> ts, T t, long value)
         {
             if (ts.ContainsKey(t))
                 ts[t] /= value;
+            else
+                ts.Add(t, value);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SafeDiv<T>(this Dictionary<T, int> ts, T t, int value)
+        {
+            if (ts.ContainsKey(t))
+                ts[t] /= value;
+            else
+                ts.Add(t, value);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SafeDiv<T>(this Dictionary<T, double> ts, T t, double value)
+        {
+            if (ts.ContainsKey(t))
+                ts[t] /= value;
+            else
+                ts.Add(t, value);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SafeMin<TKey, TValue>(this Dictionary<TKey, TValue> ts, TKey t, TValue value) where TValue : IComparable<TValue>
+        {
+            if (ts.TryGetValue(t, out var current))
+            {
+                if (current.CompareTo(value) > 0)
+                    ts[t] = value;
+            }
+            else
+                ts.Add(t, value);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SafeMax<TKey, TValue>(this Dictionary<TKey, TValue> ts, TKey t, TValue value) where TValue : IComparable<TValue>
+        {
+            if (ts.TryGetValue(t, out var current))
+            {
+                if (current.CompareTo(value) < 0)
+                    ts[t] = value;
+            }
             else
                 ts.Add(t, value);
         }
@@ -288,7 +429,7 @@ namespace V
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryMin<T>(this ref T current, T newer) where T : struct, IComparable<T>
         {
-            if (current.CompareTo(newer) < 0)
+            if (current.CompareTo(newer) <= 0)
                 return false;
 
             current = newer;
@@ -297,7 +438,7 @@ namespace V
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryMax<T>(this ref T current, T newer) where T : struct, IComparable<T>
         {
-            if (current.CompareTo(newer) > 0)
+            if (current.CompareTo(newer) >= 0)
                 return false;
 
             current = newer;
