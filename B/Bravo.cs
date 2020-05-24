@@ -288,7 +288,7 @@ namespace V
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryMin<T>(this ref T current, T newer) where T : struct, IComparable<T>
         {
-            if (current.CompareTo(newer) < 0)
+            if (current.CompareTo(newer) <= 0)
                 return false;
 
             current = newer;
@@ -297,7 +297,7 @@ namespace V
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryMax<T>(this ref T current, T newer) where T : struct, IComparable<T>
         {
-            if (current.CompareTo(newer) > 0)
+            if (current.CompareTo(newer) >= 0)
                 return false;
 
             current = newer;
