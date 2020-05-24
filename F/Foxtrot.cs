@@ -10,8 +10,40 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var ss = ArrStr(n);
+            var dics = ss.Select(x => x.Distinct().ToHashSet()).ToArray();
+
+            var res = new char[n];
+
+            foreach (var i in C.Loop((n - 1) / 2 + 1))
+            {
+                var a = dics[i];
+                var b = dics[n - 1 - i];
+
+                char? ch = null;
+
+                foreach (var aa in a)
+                {
+                    if (b.Contains(aa))
+                    {
+                        ch = aa;
+                        break;
+                    }
+                }
+
+                if (ch.HasValue == false)
+                {
+                    Wr(-1);
+                    return;
+                }
+
+                res[i] = ch.Value;
+                res[n - 1 - i] = ch.Value;
+            }
+
+            Wr(res.ToStr());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

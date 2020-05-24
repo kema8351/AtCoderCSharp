@@ -10,8 +10,35 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var m = Read;
+            var q = Read;
+
+            var counts = new long[m + 1];
+            var ansed = new bool[n + 1, m + 1];
+
+            foreach (var i in C.Loop(q))
+            {
+                var tp = Read;
+                if (tp == 1)
+                {
+                    var res = 0L;
+                    var nn = Read;
+                    foreach (var j in C.Loop(m + 1))
+                        if (ansed[nn, j])
+                            res += n - counts[j];
+
+                    Wr(res);
+                }
+                else
+                {
+                    var nn = Read;
+                    var mm = Read;
+                    counts[mm]++;
+                    ansed[nn, mm] = true;
+                }
+            }
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

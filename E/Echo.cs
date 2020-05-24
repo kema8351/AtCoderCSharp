@@ -10,8 +10,30 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var m = Read;
+            var q = Read;
+            var graph = new C.Tree(sc, m);
+            var cs = Arr(n);
+
+            foreach (var _ in C.Loop(q))
+            {
+                var tp = Read;
+                var x = Read - 1;
+                Wr(cs[x]);
+                if (tp == 1)
+                {
+                    foreach (var to in graph.To(x))
+                        cs[to] = cs[x];
+                }
+                else
+                {
+                    var y = Read;
+                    cs[x] = y;
+                }
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

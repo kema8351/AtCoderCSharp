@@ -10,8 +10,63 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var a = Read;
+            var r = Read;
+            var n = Read;
+            var lg = 1000000000;
+
+            Dictionary<long, long?> cache = new Dictionary<long, long?>();
+
+            long? Slv(long p)
+            {
+                if (p == 0)
+                    return 1;
+                if (p == 1)
+                    return r;
+
+                if (cache.TryGetValue(p, out var c))
+                    return c;
+
+                var half = Slv(p / 2);
+                long? res = null;
+                if (half.HasValue == false)
+                {
+                }
+                else
+                {
+                    res = half.Value * half.Value;
+                    if (res > lg)
+                        res = null;
+
+                    if (res.HasValue)
+                    {
+                        if (p % 2 == 1)
+                        {
+                            res *= r;
+                            if (res > lg)
+                                res = null;
+                        }
+                    }
+                }
+
+                cache.Add(p, res);
+                return res;
+            }
+
+            var rr = Slv(n - 1);
+            if (rr.HasValue)
+            {
+                rr *= a;
+                if (rr > lg)
+                    rr = null;
+            }
+
+            if (rr.HasValue)
+                Wr(rr.Value);
+            else
+                Wr("large");
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

@@ -10,8 +10,17 @@ namespace V
     {
         public void Solve()
         {
+            var s = Str;
+            var t = Str;
+            if (s == t)
+                Wr("same");
+            else if (s.ToLower() == t.ToLower())
+                Wr("case-insensitive");
+            else
+                Wr("different");
+
             //var n = Read;
-            Write(SolveLong());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

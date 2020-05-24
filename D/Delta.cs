@@ -10,8 +10,48 @@ namespace V
     {
         public void Solve()
         {
+            var n = Read;
+            var ss = ArrStr(5);
+
+            var origin = new string[]
+            {
+                ".###..#..###.###.#.#.###.###.###.###.###.",
+                ".#.#.##....#...#.#.#.#...#.....#.#.#.#.#.",
+                ".#.#..#..###.###.###.###.###...#.###.###.",
+                ".#.#..#..#.....#...#...#.#.#...#.#.#...#.",
+                ".###.###.###.###...#.###.###...#.###.###."
+            };
+
+            var res = "";
+
+            foreach (int i in C.Loop(n))
+            {
+                var r = -1;
+
+                foreach (int d in C.Loop(10))
+                {
+                    r = d;
+
+                    foreach (var l in C.Loop(5))
+                    {
+
+                        if (ss[l].Substring(i * 4 + 1, 3) != origin[l].Substring(d * 4 + 1, 3))
+                        {
+                            r = -1;
+                            break;
+                        }
+                    }
+
+                    if (r >= 0)
+                        break;
+                }
+
+                res += r.ToString();
+            }
+
+            Wr(res);
             //var n = Read;
-            Write(SolveLong());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
