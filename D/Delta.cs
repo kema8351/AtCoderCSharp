@@ -10,8 +10,48 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = ReadInt;
+            var a = Arr(n);
+            var max = a.Select((x, i) => new { x, i }).OrderByDescending(x => x.x).First();
+            var min = a.Select((x, i) => new { x, i }).OrderBy(x => x.x).First();
+            var res = new List<Pair>();
+            var add = Math.Abs(max.x) > Math.Abs(min.x) ? max : min;
+
+            for (int i = 0; i < n; i++)
+            {
+                res.Add(new Pair(add.i, i));
+                a[i] += a[add.i];
+            }
+
+            if (a[0] > 0)
+            {
+                for (int i = 0; i < n - 1; i++)
+                {
+                    if (a[i] > a[i + 1])
+                    {
+                        res.Add(new Pair(i, i + 1));
+                        a[i + 1] += a[i];
+                    }
+                }
+            }
+            else
+            {
+                for (int i = n - 2; i >= 0; i--)
+                {
+                    if (a[i] > a[i + 1])
+                    {
+                        res.Add(new Pair(i + 1, i));
+                        a[i] += a[i + 1];
+                    }
+                }
+            }
+
+            Wr(res.Count);
+            foreach (var r in res)
+            {
+                Wr((r.X + 1) + " " + (r.Y + 1));
+            }
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
