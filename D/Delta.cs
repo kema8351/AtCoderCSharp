@@ -10,8 +10,38 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var q = ReadInt;
+
+            var sums = new long[100002];
+            var cands = new bool[100001];
+            var sosu = new HashSet<int>();
+            for (int i = 2; i <= 100000; i++)
+            {
+                if (cands[i] == false)
+                {
+                    sosu.Add(i);
+
+                    var bg = i * 2;
+                    while (bg <= 100000)
+                    {
+                        cands[bg] = true;
+                        bg += i;
+                    }
+                }
+
+                var b = i % 2 == 1 && sosu.Contains(i) && sosu.Contains((i + 1) / 2);
+                sums[i + 1] = sums[i] + (b ? 1 : 0);
+            }
+
+            foreach (var i in C.Loop(q))
+            {
+                var l = ReadInt;
+                var r = ReadInt;
+
+                Wr(sums[r + 1] - sums[l]);
+
+            }
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
