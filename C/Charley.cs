@@ -18,7 +18,9 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0L;
+            var a = Arr(n);
+
+            return a.GroupBy(x => x).Sum(g => g.Count() >= g.Key ? g.Count() - g.Key : g.Count());
         }
 
         public bool SolveBool()
