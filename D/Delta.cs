@@ -18,7 +18,17 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0L;
+            var m = Read;
+            var dic = C.Factorize(m);
+
+            var res = new Mint(1);
+
+            foreach (var x in dic.Values)
+            {
+                res *= Mint.Comb(x + n - 1, n - 1);
+            }
+
+            return res.Value;
         }
 
         public bool SolveBool()
