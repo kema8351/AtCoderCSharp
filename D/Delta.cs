@@ -18,7 +18,52 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0L;
+            var k = Read;
+            var counts = new long[k, k, 2];
+            foreach (var i in C.Loop(n))
+            {
+                var xx = Read % (k * 2);
+                var yy = Read % (k * 2);
+                var c = (xx / k + yy / k + (Str == "B" ? 0 : 1)) % 2;
+                counts[xx % k, yy % k, c]++;
+            }
+
+            var sums = new long[k + 1, k + 1, 2];
+            foreach (var i in C.Loop(k))
+            {
+                foreach (var j in C.Loop(k))
+                {
+                    foreach (var c in C.Loop(2))
+                    {
+                        sums[i + 1, j + 1, c] = sums[i + 1, j, c] + sums[i, j + 1, c] - sums[i, j, c] + counts[i, j, c];
+                    }
+                }
+            }
+
+            var res = 0L;
+            foreach (var i in C.Loop(k))
+            {
+                foreach (var j in C.Loop(k))
+                {
+                    foreach (var c in C.Loop(2))
+                    {
+                        var cand = 0L;
+                        cand += Slv(sums, 0, 0, i, j, c);
+                        cand += Slv(sums, i, 0, k, j, 1 - c);
+                        cand += Slv(sums, 0, j, i, k, 1 - c);
+                        cand += Slv(sums, i, j, k, k, c);
+
+                        res = Math.Max(cand, res);
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        long Slv(long[,,] sums, long x0, long y0, long x1, long y1, long c)
+        {
+            return sums[x1, y1, c] - sums[x0, y1, c] - sums[x1, y0, c] + sums[x0, y0, c];
         }
 
         public bool SolveBool()
