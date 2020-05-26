@@ -17,8 +17,35 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            return 0L;
+            var n = ReadInt;
+            var s = Str;
+            var c = 0;
+            var res = new Mint(1);
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                var isLeft =
+                    (i % 2 == 0 && s[i] == 'B')
+                    || (i % 2 == 1 && s[i] == 'W');
+
+                if (isLeft)
+                    c++;
+                else
+                {
+                    res *= c;
+                    c--;
+                }
+
+                if (c < 0)
+                    return 0;
+            }
+
+            if (c != 0)
+                return 0;
+
+            res *= Mint.Fac(n);
+
+            return res.Value;
         }
 
         public bool SolveBool()
