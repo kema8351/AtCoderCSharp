@@ -17,8 +17,43 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            return 0L;
+            var n = ReadInt;
+            var m = ReadInt;
+            var a = Arr(n).OrderBy(x => x).ToArray();
+            var b = Arr(m).OrderBy(x => x).ToArray();
+
+            if (a.GroupBy(x => x).Any(x => x.Count() > 1)
+                || b.GroupBy(x => x).Any(x => x.Count() > 1))
+                return 0L;
+
+            var res = new Mint(1);
+
+
+            for (int i = n * m; i > 0; i--)
+            {
+                var ai = C.BinarySearch.GetLastIndexLess(i, a);
+                var bi = C.BinarySearch.GetLastIndexLess(i, b);
+
+                if (ai + 1 >= n || bi + 1 >= m)
+                    return 0;
+
+                var an = a[ai + 1] == i ? 1 : (n - ai - 1);
+                var bn = b[bi + 1] == i ? 1 : (m - bi - 1);
+
+                if (a[ai + 1] == i || b[bi + 1] == i)
+                    res *= an * bn;
+                else
+                {
+                    var abn = an * bn - (n * m - i);
+                    if (abn <= 0)
+                        return 0;
+
+                    res *= abn;
+                }
+            }
+
+            return res.Value;
+
         }
 
         public bool SolveBool()
