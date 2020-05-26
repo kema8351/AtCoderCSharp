@@ -18,8 +18,77 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0L;
+            var q = Read;
+            var s = Str;
+            var pairs = sc.Pairs<string, string>(q);
+
+            int aliveLeft, aliveRight;
+            {
+                var l = -1;
+                var r = s.Length;
+                while (l < r)
+                {
+                    var mid = (l + r + 2) / 2 - 1;
+                    if (GetResult(s, mid, pairs) == Result.Left)
+                    {
+                        l = mid + 1;
+                    }
+                    else
+                    {
+                        r = mid;
+                    }
+                }
+                aliveLeft = l;
+            }
+            {
+                var l = -1;
+                var r = s.Length;
+                while (l < r)
+                {
+                    var mid = (l + r + 2) / 2;
+                    if (GetResult(s, mid, pairs) == Result.Right)
+                    {
+                        r = mid - 1;
+                    }
+                    else
+                    {
+                        l = mid;
+                    }
+                }
+                aliveRight = l;
+            }
+
+            return aliveRight - aliveLeft + 1;
         }
+
+        private Result GetResult(string s, int index, Pair<string, string>[] pairs)
+        {
+            if (index < 0)
+                return Result.Left;
+            if (index >= s.Length)
+                return Result.Right;
+
+            var current = index;
+            foreach (var p in pairs)
+            {
+                if (p.X[0] == s[current])
+                {
+                    if (p.Y == "L")
+                        current--;
+                    else
+                        current++;
+
+                    if (current < 0)
+                        return Result.Left;
+                    else if (current >= s.Length)
+                        return Result.Right;
+                }
+            }
+
+            return Result.Alive;
+        }
+
+        enum Result { Left, Right, Alive };
 
         public bool SolveBool()
         {
