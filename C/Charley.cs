@@ -10,9 +10,99 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = ReadInt;
+            var m = ReadInt;
+            var s = ReadInt - 1;
+            var t = ReadInt - 1;
+            var paths = new List<Path>();
+            foreach (var i in C.Loop(m))
+            {
+                var u = ReadInt - 1;
+                var v = ReadInt - 1;
+                var a = Read;
+                var b = Read;
+                paths.Add(new Path() { u = u, v = v, a = a, b = b });
+                paths.Add(new Path() { u = v, v = u, a = a, b = b });
+            }
+            var tos = paths.GroupBy(x => x.u).ToDictionary(x => x.Key, x => x.ToArray());
+
+            // 0:Yen, 1:Snuuku
+            var dp = new long[n, 2];
+
+            var initial = 1000000000000000L;
+
+            var pq = new C.PriorityQueue<long, State>(x => x.current + (x.isYen ? initial : 0), true);
+            Enqueue(pq, new State() { isYen = true, current = initial, city = s }, dp);
+
+            var res = new long[n];
+            for (int i = n - 1; i >= 0; i--)
+            {
+                if (i < n - 1)
+                {
+                    var state = new State() { isYen = false, city = i, current = dp[i, 0] };
+                    Enqueue(pq, state, dp);
+                }
+
+                while (pq.Count > 0)
+                {
+                    var q = pq.Dequeue();
+
+                    //if (q.city == t && q.isYen == false)
+                    //    break;
+
+                    if (dp[q.city, q.isYen ? 0 : 1] != q.current)
+                        continue;
+
+                    foreach (var to in tos[q.city])
+                    {
+                        var cost = q.isYen ? to.a : to.b;
+                        var state = new State() { isYen = q.isYen, city = to.v, current = q.current - cost };
+
+                        Enqueue(pq, state, dp);
+                    }
+
+                    if (i <= q.city && q.isYen)
+                    {
+                        var state = new State() { isYen = false, city = q.city, current = q.current };
+
+                        Enqueue(pq, state, dp);
+                    }
+                }
+
+                res[i] = dp[t, 1];
+            }
+
+            foreach (var r in res)
+            {
+                Wr(r);
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
+        }
+
+        void Enqueue(C.PriorityQueue<long, State> pq, State state, long[,] dp)
+        {
+            if (dp[state.city, state.isYen ? 0 : 1] >= state.current)
+                return;
+
+            dp[state.city, state.isYen ? 0 : 1] = state.current;
+            pq.Enqueue(state);
+        }
+
+        public class Path
+        {
+            public int u;
+            public int v;
+            public long a;
+            public long b;
+        }
+
+        public class State
+        {
+            public bool isYen;
+            public long current;
+            public int city;
         }
 
         public long SolveLong()
