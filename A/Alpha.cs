@@ -10,8 +10,86 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = ReadInt;
+            var m = ReadInt;
+            HashSet<int>[] tos = Enumerable.Repeat(0, n).Select(x => new HashSet<int>()).ToArray();
+
+            foreach (var i in C.Loop(m))
+            {
+                var a = ReadInt - 1;
+                var b = ReadInt - 1;
+                tos[a].Add(b);
+                tos[b].Add(a);
+            }
+
+            var zeros = new HashSet<int>();
+            var singles = tos.Select((x, i) => new { x, i }).Where(x => x.x.Count == 1).Select(x => x.i).ToHashSet();
+            var others = tos.Select((x, i) => new { x, i }).Where(x => x.x.Count > 1).Select(x => x.i).ToHashSet();
+            var pairs = new List<Pair<int, int>>();
+
+            while (true)
+            {
+                int first = -1;
+                int second = -1;
+                int third = -1;
+
+                if (singles.Count > 0)
+                {
+                    first = singles.First();
+                    second = tos[first].First();
+                    if (tos[second].Count <= 1)
+                        break;
+
+                    third = tos[second].Where(x => x != first).First();
+                }
+                else if (others.Count > 0)
+                {
+                    second = others.First();
+                    first = tos[second].First();
+                    third = tos[second].Where(x => x != first).First();
+                }
+                else
+                {
+                    break;
+                }
+
+                pairs.Add(new Pair<int, int>(second, first));
+                pairs.Add(new Pair<int, int>(second, third));
+
+                tos[first].Remove(second);
+                tos[second].Remove(first);
+                tos[second].Remove(third);
+                tos[third].Remove(second);
+
+                foreach (var r in new int[] { first, second, third })
+                {
+                    zeros.SafeRemove(r);
+                    singles.SafeRemove(r);
+                    others.SafeRemove(r);
+
+                    switch (tos[r].Count)
+                    {
+                        case 0:
+                            zeros.Add(r); break;
+                        case 1:
+                            singles.Add(r); break;
+                        default:
+                            others.Add(r); break;
+                    }
+                }
+            }
+
+            if (zeros.Count != n)
+                Wr(-1);
+            else
+            {
+                foreach (var p in pairs)
+                {
+                    Wr($"{p.X + 1} {p.Y + 1}");
+                }
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

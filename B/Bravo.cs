@@ -10,9 +10,94 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var n = ReadInt;
+            var m = ReadInt;
+            HashSet<int>[] tos = Enumerable.Repeat(0, n).Select(x => new HashSet<int>()).ToArray();
+
+            foreach (var i in C.Loop(m))
+            {
+                var a = ReadInt - 1;
+                var b = ReadInt - 1;
+                tos[a].Add(b);
+                tos[b].Add(a);
+            }
+
+            if (m % 2 == 1)
+            {
+                Wr(-1);
+                return;
+            }
+
+            var res = new List<Pair<int, int>>();
+
+            var root = 0;
+            var parents = new int[n];
+            var children = new Dictionary<int, HashSet<int>>();
+            var queue = new Queue<int>();
+            var stack = new Stack<int>();
+            queue.Enqueue(root);
+            children.Add(root, new HashSet<int>());
+            parents[root] = -1;
+            while (queue.Count > 0)
+            {
+                var q = queue.Dequeue();
+
+                foreach (var to in tos[q])
+                {
+                    if (children.ContainsKey(to))
+                        continue;
+
+                    children.Add(to, new HashSet<int>());
+                    children[q].Add(to);
+                    parents[to] = q;
+                    queue.Enqueue(to);
+                }
+
+                stack.Push(q);
+            }
+
+            var outs = new int[n];
+            foreach (int i in C.Loop(n))
+            {
+                foreach (var to in tos[i])
+                {
+                    if (i < to)
+                        continue;
+
+                    if (children[i].Contains(to))
+                        continue;
+
+                    if (children[to].Contains(i))
+                        continue;
+
+                    res.Add(new Pair<int, int>(i, to));
+                    outs[i]++;
+                }
+            }
+
+            while (stack.Count > 0)
+            {
+                var s = stack.Pop();
+
+                if (parents[s] < 0)
+                    continue;
+
+                if (outs[s] % 2 == 1)
+                {
+                    res.Add(new Pair<int, int>(s, parents[s]));
+                    outs[s]++;
+                }
+                else
+                {
+                    res.Add(new Pair<int, int>(parents[s], s));
+                    outs[parents[s]]++;
+                }
+            }
+
+            foreach (var p in res)
+            {
+                Wr($"{p.X + 1} {p.Y + 1}");
+            }
         }
 
         public long SolveLong()
