@@ -17,8 +17,56 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            return 0L;
+            var n = ReadInt;
+            var a = Arr(n);
+            var b = Arr(n);
+
+            if (Enumerable.Range(0, n).Any(x => a[x] > b[x]))
+                return -1;
+
+            var indices = new Queue<int>(Enumerable.Range(0, n).Where(x => a[x] != b[x] && b[x] - b[(x + n - 1) % n] - b[(x + 1) % n] >= a[x]));
+            var finished = Enumerable.Range(0, n).Count(x => a[x] == b[x]);
+            var res = 0L;
+
+            while (indices.Count > 0)
+            {
+                var i = indices.Dequeue();
+
+                var prev = b[(i + n - 1) % n];
+                var next = b[(i + 1) % n];
+                var add = prev + next;
+
+                if (add > a[i])
+                {
+                    res += b[i] / add;
+                    b[i] %= add;
+                }
+                else
+                {
+                    var diff = b[i] - a[i];
+                    var count = diff / add;
+
+                    if (count == 0)
+                        continue;
+
+                    res += count;
+                    b[i] -= add * count;
+                }
+
+                if (b[i] < a[i])
+                    return -1;
+                else if (b[i] == a[i])
+                    finished++;
+
+                if (prev >= b[(i + n - 2) % n] + b[i])
+                    indices.Enqueue((i + n - 1) % n);
+
+                if (next >= b[(i + 2) % n] + b[i])
+                    indices.Enqueue((i + 1) % n);
+            }
+
+
+            return finished == n ? res : -1;
         }
 
         public bool SolveBool()
