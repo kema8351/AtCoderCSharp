@@ -17,8 +17,18 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            return 0L;
+            var h1 = Read;
+            var m1 = Read;
+            var h2 = Read;
+            var m2 = Read;
+            var k = Read;
+
+            var hm1 = h1 * 60 + m1;
+            var hm2 = h2 * 60 + m2;
+            if (hm1 > hm2)
+                hm2 += 24 * 60;
+
+            return hm2 - hm1 - k;
         }
 
         public bool SolveBool()

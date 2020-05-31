@@ -10,8 +10,25 @@ namespace V
     {
         public void Solve()
         {
+            var s = Str;
+            var cs = new char[s.Length];
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                switch (s[i])
+                {
+                    case '?':
+                        cs[i] = 'D';
+                        break;
+                    default:
+                        cs[i] = s[i];
+                        break;
+                }
+            }
+
+            Wr(new string(cs));
             //var n = Read;
-            Write(SolveLong());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

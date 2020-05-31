@@ -17,8 +17,73 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            return 0L;
+            var n = ReadInt;
+            var p = ArrInt(n).Select(x => x - 1).ToArray();
+            var unionFind = new C.UnionFind(n);
+            for (int i = 0; i < n; i++)
+            {
+                if (p[i] >= 0)
+                    unionFind.TryUnite(i, p[i]);
+            }
+
+            var roots = new int[n];
+            var undifineds = new HashSet<int>();
+            for (int i = 0; i < n; i++)
+            {
+                roots[i] = unionFind.GetRoot(i);
+
+                if (p[i] < 0)
+                    undifineds.Add(roots[i]);
+            }
+
+            var dp = new Mint[n + 1, n + 1];
+            var mx = 0;
+            dp[0, 0] = new Mint(1);
+            var checkedRoots = new HashSet<int>();
+
+            for (int i = 0; i < n; i++)
+            {
+                var root = roots[i];
+                var isUndifinedGroup = undifineds.Contains(root);
+                var isCheckedRoots = checkedRoots.Contains(root);
+
+                if (p[i] >= 0)
+                {
+                    var add = (!isCheckedRoots && !isUndifinedGroup) ? +1 : 0;
+
+                    for (int j = 0; j <= mx; j++)
+                    {
+                        dp[i + 1, j + add] = dp[i, j];
+                    }
+
+                    if (add > 0)
+                    {
+                        mx++;
+                        checkedRoots.Add(root);
+                    }
+                }
+                else
+                {
+                    var size = unionFind.GetSize(i);
+
+                    for (int j = 0; j <= mx; j++)
+                    {
+                        dp[i + 1, j] += dp[i, j] * (n - size);
+                        dp[i + 1, j + 1] += dp[i, j] * (size - 1);
+                    }
+
+                    mx++;
+                }
+            }
+
+            var res = new Mint();
+
+            for (int j = 0; j <= mx; j++)
+            {
+                res += dp[n, j] * (n - j);
+            }
+
+            return res.Value;
         }
 
         public bool SolveBool()

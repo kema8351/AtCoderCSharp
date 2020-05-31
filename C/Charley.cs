@@ -17,8 +17,33 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            return 0L;
+            var n = Read + 1;
+            var a = Arr(n);
+            var max = new long[n];
+
+            max[n - 1] = a[n - 1];
+
+            for (long i = n - 2; i >= 0; i--)
+            {
+                max[i] = max[i + 1] + a[i];
+            }
+
+            var res = 1L;
+            var parent = 1L - a[0];
+            for (long i = 1; i < n; i++)
+            {
+                if (parent <= 0)
+                    return -1;
+
+                var r = Math.Min(parent * 2, max[i]);
+                res += r;
+                parent = r - a[i];
+            }
+
+            if (parent != 0)
+                return -1;
+
+            return res;
         }
 
         public bool SolveBool()
