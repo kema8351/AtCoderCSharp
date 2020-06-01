@@ -18,7 +18,8 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0L;
+            var m = Read;
+            return n * m;
         }
 
         public bool SolveBool()

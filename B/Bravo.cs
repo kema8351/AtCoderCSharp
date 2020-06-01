@@ -18,7 +18,20 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0L;
+            var a = Arr(n);
+            var res = 1L;
+
+            if (a.Any(x => x == 0))
+                return 0;
+
+            foreach (var aa in a)
+            {
+                if (aa > 1000000000000000000 / res)
+                    return -1;
+
+                res *= aa;
+            }
+            return res;
         }
 
         public bool SolveBool()

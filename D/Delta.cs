@@ -18,7 +18,23 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0L;
+            var dic = C.Factorize(n);
+            var res = 0;
+
+            foreach (var p in dic.Values)
+            {
+                var pp = p;
+                var x = 1;
+                while (x <= pp)
+                {
+                    pp -= x;
+                    x++;
+                }
+
+                res += x - 1;
+            }
+
+            return res;
         }
 
         public bool SolveBool()

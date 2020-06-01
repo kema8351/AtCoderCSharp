@@ -15,10 +15,15 @@ namespace V
             //YesNo(SolveBool());
         }
 
-        public long SolveLong()
+        public decimal SolveLong()
         {
             var n = Read;
-            return 0L;
+            var s = Str;
+            var d = decimal.Parse(s);
+
+            var res = Math.Floor(n * d);
+
+            return res;
         }
 
         public bool SolveBool()

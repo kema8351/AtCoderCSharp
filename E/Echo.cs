@@ -18,7 +18,18 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0L;
+            var pairs = sc.Pairs(n);
+            var aa = pairs.Select(x => x.X).OrderBy(x => x).ToArray();
+            var bb = pairs.Select(x => x.Y).OrderBy(x => x).ToArray();
+
+            if (n % 2 == 0)
+            {
+                return bb[n / 2] + bb[n / 2 - 1] - aa[n / 2] - aa[n / 2 - 1] + 1;
+            }
+            else
+            {
+                return bb[n / 2] - aa[n / 2] + 1;
+            }
         }
 
         public bool SolveBool()

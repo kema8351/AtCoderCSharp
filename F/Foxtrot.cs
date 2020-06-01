@@ -18,7 +18,43 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0L;
+            var s = Read;
+            var a = Arr(n);
+
+            Mint.Set998244353();
+
+            var dp = new Mint[3001, 3001];
+            var dpsum = new Mint[3001, 3001];
+            dp[0, 0] = new Mint(1);
+            dpsum[0, 0] = new Mint(1);
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j <= 3000; j++)
+                {
+                    dp[i + 1, j] = dpsum[i, j];
+                }
+
+                for (int j = 0; j <= 3000; j++)
+                {
+                    var jj = j + a[i];
+                    if (jj > 3000)
+                        continue;
+
+                    dp[i + 1, jj] += dpsum[i, j];
+                }
+
+                for (int j = 0; j <= 3000; j++)
+                {
+                    dpsum[i + 1, j] = dpsum[i, j] + dp[i + 1, j];
+                }
+            }
+
+            var res = new Mint();
+            for (int i = 0; i <= n; i++)
+                res += dp[i, s];
+
+            return res.Value;
         }
 
         public bool SolveBool()
