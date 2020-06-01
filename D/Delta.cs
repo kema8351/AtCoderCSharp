@@ -15,10 +15,66 @@ namespace V
             //YesNo(SolveBool());
         }
 
+        long? SafeMin(long? current, long? prev, long adding)
+        {
+            if (prev == null)
+                return current;
+
+            var cand = prev.Value + adding;
+            if (current == null)
+                return cand;
+
+            return Math.Min(cand, current.Value);
+        }
+
         public long SolveLong()
         {
             var n = Read;
-            return 0L;
+            var a = Arr(n);
+            var dp = new long?[n + 1, 5];
+            dp[0, 0] = 0;
+
+            for (int i = 0; i < n; i++)
+            {
+                var addEven = a[i] == 0 ? 2 : a[i] % 2;
+                var addOdd = a[i] == 0 ? 1 : (1 - a[i] % 2);
+
+                // no walk
+                dp[i + 1, 0] = SafeMin(dp[i + 1, 0], dp[i, 0], a[i]);
+
+                // even 1
+                dp[i + 1, 1] = SafeMin(dp[i + 1, 1], dp[i, 0], addEven);
+                dp[i + 1, 1] = SafeMin(dp[i + 1, 1], dp[i, 1], addEven);
+
+                // odd
+                dp[i + 1, 2] = SafeMin(dp[i + 1, 2], dp[i, 0], addOdd);
+                dp[i + 1, 2] = SafeMin(dp[i + 1, 2], dp[i, 1], addOdd);
+                dp[i + 1, 2] = SafeMin(dp[i + 1, 2], dp[i, 2], addOdd);
+
+                // even 2
+                dp[i + 1, 3] = SafeMin(dp[i + 1, 3], dp[i, 0], addEven);
+                dp[i + 1, 3] = SafeMin(dp[i + 1, 3], dp[i, 1], addEven);
+                dp[i + 1, 3] = SafeMin(dp[i + 1, 3], dp[i, 2], addEven);
+                dp[i + 1, 3] = SafeMin(dp[i + 1, 3], dp[i, 3], addEven);
+
+                // no walk
+                dp[i + 1, 4] = SafeMin(dp[i + 1, 4], dp[i, 0], a[i]);
+                dp[i + 1, 4] = SafeMin(dp[i + 1, 4], dp[i, 1], a[i]);
+                dp[i + 1, 4] = SafeMin(dp[i + 1, 4], dp[i, 2], a[i]);
+                dp[i + 1, 4] = SafeMin(dp[i + 1, 4], dp[i, 3], a[i]);
+                dp[i + 1, 4] = SafeMin(dp[i + 1, 4], dp[i, 4], a[i]);
+            }
+
+            var res = long.MaxValue;
+            for (int i = 0; i <= 4; i++)
+            {
+                if (dp[n, i].HasValue == false)
+                    continue;
+
+                res = Math.Min(res, dp[n, i].Value);
+            }
+
+            return res;
         }
 
         public bool SolveBool()
