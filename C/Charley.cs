@@ -18,13 +18,15 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0L;
+            var res = 0L;
+            return res;
         }
 
         public bool SolveBool()
         {
             var n = Read;
-            return false;
+            var res = false;
+            return res;
         }
     }
 }
@@ -939,6 +941,26 @@ namespace V
         }
         public static class BinarySearch
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static long GetCountLarger<T>(T x, IList<T> listOrdered) where T : IComparable
+            {
+                return listOrdered.Count - GetCountSmallerOrEqual(x, listOrdered);
+            }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static long GetCountLargerOrEqual<T>(T x, IList<T> listOrdered) where T : IComparable
+            {
+                return listOrdered.Count - GetCountSmaller(x, listOrdered);
+            }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static long GetCountSmaller<T>(T x, IList<T> listOrdered) where T : IComparable
+            {
+                return GetLastIndexLess(x, listOrdered) + 1;
+            }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static long GetCountSmallerOrEqual<T>(T x, IList<T> listOrdered) where T : IComparable
+            {
+                return GetFirstIndexGreater(x, listOrdered);
+            }
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static long GetFirstIndexGreater<T>(T x, IList<T> listOrdered) where T : IComparable
             {
