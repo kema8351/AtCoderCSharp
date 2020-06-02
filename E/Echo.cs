@@ -18,7 +18,50 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0L;
+            var m = Read;
+            var a = Arr(n).OrderBy(x => x).ToArray();
+
+            var l = a[0] + a[0];
+            var r = a[n - 1] + a[n - 1];
+            while (l + 1 < r)
+            {
+                var mid = (l + r) / 2;
+                var count = 0L;
+                foreach (var i in C.Loop(n))
+                {
+                    var idx = C.BinarySearch.GetLastIndexLess(mid - a[i], a);
+                    var c = (n - idx) - 1;
+                    count += c;
+                }
+
+                if (count >= m)
+                    l = mid;
+                else
+                    r = mid;
+            }
+
+            var s = new List<long>() { 0L };
+            var current = 0L;
+            foreach (var i in C.Loop(n))
+            {
+                current += a[i];
+                s.Add(current);
+            }
+
+            var res = 0L;
+            var cnt = 0L;
+            foreach (var i in C.Loop(n))
+            {
+                var idx = C.BinarySearch.GetLastIndexLess(l - a[i], a);
+                var c = (n - idx) - 1;
+                cnt += c;
+                res += c * a[i];
+                res += s[(int)n] - s[(int)idx + 1];
+            }
+
+            res -= (cnt - m) * l;
+
+            return res;
         }
 
         public bool SolveBool()
