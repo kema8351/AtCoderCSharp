@@ -17,8 +17,43 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            return 0L;
+            var n = ReadInt;
+            var k = ReadInt;
+            var r = Read;
+            var s = Read;
+            var p = Read;
+            var t = Str;
+
+            var res = 0L;
+            var ls = new bool[n];
+
+
+            for (int i = 0; i < n; i++)
+            {
+                var win = false;
+                if (i < k)
+                    win = true;
+                else
+                    win = ls[i - k] || t[i] != t[i - k];
+
+                if (!win)
+                {
+                    ls[i] = true;
+                    continue;
+                }
+
+                switch (t[i])
+                {
+                    case 'r':
+                        res += p; break;
+                    case 's':
+                        res += r; break;
+                    case 'p':
+                        res += s; break;
+                }
+            }
+
+            return res;
         }
 
         public bool SolveBool()

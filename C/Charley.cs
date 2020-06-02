@@ -18,7 +18,25 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            return 0L;
+            var a = Enumerable.Range(0, 110000).ToArray();
+
+            var i = 2;
+            while (true)
+            {
+                if (a[i] != 0)
+                {
+                    if (i >= n)
+                        return i;
+
+                    for (long j = i * 2; j < a.Length; j += i)
+                    {
+                        a[j] = 0;
+                    }
+                }
+
+                i++;
+            }
+            return 0;
         }
 
         public bool SolveBool()

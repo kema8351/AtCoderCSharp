@@ -10,8 +10,11 @@ namespace V
     {
         public void Solve()
         {
+            var s = Str;
+            var t = Str;
+            Wr(t + s);
             //var n = Read;
-            Write(SolveLong());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
