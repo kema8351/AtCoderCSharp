@@ -10,8 +10,18 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = ReadInt;
+            var s = Str;
+            var t = Str;
+            var cs = new List<char>();
+            foreach (var i in C.Loop(n))
+            {
+                cs.Add(s[i]);
+                cs.Add(t[i]);
+            }
+
+            Wr(new string(cs.ToArray()));
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

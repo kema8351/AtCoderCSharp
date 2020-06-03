@@ -18,7 +18,96 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var u = Read - 1;
+            var v = Read - 1;
+            var tree = new C.Tree(sc, n - 1);
+
+            var heights = new long[n];
+            var parents = new long[n];
+
+            foreach (var i in C.Loop(n))
+            {
+                heights[i] = -1;
+                parents[i] = -1;
+            }
+            var queue = new Queue<long>();
+            queue.Enqueue(v);
+            heights[v] = 0;
+
+            while (queue.Count > 0)
+            {
+                var q = queue.Dequeue();
+
+                foreach (var to in tree.To(q))
+                {
+                    if (heights[to] >= 0)
+                        continue;
+
+                    heights[to] = heights[q] + 1;
+                    parents[to] = q;
+
+                    queue.Enqueue(to);
+                }
+            }
+
+            var maxHeights = new long[n];
+            foreach (var pair in heights.Select((h, i) => new { h, i }).OrderByDescending(x => x.h))
+            {
+                long p = pair.i;
+                while (p >= 0 && maxHeights[p] < pair.h)
+                {
+                    maxHeights[p] = pair.h;
+                    p = parents[p];
+                }
+            }
+
             var res = 0L;
+            var aokiHeight = 0L;
+            var taka = u;
+            var takaHeight = heights[u];
+            var takaMaxHeight = 0L;
+            var phase = 0;
+
+            while (true)
+            {
+                // taka
+                switch (phase)
+                {
+                    case 0:
+                        if (heights[taka] - 2 <= aokiHeight)
+                        {
+                            phase = 1;
+                            takaMaxHeight = maxHeights[taka];
+                            if (takaMaxHeight > takaHeight)
+                                takaHeight++;
+                            else
+                                takaHeight--;
+                        }
+                        else
+                        {
+                            taka = parents[taka];
+                            takaHeight = heights[taka];
+                        }
+
+                        break;
+                    case 1:
+                        if (takaMaxHeight > takaHeight)
+                            takaHeight++;
+                        else
+                            takaHeight--;
+                        break;
+                }
+
+                if (takaHeight == aokiHeight)
+                    return res;
+
+                // aoki
+                aokiHeight++;
+                res++;
+                if (takaHeight == aokiHeight)
+                    return res;
+            }
+
             return res;
         }
 
