@@ -18,7 +18,46 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var k = Read;
+            var a = Arr(n);
+            var mx = 48;
+            var d = new long[mx];
+
+            foreach (var aa in a)
+            {
+                for (int i = 0; i < mx; i++)
+                {
+                    if ((aa >> i & 1) == 1)
+                        d[i]++;
+                }
+            }
+
+            var dp = new long?[mx + 1, 2];
+            dp[0, 0] = 0;
+
+            for (int i = 0; i < mx; i++)
+            {
+                var dgt = 48 - i - 1;
+                var isOne = (k >> dgt & 1) == 1;
+
+                if (isOne)
+                {
+                    dp[i + 1, 0] = dp[i, 0] + ((n - d[dgt]) << dgt);
+                    dp[i + 1, 1] = dp[i, 0] + (d[dgt] << dgt);
+                }
+                else
+                {
+                    dp[i + 1, 0] = dp[i, 0] + (d[dgt] << dgt);
+                }
+
+                if (dp[i, 1].HasValue)
+                {
+                    var cand = dp[i, 1].Value + (Math.Max(d[dgt], n - d[dgt]) << dgt);
+                    dp[i + 1, 1] = Math.Max(dp[i + 1, 1] ?? 0, cand);
+                }
+            }
+
+            var res = Math.Max(dp[mx, 0] ?? 0, dp[mx, 1] ?? 0);
             return res;
         }
 
