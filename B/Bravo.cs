@@ -10,8 +10,17 @@ namespace V
     {
         public void Solve()
         {
+            var n = Read;
+            var s = Str;
+            Wr(new String(s.Select(x =>
+            {
+                var xn = (long)x + n;
+                var xx = (xn - (long)'A') % 26;
+                return (char)(xx + (long)'A');
+
+            }).ToArray()));
             //var n = Read;
-            Write(SolveLong());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

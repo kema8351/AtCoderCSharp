@@ -18,7 +18,34 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var k = Read;
+            var a = Arr(n);
+            var s = new List<long>() { 0 };
+            var t = 0L;
+
+            foreach (var aa in a)
+            {
+                t += aa - 1;
+                t %= k;
+                s.Add(t);
+            }
+            var dic = new Dictionary<long, long>();
             var res = 0L;
+
+            foreach (var i in C.Loop(n + 1))
+            {
+                long r = 0L;
+                if (dic.TryGetValue(s[(int)i], out r))
+                    res += r;
+                else
+                    dic.Add(s[(int)i], 0);
+
+                dic[s[(int)(i)]]++;
+                if (i >= k - 1)
+                    dic[s[(int)(i - k + 1)]]--;
+
+            }
+
             return res;
         }
 

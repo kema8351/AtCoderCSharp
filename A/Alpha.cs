@@ -10,8 +10,12 @@ namespace V
     {
         public void Solve()
         {
+            var s = Str;
+            var ss = new string[] { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
+            var ii = ss.Select((x, i) => new { x, i }).First(x => x.x == s).i;
+            Wr(7 - ii);
             //var n = Read;
-            Write(SolveLong());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

@@ -10,9 +10,60 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var edges = new List<Edge>();
+            var dic = new List<Edge>[n];
+
+            foreach (var i in C.Loop(n))
+            {
+                dic[i] = new List<Edge>();
+            }
+            foreach (var i in C.Loop(n - 1))
+            {
+                var edge = new Edge() { a = Read - 1, b = Read - 1 };
+                edges.Add(edge);
+
+                dic[edge.a].Add(edge);
+                dic[edge.b].Add(edge);
+            }
+
+            var k = dic.Select(x => x.Count()).Max();
+            Wr(k);
+
+            foreach (var i in C.Loop(n))
+            {
+                var hs = dic[i].Select(x => x.color).Distinct().ToHashSet();
+                var p = 1;
+
+                foreach (var e in dic[i])
+                {
+                    if (e.color > 0)
+                        continue;
+
+                    while (hs.Contains(p))
+                        p++;
+
+                    hs.Add(p);
+                    e.color = p;
+                }
+            }
+
+            foreach (var e in edges)
+                Wr(e.color);
+            //Write(SolveLong());
             //YesNo(SolveBool());
+        }
+
+        public class Edge
+        {
+            public long a;
+            public long b;
+            public long color;
+
+            public long To(long node)
+            {
+                if (node == a) return b; else return a;
+            }
         }
 
         public long SolveLong()

@@ -17,8 +17,28 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
+            var a = Read;
+            var b = Read;
+            var x = Read;
             var res = 0L;
+            var d = 1L;
+            var dd = 9L;
+
+            while (true)
+            {
+                var aa = x - b * d;
+                var aaa = Math.Min(aa / a, dd);
+
+                res = Math.Max(res, aaa);
+
+                d++;
+                dd *= 10;
+                dd += 9;
+                if (d > 10)
+                    break;
+            }
+            res = Math.Min(res, 1000000000);
+
             return res;
         }
 

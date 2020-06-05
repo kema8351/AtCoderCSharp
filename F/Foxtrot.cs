@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace V
 {
@@ -10,8 +11,56 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var m = Read;
+            var s = Str;
+            var res = new Stack<long>();
+            var p = n;
+            var b = n;
+            var sf = n;
+
+            while (true)
+            {
+                p--;
+
+                if (p < 0)
+                {
+                    if (b != 0)
+                        res.Push(b);
+                    break;
+                }
+
+                if (s[(int)p] == '0')
+                {
+                    sf = p;
+                }
+                else
+                {
+                }
+
+                if (b - p == m)
+                {
+                    if (sf == b)
+                    {
+                        Wr(-1);
+                        return;
+                    }
+
+                    res.Push(b - sf);
+                    b = sf;
+                }
+            }
+
+            var sb = new StringBuilder();
+            while (res.Count > 0)
+            {
+                var r = res.Pop();
+                sb.Append(r);
+                sb.Append(" ");
+            }
+
+            Wr(sb.ToString());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
