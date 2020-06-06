@@ -18,7 +18,26 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var h = Arr(n);
+
             var res = 0L;
+            var cand = 0L;
+            var cur = h[0];
+
+            foreach (var hh in h.Skip(1))
+            {
+                if (cur >= hh)
+                {
+                    cand++;
+                    res = Math.Max(cand, res);
+                }
+                else
+                {
+                    cand = 0;
+                }
+
+                cur = hh;
+            }
             return res;
         }
 

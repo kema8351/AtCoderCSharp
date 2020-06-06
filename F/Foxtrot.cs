@@ -10,24 +10,60 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var vs = new List<Vector>();
+            foreach (var i in C.Loop(n))
+            {
+                var x = Read;
+                var y = Read;
+                if (x == 0 && y == 0)
+                    continue;
+
+                vs.Add(new Vector() { x = x, y = y, d = Math.Atan2(y, x) });
+            }
+            vs = vs.OrderBy(x => x.d).ToList();
+            vs = vs.Concat(vs.Select(x => new Vector() { x = x.x, y = x.y, d = x.d + Math.PI * 2d })).ToList();
+
+            var res = 0L;
+
+            foreach (var v in vs)
+            {
+                {
+                    var xx = 0L;
+                    var yy = 0L;
+                    foreach (var a in vs.Where(x => v.d <= x.d && x.d < v.d + Math.PI))
+                    {
+                        xx += a.x;
+                        yy += a.y;
+                    }
+
+                    res = Math.Max(res, xx * xx + yy * yy);
+                }
+
+                {
+                    var xx = 0L;
+                    var yy = 0L;
+                    foreach (var a in vs.Where(x => v.d < x.d && x.d <= v.d + Math.PI))
+                    {
+                        xx += a.x;
+                        yy += a.y;
+                    }
+
+                    res = Math.Max(res, xx * xx + yy * yy);
+                }
+            }
+
+            Wr(Math.Sqrt(res));
             //YesNo(SolveBool());
         }
 
-        public long SolveLong()
+        public class Vector
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            public long x;
+            public long y;
+            public double d;
         }
 
-        public bool SolveBool()
-        {
-            var n = Read;
-            var res = false;
-            return res;
-        }
     }
 }
 namespace V

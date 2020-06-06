@@ -10,23 +10,68 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
-        }
-
-        public long SolveLong()
-        {
             var n = Read;
+            var qs = new Queue<long>[n];
+            var dic = new long[1024 * 1024];
+            var wait = new Queue<long>();
+            var filled = new long[n];
+
+            foreach (var i in C.Loop(n))
+            {
+                qs[i] = new Queue<long>();
+                foreach (var j in C.Loop(n - 1))
+                {
+                    qs[i].Enqueue(Read - 1);
+                }
+                wait.Enqueue(i);
+            }
+
+            var match = 0L;
             var res = 0L;
-            return res;
+            while (wait.Count > 0)
+            {
+                var a = wait.Dequeue();
+                if (qs[a].Count == 0)
+                    continue;
+
+                var b = qs[a].Dequeue();
+                var c = Encode(a, b);
+
+                dic[c]++;
+
+                if (dic[c] < 2)
+                    continue;
+
+                wait.Enqueue(a);
+                wait.Enqueue(b);
+
+                var day = Math.Max(filled[a], filled[b]) + 1;
+                res = Math.Max(res, day);
+                filled[a] = day;
+                filled[b] = day;
+                match++;
+            }
+
+            if (match < n * (n - 1) / 2)
+            {
+                Wr(-1);
+                return;
+            }
+
+            Wr(res);
         }
 
-        public bool SolveBool()
+        long Encode(long a, long b)
         {
-            var n = Read;
-            var res = false;
-            return res;
+            if (a > b)
+                return Encode(b, a);
+
+            return (a << 10) + b;
+        }
+
+        long[] Decode(long c)
+        {
+            return new long[] { c >> 10, c & (1 << 10 - 1) };
         }
     }
 }
