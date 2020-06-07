@@ -17,8 +17,9 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var n = ReadInt;
+            var a = ArrInt(n);
+            var res = C.InversionNumberCount(a, n);
             return res;
         }
 
@@ -1203,6 +1204,47 @@ namespace V
                 var i = cache.Pop();
                 yield return n / i;
             }
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static long InversionNumberCountWithCompression<T>(IList<T> list) where T : IComparable<T>
+        {
+            var compressed = list
+                .Select((n, i) => new { n, i })
+                .GroupBy(x => x.n)
+                .OrderBy(x => x.Key)
+                .Select((g, i) => new { g, i })
+                .SelectMany(x => x.g.Select(xs => new { order = xs.i, index = x.i }))
+                .OrderBy(x => x.index)
+                .Select(x => x.order);
+
+            return InversionNumberCount(compressed, list.Count);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static long InversionNumberCountWithMinusCheck(IList<int> list)
+        {
+            var min = list.Min();
+            var max = list.Max();
+
+            if (min < 0)
+                return InversionNumberCount(list.Select(x => x - min), max - min);
+            else
+                return InversionNumberCount(list, max);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static long InversionNumberCount(IEnumerable<int> list, int maxValue)
+        {
+
+            var bit = new BinaryIndexTree(maxValue + 1);
+            var res = 0L;
+            var i = 0;
+            foreach (var n in list)
+            {
+                res += i - bit.Sum(n);
+                bit.Add(n, +1);
+                i++;
+            }
+
+            return res;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<int> Loop(int n)
