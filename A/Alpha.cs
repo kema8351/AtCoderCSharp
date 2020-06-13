@@ -10,8 +10,10 @@ namespace V
     {
         public void Solve()
         {
+            var s = Str;
+            Wr(s.Substring(0, 3));
             //var n = Read;
-            Write(SolveLong());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

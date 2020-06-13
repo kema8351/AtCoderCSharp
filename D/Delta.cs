@@ -10,8 +10,69 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            // x = value, y = weight
+            var items = sc.Pairs<long, long>(n);
+
+            var dic = new Dictionary<long, Dictionary<long, long>>();
+            dic.Add(0, new Dictionary<long, long>() { { 0, 0 } });
+
+            var q = Read;
+            foreach (var _ in C.Loop(q))
+            {
+                var v = Read;
+                var l = Read;
+
+                var stack = new Stack<long>();
+                var p = v;
+                while (p > 0)
+                {
+                    stack.Push(p);
+                    p /= 2;
+                }
+
+                while (stack.Count > 0)
+                {
+                    var vv = stack.Pop();
+                    if (dic.ContainsKey(vv))
+                        continue;
+
+                    var item = items[vv - 1];
+
+                    var prev = dic[vv / 2];
+
+                    // weight, valueSum
+                    var table = new Dictionary<long, long>(prev);
+                    dic.Add(vv, table);
+
+                    foreach (var pair in prev)
+                    {
+                        var newWeight = pair.Key + item.Y;
+
+                        if (newWeight > 100000)
+                            continue;
+
+                        var newValue = pair.Value + item.X;
+
+                        if (table.TryGetValue(newWeight, out var current2))
+                        {
+                            if (current2 < newValue)
+                                table[newWeight] = newValue;
+                        }
+                        else
+                        {
+                            table.Add(newWeight, newValue);
+                        }
+                    }
+                }
+
+                var resTable = dic[v];
+                var res = resTable.Where(pp => pp.Key <= l).Select(pp => pp.Value).Max();
+
+                Wr(res);
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

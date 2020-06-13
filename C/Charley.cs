@@ -10,8 +10,39 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var k = Read;
+            var a = Arr(n);
+
+            foreach (var _ in C.Loop(k))
+            {
+                var deltas = new long[n + 1];
+
+                foreach (var i in C.Loop(n))
+                {
+                    var l = Math.Max(0, i - a[i]);
+                    var r = Math.Min(n - 1, i + a[i]);
+
+                    deltas[l]++;
+                    deltas[r + 1]--;
+                }
+
+                var sum = 0L;
+                var newA = new long[n];
+                foreach (var i in C.Loop(n))
+                {
+                    sum += deltas[i];
+                    newA[i] = sum;
+                }
+
+                a = newA;
+
+                if (a.All(x => x == n))
+                    break;
+            }
+
+            Wr(string.Join(" ", a.Select(x => x.ToString())));
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
