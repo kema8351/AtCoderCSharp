@@ -1277,7 +1277,12 @@ namespace V
         public override string ToString() => this.Value.ToString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Mint(long value) { this.Value = value; }
+        public Mint(long value)
+        {
+            this.Value = value % divider;
+            if (this.Value < 0)
+                this.Value += divider;
+        }
 
         //public static implicit operator Mint(long a) => new Mint(a % divider);
         //public static implicit operator Mint(int a) => new Mint(a % divider);
