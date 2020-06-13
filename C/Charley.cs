@@ -18,7 +18,43 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var xy = new List<Pair<long, long>>[n];
+            foreach (var i in C.Loop(n))
+            {
+                var a = Read;
+                xy[i] = new List<Pair<long, long>>();
+                xy[i].AddRange(sc.Pairs(a));
+            }
+
             var res = 0L;
+
+            for (long i = 0; i < 1 << (int)n; i++)
+            {
+                var b = true;
+                var c = 0;
+                foreach (var j in C.Loop(n))
+                {
+                    if ((i >> (int)j) % 2 == 0)
+                        continue;
+
+                    c++;
+                    foreach (var p in xy[(int)j])
+                    {
+                        if ((i >> ((int)p.X - 1)) % 2 != p.Y)
+                            b = false;
+
+                        if (!b)
+                            break;
+                    }
+
+                    if (!b)
+                        break;
+                }
+
+                if (b)
+                    res = Math.Max(res, c);
+            }
+
             return res;
         }
 

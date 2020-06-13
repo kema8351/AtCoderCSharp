@@ -10,8 +10,8 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Arr(3).Sum();
+            Write(n >= 22 ? "bust" : "win");
             //YesNo(SolveBool());
         }
 

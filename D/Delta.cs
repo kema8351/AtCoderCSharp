@@ -18,10 +18,32 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
-            return res;
-        }
+            var r = new Random();
+            var a = Arr(n);//.Select(x => (long)Math.Abs(r.Next()) * (long)Math.Abs(r.Next()) % (1L << 60)).ToArray();
 
+            var res = new Mint();
+
+            for (int i = 0; i < 61; i++)
+            {
+                long f = 1L << i;
+                long a0 = a.LongCount(x => (x & f) == 0L);
+                long a1 = a.LongCount(x => (x & f) != 0L);
+
+                res += new Mint(f) * new Mint(a0) * new Mint(a1);
+            }
+
+            //var res2 = new Mint();
+            //for (int i = 0; i < n; i++)
+            //{
+            //    for (int j = i + 1; j < n; j++)
+            //    {
+            //        res2 += new Mint(a[i] ^ a[j]);
+            //    }
+            //}
+            //Wr(res2);
+
+            return res.Value;
+        }
         public bool SolveBool()
         {
             var n = Read;
@@ -1277,7 +1299,7 @@ namespace V
         public override string ToString() => this.Value.ToString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Mint(long value) { this.Value = value; }
+        public Mint(long value) { this.Value = value % divider; }
 
         //public static implicit operator Mint(long a) => new Mint(a % divider);
         //public static implicit operator Mint(int a) => new Mint(a % divider);

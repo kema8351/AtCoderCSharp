@@ -17,9 +17,74 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var h = ReadInt;
+            var w = ReadInt;
+            var a = new int[h, w];
+            var b = new int[h, w];
+            var d = new int[h, w];
+            var dp = new bool[h, w, 80 * 160 + 5];
+            var mx = new int[h, w];
+            foreach (var i in C.Loop(h))
+                foreach (var j in C.Loop(w))
+                    a[i, j] = ReadInt;
+            foreach (var i in C.Loop(h))
+                foreach (var j in C.Loop(w))
+                    b[i, j] = ReadInt;
+
+            foreach (var i in C.Loop(h))
+                foreach (var j in C.Loop(w))
+                    d[i, j] = Math.Abs(a[i, j] - b[i, j]);
+            dp[0, 0, d[0, 0]] = true;
+            mx[0, 0] = d[0, 0];
+
+            foreach (var i in C.Loop(h))
+                foreach (var j in C.Loop(w))
+                {
+                    foreach (var k in C.Loop(mx[i, j] + 1))
+                    {
+                        if (dp[i, j, k] == false)
+                            continue;
+
+                        if (i < h - 1)
+                        {
+                            var k1 = k + d[i + 1, j];
+                            mx[i + 1, j] = Math.Max(mx[i + 1, j], k1);
+                            dp[i + 1, j, k1] = true;
+
+                            var k2 = Math.Abs(k - d[i + 1, j]);
+                            mx[i + 1, j] = Math.Max(mx[i + 1, j], k2);
+                            dp[i + 1, j, k2] = true;
+                        }
+
+                        if (j < w - 1)
+                        {
+                            var k1 = k + d[i, j + 1];
+                            mx[i, j + 1] = Math.Max(mx[i, j + 1], k1);
+                            dp[i, j + 1, k1] = true;
+
+                            var k2 = Math.Abs(k - d[i, j + 1]);
+                            mx[i, j + 1] = Math.Max(mx[i, j + 1], k2);
+                            dp[i, j + 1, k2] = true;
+                        }
+                    }
+                }
+
+            foreach (var i in C.Loop(mx[h - 1, w - 1] + 1))
+            {
+                if (dp[h - 1, w - 1, i])
+                {
+                    return i;
+                }
+            }
+
+            return 0;
+        }
+
+        void SafeAdd(HashSet<int> hs, int v, int ri, int rj)
+        {
+            var vv = Math.Abs(v);
+            if (vv <= (ri + rj) * 80)
+                hs.SafeAdd(vv);
         }
 
         public bool SolveBool()
