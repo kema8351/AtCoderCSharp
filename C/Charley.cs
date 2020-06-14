@@ -8,11 +8,180 @@ namespace V
 {
     partial class Solver
     {
+        const long maxWeight = 100000;
+
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var items = new List<Item>() { new Item() };
+            foreach (var i in C.Loop(n))
+            {
+                var v = Read;
+                var w = Read;
+                items.Add(new Item() { Value = v, Weight = w });
+            }
+
+            var tables = new Dictionary<long, List<Item>>();
+            var threshold = 0;
+            var tn = n;
+            while (tn > 0)
+            {
+                tn /= 2;
+                threshold++;
+            }
+            threshold /= 2;
+            threshold = Math.Max(1, threshold);
+
+            var table1stNode = new List<Item>();
+            table1stNode.Add(new Item());
+            table1stNode.Add(items[1]);
+            tables.Add(1, table1stNode);
+
+            var q = Read;
+            foreach (var _ in C.Loop(q))
+            {
+                var v = Read;
+                var l = Read;
+
+                var stack = new Stack<long>();
+                var tv = v;
+                while (tv > 0)
+                {
+                    stack.Push(tv);
+                    tv /= 2;
+                }
+
+                IReadOnlyList<Item> firstTable = null;
+                for (int i = 0; i < threshold; i++)
+                {
+                    if (stack.Count <= 0)
+                        break;
+
+                    var vert = stack.Pop();
+                    if (tables.TryGetValue(vert, out var cache))
+                    {
+                        firstTable = cache;
+                        continue;
+                    }
+
+                    var newTable = AddItem(firstTable, items[(int)vert]);
+
+                    tables.Add(vert, newTable);
+                    firstTable = newTable;
+                }
+
+                if (stack.Count <= 0)
+                {
+                    var r = firstTable.Where(x => x.Weight <= l).Max(x => x.Value);
+                    Wr(r);
+                    continue;
+                }
+
+                IReadOnlyList<Item> secondTable = new List<Item>() { new Item() };
+                while (stack.Count > 0)
+                {
+                    var vert = stack.Pop();
+                    var newTable = AddItem(secondTable, items[(int)vert]);
+                    secondTable = newTable;
+                }
+
+                List<long> values = new List<long>() { secondTable[0].Value };
+                List<long> weights = new List<long>() { secondTable[0].Weight };
+
+                for (int i = 1; i < secondTable.Count; i++)
+                {
+                    var item = secondTable[i];
+
+                    if (values[values.Count - 1] < item.Value)
+                    {
+                        values.Add(item.Value);
+                        weights.Add(item.Weight);
+                    }
+                }
+
+                var res = 0L;
+                foreach (var item in firstTable)
+                {
+                    var remaining = l - item.Weight;
+                    var idx = C.BinarySearch.GetFirstIndexGreater(remaining, weights);
+                    if (idx <= 0)
+                        continue;
+
+                    var newRes = item.Value + values[(int)idx - 1];
+                    res = Math.Max(res, newRes);
+                }
+
+                Wr(res);
+            }
+            //Write(SolveLong());
             //YesNo(SolveBool());
+        }
+
+        List<Item> AddItem(IReadOnlyList<Item> baseTable, Item item)
+        {
+            var newTable = new List<Item>();
+            var addedTable = new List<Item>();
+
+            foreach (var baseItem in baseTable)
+            {
+                var newWeight = baseItem.Weight + item.Weight;
+
+                if (newWeight > maxWeight)
+                    continue;
+
+                var newValue = baseItem.Value + item.Value;
+                addedTable.Add(new Item() { Value = newValue, Weight = newWeight });
+            }
+
+            var baseIndex = 0;
+            var addedIndex = 0;
+            while (baseIndex < baseTable.Count || addedIndex < addedTable.Count)
+            {
+                bool? selectBase = false;
+
+                if (baseIndex >= baseTable.Count)
+                    selectBase = false;
+                else if (addedIndex >= addedTable.Count)
+                    selectBase = true;
+                else
+                    selectBase =
+                        baseTable[baseIndex].Weight < addedTable[addedIndex].Weight
+                        ? true :
+                        baseTable[baseIndex].Weight == addedTable[addedIndex].Weight
+                        ? (bool?)null : false;
+
+                if (selectBase == true)
+                {
+                    newTable.Add(baseTable[baseIndex]);
+                    baseIndex++;
+                }
+                else if (selectBase == null)
+                {
+                    var baseItem = baseTable[baseIndex];
+                    var addedItem = addedTable[addedIndex];
+
+                    if (baseItem.Value > addedItem.Value)
+                        newTable.Add(baseItem);
+                    else
+                        newTable.Add(addedItem);
+
+                    baseIndex++;
+                    addedIndex++;
+                }
+                else
+                {
+                    newTable.Add(addedTable[addedIndex]);
+                    addedIndex++;
+                }
+            }
+
+            return newTable;
+        }
+
+        public struct Item
+        {
+            public long Value { get; set; }
+            public long Weight { get; set; }
         }
 
         public long SolveLong()

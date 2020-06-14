@@ -8,11 +8,79 @@ namespace V
 {
     partial class Solver
     {
+        const int maxWeight = 100000;
+
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = ReadInt;
+            var items = new Item[n + 1];
+            foreach (var i in C.Loop(n))
+            {
+                var v = ReadInt;
+                var w = ReadInt;
+                items[i + 1] = new Item() { Value = v, Weight = w };
+            }
+
+            var cacheEd = Math.Min(1 << 10, n + 1);
+            var cache = new int[cacheEd][];
+            cache[0] = new int[maxWeight + 1];
+            for (int i = 1; i < cacheEd; i++)
+            {
+                var item = items[i];
+                var half = i / 2;
+                cache[i] = (int[])cache[half].Clone();
+                for (int j = maxWeight - item.Weight; j >= 0; j--)
+                {
+                    cache[i][j + item.Weight] = Math.Max(cache[i][j + item.Weight], cache[half][j] + item.Value);
+                }
+            }
+
+            var q = ReadInt;
+            foreach (var _ in C.Loop(q))
+            {
+                var v = ReadInt;
+                var l = ReadInt;
+
+                var secondItems = new List<Item>();
+                var tv = v;
+                while (tv >= cacheEd)
+                {
+                    secondItems.Add(items[tv]);
+                    tv /= 2;
+                }
+
+                var res = 0;
+                for (int i = 0; i < 1 << secondItems.Count; i++)
+                {
+                    var value = 0;
+                    var weight = 0;
+
+                    for (int j = 0; j < secondItems.Count; j++)
+                    {
+                        if (((1 << j) & i) != 0)
+                        {
+                            value += secondItems[j].Value;
+                            weight += secondItems[j].Weight;
+                        }
+                    }
+
+                    if (l < weight)
+                        continue;
+
+                    var cand = value + cache[tv][l - weight];
+                    res = Math.Max(res, cand);
+                }
+                Wr(res);
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
+        }
+
+        public struct Item
+        {
+            public int Value { get; set; }
+            public int Weight { get; set; }
         }
 
         public long SolveLong()
