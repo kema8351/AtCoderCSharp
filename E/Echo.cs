@@ -10,8 +10,70 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var q = Read;
+            // x = score, y = belong
+            var infs = sc.Pairs(n);
+
+            //n = 200000;
+            //var r = new Random();
+            //infs = Enumerable.Range(0, (int)n).Select(x => new Pair<long, long>(Math.Abs(r.Next()), x + 1)).ToArray();
+            //q = 200000;
+
+            var sss = Enumerable.Range(0, 200001).Select(x => new SortedSet<long>()).ToArray();
+            var dics = Enumerable.Range(0, 200001).Select(x => new Dictionary<long, long>()).ToArray();
+
+            void Add(Pair<long, long> inf)
+            {
+                if (dics[inf.Y].ContainsKey(inf.X))
+                    dics[inf.Y][inf.X]++;
+                else
+                    dics[inf.Y].Add(inf.X, 1);
+
+                if (dics[inf.Y][inf.X] == 1)
+                    sss[inf.Y].Add(inf.X);
+            }
+
+            void Remove(Pair<long, long> inf)
+            {
+                dics[inf.Y][inf.X]--;
+                if (dics[inf.Y][inf.X] == 0)
+                    sss[inf.Y].Remove(inf.X);
+            }
+
+            foreach (var inf in infs)
+                Add(inf);
+
+            long Calc(SortedSet<long> ss)
+            {
+                return ss.Count > 0 ? ss.Max : long.MaxValue;
+            }
+
+            var tree = new C.SegmentTree<long>(sss.Select(Calc).ToArray(), (x1, x2) => Math.Min(x1, x2), long.MaxValue);
+
+            foreach (var _ in C.Loop(q))
+            {
+                var c = Read - 1;
+                var d = Read;
+
+                //long c = r.Next(200000);
+                //long d = r.Next(200000) + 1;
+
+                var inf = infs[c];
+                var prev = inf.Y;
+
+                Remove(inf);
+                var newInf = new Pair<long, long>(inf.X, d);
+                infs[c] = newInf;
+                Add(newInf);
+
+                tree.Update((int)prev, Calc(sss[prev]));
+                tree.Update((int)d, Calc(sss[d]));
+
+                Wr(tree.Query(0, sss.Length + 1));
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

@@ -17,9 +17,76 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var h = Read;
+            var w = Read;
+            var k = Read;
+
+            var sx = Read;
+            var sy = Read;
+            var ex = Read;
+            var ey = Read;
+
+            var b = new bool[h + 2, w + 2];
+
+            foreach (var i in C.Loop(h))
+            {
+                var s = Str;
+                foreach (var j in C.Loop(w))
+                {
+                    if (s[(int)j] != '@')
+                        b[i + 1, j + 1] = true;
+                }
+            }
+
+            var steps = new long[h + 2, w + 2];
+            var pq = new C.PriorityQueue<long, (long x, long y, long step)>(xx => xx.step);
+
+            void Enqueue(long x, long y, long step)
+            {
+                if (steps[x, y] > 0)
+                    return;
+
+                steps[x, y] = step;
+                pq.Enqueue((x, y, step));
+            }
+
+            Enqueue(sx, sy, 1);
+
+            var ops = new (long x, long y)[] { (+1, 0), (-1, 0), (0, +1), (0, -1) };
+
+            while (pq.Count > 0)
+            {
+                var q = pq.Dequeue();
+                var x = q.x;
+                var y = q.y;
+                var step = q.step;
+
+                foreach (var op in ops)
+                {
+                    var nx = x + op.x;
+                    var ny = y + op.y;
+
+                    if (b[nx, ny] == false)
+                        continue;
+
+                    if (steps[nx, ny] != 0 && steps[nx, ny] != step + 1)
+                        continue;
+
+                    for (int dis = 1; dis <= k; dis++)
+                    {
+                        var nnx = x + op.x * dis;
+                        var nny = y + op.y * dis;
+
+                        if (b[nnx, nny] == false)
+                            break;
+
+                        Enqueue(nnx, nny, step + 1);
+                    }
+                }
+            }
+
+            var res = steps[ex, ey];
+            return res - 1;
         }
 
         public bool SolveBool()

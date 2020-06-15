@@ -17,8 +17,30 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var n = ReadInt;
+            var a = ArrInt(n);
+            //a = Enumerable.Range(0, 200000).Select(x => 1000000 - x).ToArray();
+            var d = new int[1000001];
+            foreach (var aa in a)
+            {
+                d[aa]++;
+            }
+
+            var res = 0;
+
+            for (int i = 1; i < 1000001; i++)
+            {
+                if (d[i] > 0)
+                {
+                    if (d[i] == 1)
+                        res++;
+
+                    for (int j = i; j < 1000001; j += i)
+                        d[j] = 0;
+                }
+
+            }
+
             return res;
         }
 

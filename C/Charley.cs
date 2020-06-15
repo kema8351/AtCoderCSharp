@@ -17,8 +17,24 @@ namespace V
 
         public long SolveLong()
         {
+            var x = Read;
             var n = Read;
-            var res = 0L;
+            var a = Arr(n).ToHashSet();
+            var b = Enumerable.Range(-1, 201).Where(xx => a.Contains(xx) == false);
+
+            var res = -1;
+
+            foreach (var aa in b)
+            {
+                var c = Math.Abs(res - x);
+                var c2 = Math.Abs(x - aa);
+
+                if (c > c2)
+                    res = aa;
+                else if (c == c2 && res > aa)
+                    res = aa;
+            }
+
             return res;
         }
 

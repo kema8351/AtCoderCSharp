@@ -17,7 +17,12 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
+            var n = Arr(5);
+            for (int i = 0; i < 5; i++)
+            {
+                if (n[i] == 0)
+                    return i + 1;
+            }
             var res = 0L;
             return res;
         }
