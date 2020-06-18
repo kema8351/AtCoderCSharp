@@ -10,23 +10,42 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
-        }
+            var r = Read;
+            var b = Read;
+            var x = Read;
+            var y = Read;
 
-        public long SolveLong()
-        {
-            var n = Read;
-            var res = 0L;
-            return res;
-        }
+            long valid = 0;
+            long invalid = long.MaxValue;
 
-        public bool SolveBool()
-        {
-            var n = Read;
-            var res = false;
-            return res;
+            bool IsValid(long mid)
+            {
+                var rr = r - mid;
+                if (rr < 0)
+                    return false;
+
+                var bb = b - mid;
+                if (bb < 0)
+                    return false;
+
+                var rn = rr / (x - 1);
+                var bn = bb / (y - 1);
+
+                return rn + bn >= mid;
+            }
+
+
+            while (valid + 1 < invalid)
+            {
+                var mid = (valid + invalid) / 2;
+
+                if (IsValid(mid))
+                    valid = mid;
+                else
+                    invalid = mid;
+            }
+
+            Wr(valid);
         }
     }
 }
