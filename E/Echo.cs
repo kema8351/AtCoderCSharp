@@ -10,23 +10,34 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
-        }
+            var n = ReadInt;
+            var a = Arr(n).ToList();
+            a.Add(0);
 
-        public long SolveLong()
-        {
-            var n = Read;
-            var res = 0L;
-            return res;
-        }
+            var res = new long[n];
 
-        public bool SolveBool()
-        {
-            var n = Read;
-            var res = false;
-            return res;
+            var sorted = a.Select((aa, idx) => (aa, idx))
+                .GroupBy(x => x.aa)
+                .OrderByDescending(x => x.Key)
+                .Select(x => (x.Key, x.OrderBy(xs => xs.idx).ToArray()))
+                .ToArray();
+
+            var pointer = n;
+            long count = 0;
+            foreach (var i in C.Loop(sorted.Length - 1))
+            {
+                var cur = sorted[i];
+                var next = sorted[i + 1];
+
+                pointer = Math.Min(pointer, cur.Item2[0].idx);
+                count += cur.Item2.LongLength;
+
+                res[pointer] += (cur.Key - next.Key) * count;
+            }
+
+            foreach (var r in res)
+                Wr(r);
+
         }
     }
 }
