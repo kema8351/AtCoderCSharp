@@ -287,24 +287,24 @@ namespace V
             }
             return res;
         }
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        //public static bool TryMin<T>(this ref T current, T newer) where T : struct, IComparable<T>
-        //{
-        //    if (current.CompareTo(newer) <= 0)
-        //        return false;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryMin<T>(this ref T current, T newer) where T : struct, IComparable<T>
+        {
+            if (current.CompareTo(newer) <= 0)
+                return false;
 
-        //    current = newer;
-        //    return true;
-        //}
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        //public static bool TryMax<T>(this ref T current, T newer) where T : struct, IComparable<T>
-        //{
-        //    if (current.CompareTo(newer) >= 0)
-        //        return false;
+            current = newer;
+            return true;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryMax<T>(this ref T current, T newer) where T : struct, IComparable<T>
+        {
+            if (current.CompareTo(newer) >= 0)
+                return false;
 
-        //    current = newer;
-        //    return true;
-        //}
+            current = newer;
+            return true;
+        }
     }
     class C
     {
