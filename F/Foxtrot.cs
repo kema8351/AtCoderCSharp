@@ -8,25 +8,140 @@ namespace V
 {
     partial class Solver
     {
+
+        public class Path
+        {
+            public int To;
+            public int From;
+            public int Dist;
+        }
+
+        public class State
+        {
+            public int City;
+            public int Cost;
+        }
+
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
-        }
+            var n = ReadInt;
+            var m = ReadInt;
+            var l = ReadInt;
+            var map = new List<Path>[n];
 
-        public long SolveLong()
-        {
-            var n = Read;
-            var res = 0L;
-            return res;
-        }
+            foreach (var i in C.Loop(n))
+                map[i] = new List<Path>();
+            foreach (var i in C.Loop(m))
+            {
+                var a = ReadInt - 1;
+                var b = ReadInt - 1;
+                var c = ReadInt;
 
-        public bool SolveBool()
-        {
-            var n = Read;
-            var res = false;
-            return res;
+                map[a].Add(new Path() { From = a, To = b, Dist = c });
+                map[b].Add(new Path() { From = b, To = a, Dist = c });
+            }
+
+            var newMap = new List<Path>[n];
+            foreach (var i in C.Loop(n))
+                newMap[i] = new List<Path>();
+
+            foreach (var i in C.Loop(n))
+            {
+                var pq = new C.PriorityQueue<int, State>(x => x.Cost);
+                var costs = new int[n];
+                var init = int.MaxValue;
+                foreach (var j in C.Loop(n))
+                    costs[j] = init;
+
+                void Enq(State state)
+                {
+                    if (costs[state.City] < state.Cost)
+                        return;
+
+                    if (state.Cost > l)
+                        return;
+
+                    costs[state.City] = state.Cost;
+                    pq.Enqueue(state);
+                }
+
+                Enq(new State() { City = i, Cost = 0 });
+                while (pq.Count > 0)
+                {
+                    var q = pq.Dequeue();
+
+                    if (costs[q.City] != q.Cost)
+                        continue;
+
+                    foreach (var path in map[q.City])
+                    {
+                        var newState = new State() { Cost = q.Cost + path.Dist, City = path.To };
+                        Enq(newState);
+                    }
+                }
+
+                foreach (var j in C.Loop(n))
+                {
+                    if (costs[j] != init)
+                        newMap[i].Add(new Path() { From = i, To = j, Dist = 1 });
+                }
+            }
+
+
+            var res = new int[n, n];
+            foreach (var i in C.Loop(n))
+                foreach (var j in C.Loop(n))
+                    res[i, j] = -1;
+
+            foreach (var i in C.Loop(n))
+            {
+                var pq = new C.PriorityQueue<int, State>(x => x.Cost);
+                var costs = new int[n];
+                var init = int.MaxValue;
+                foreach (var j in C.Loop(n))
+                    costs[j] = init;
+
+                void Enq(State state)
+                {
+                    if (costs[state.City] < state.Cost)
+                        return;
+
+                    if (state.Cost > l)
+                        return;
+
+                    costs[state.City] = state.Cost;
+                    pq.Enqueue(state);
+                }
+
+                Enq(new State() { City = i, Cost = -1 });
+                while (pq.Count > 0)
+                {
+                    var q = pq.Dequeue();
+
+                    if (costs[q.City] != q.Cost)
+                        continue;
+
+                    foreach (var path in newMap[q.City])
+                    {
+                        var newState = new State() { Cost = q.Cost + 1, City = path.To };
+                        Enq(newState);
+                    }
+                }
+
+                foreach (var j in C.Loop(n))
+                {
+                    if (costs[j] != init)
+                        res[i, j] = costs[j];
+                }
+            }
+
+            var qq = ReadInt;
+            foreach (var i in C.Loop(qq))
+            {
+                var s = ReadInt - 1;
+                var t = ReadInt - 1;
+                Wr(res[s, t]);
+            }
         }
     }
 }

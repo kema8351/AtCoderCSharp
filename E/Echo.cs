@@ -10,23 +10,46 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
-        }
+            var n = ReadInt;
+            var m = ReadInt;
+            var l = Read;
+            var dist = new long[n, n];
+            foreach (var i in C.Loop(n))
+                foreach (var j in C.Loop(n))
+                    dist[i, j] = int.MaxValue;
 
-        public long SolveLong()
-        {
-            var n = Read;
-            var res = 0L;
-            return res;
-        }
+            foreach (var _ in C.Loop(m))
+            {
+                var a = ReadInt - 1;
+                var b = ReadInt - 1;
+                var c = ReadInt;
+                dist[a, b] = c;
+                dist[b, a] = c;
+            }
 
-        public bool SolveBool()
-        {
-            var n = Read;
-            var res = false;
-            return res;
+            foreach (var k in C.Loop(n))
+                foreach (var i in C.Loop(n))
+                    foreach (var j in C.Loop(n))
+                        dist[i, j] = Math.Min(dist[i, j], dist[i, k] + dist[k, j]);
+
+            var dist2 = new long[n, n];
+            foreach (var i in C.Loop(n))
+                foreach (var j in C.Loop(n))
+                    dist2[i, j] = dist[i, j] <= l ? 1 : int.MaxValue;
+
+            foreach (var k in C.Loop(n))
+                foreach (var i in C.Loop(n))
+                    foreach (var j in C.Loop(n))
+                        dist2[i, j] = Math.Min(dist2[i, j], dist2[i, k] + dist2[k, j]);
+
+            var q = ReadInt;
+            foreach (var _ in C.Loop(q))
+            {
+                var s = ReadInt - 1;
+                var t = ReadInt - 1;
+
+                Wr(dist2[s, t] == int.MaxValue ? -1 : dist2[s, t] - 1);
+            }
         }
     }
 }
