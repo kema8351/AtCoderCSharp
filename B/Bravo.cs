@@ -17,8 +17,40 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            Mint.Set998244353();
+            var a = ReadInt;
+            var b = ReadInt;
+            var c = ReadInt;
+            var d = ReadInt;
+
+            var dp = new Mint[c, d];
+            var onceV = new Mint[c, d];
+            var onceH = new Mint[c, d];
+            dp[a - 1, b - 1] = new Mint(1);
+            for (int x = a; x < c; x++)
+            {
+                dp[x, b - 1] = dp[x - 1, b - 1] * b;
+                onceV[x, b - 1] = dp[x, b - 1];
+            }
+
+            for (int y = b; y < d; y++)
+            {
+                dp[a - 1, y] = dp[a - 1, y - 1] * a;
+                onceH[a - 1, y] = dp[a - 1, y];
+            }
+
+            for (int x = a; x < c; x++)
+            {
+                var nx = x + 1;
+                for (int y = b; y < d; y++)
+                {
+                    var ny = y + 1;
+                    dp[x, y] = dp[x, y - 1] * nx + dp[x - 1, y] * ny - onceH[x - 1, y] * (ny - 1);
+                    onceH[x, y] = dp[x, y - 1] * nx;
+                }
+            }
+
+            var res = dp[c - 1, d - 1].Value;
             return res;
         }
 

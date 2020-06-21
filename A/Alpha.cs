@@ -18,7 +18,9 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var g = C.Gcd(n, 360);
+
+            var res = 360 / g;
             return res;
         }
 
