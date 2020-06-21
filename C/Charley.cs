@@ -18,7 +18,17 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var s = Str;
             var res = 0L;
+            char prev = '0';
+            foreach (var c in s)
+            {
+                if (prev != c)
+                    res++;
+
+                prev = c;
+            }
+
             return res;
         }
 

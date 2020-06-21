@@ -17,8 +17,20 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
+            var n = ReadInt;
+            var l = Arr(n).OrderBy(x => x).ToArray();
+
             var res = 0L;
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = i + 1; j < n; j++)
+                {
+                    var idx = C.BinarySearch.GetLastIndexLess(l[i] + l[j], l);
+
+                    res += idx - j;
+                }
+            }
+
             return res;
         }
 

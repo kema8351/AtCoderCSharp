@@ -8,18 +8,134 @@ namespace V
 {
     partial class Solver
     {
+        int n, m, l;
+        List<Path>[] map;
+        List<int>[] cache;
+
+        public class Path
+        {
+            public int From;
+            public int To;
+            public int Dist;
+        }
+
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            n = ReadInt;
+            m = ReadInt;
+            l = ReadInt;
+            cache = new List<int>[n];
+
+            map = new List<Path>[n];
+            foreach (var _ in C.Loop(n))
+                map[_] = new List<Path>();
+            foreach (var _ in C.Loop(m))
+            {
+                var a = ReadInt - 1;
+                var b = ReadInt - 1;
+                var c = ReadInt;
+                map[a].Add(new Path() { From = a, To = b, Dist = c });
+                map[b].Add(new Path() { From = b, To = a, Dist = c });
+            }
+
+            var q = Read;
+            foreach (var _ in C.Loop(q))
+                Write(SolveLong());
             //YesNo(SolveBool());
+        }
+
+        public class State
+        {
+            public int city;
+            public int supply;
+            public int remaining;
         }
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var s = ReadInt - 1;
+            var t = ReadInt - 1;
+
+            if (cache[s] != null)
+                return cache[s][t];
+
+            long Encode(int suplly, int remaining) => ((long)suplly << 32) + (l - remaining);
+
+            var pq = new C.PriorityQueue<long, State>(x => Encode(x.supply, x.remaining));
+            var rems = new int[n, n * 2 + 1];
+            var initial = -1;
+            foreach (var i in C.Loop(n))
+                foreach (var j in C.Loop(n))
+                    rems[i, j] = initial;
+
+            var mx = new int[n];
+            foreach (var i in C.Loop(n))
+                mx[i] = initial;
+
+            var processedMx = new int[n];
+            foreach (var i in C.Loop(n))
+                processedMx[i] = initial;
+
+            void Enq(State state)
+            {
+                if (state.remaining < 0)
+                    return;
+
+                if (mx[state.city] >= state.remaining)
+                    return;
+
+                if (rems[state.city, state.supply] >= state.remaining)
+                    return;
+
+                mx[state.city] = Math.Max(mx[state.city], state.remaining);
+                rems[state.city, state.supply] = state.remaining;
+                pq.Enqueue(state);
+            }
+
+            Enq(new State() { city = s, supply = 0, remaining = l });
+            var hs = new HashSet<int>();
+
+            while (pq.Count > 0)
+            {
+                var q = pq.Dequeue();
+                hs.SafeAdd(q.city);
+                if (hs.Count == n)
+                    break;
+
+                if (rems[q.city, q.supply] != q.remaining)
+                    continue;
+
+                if (processedMx[q.city] >= q.remaining)
+                    continue;
+
+                processedMx[q.city] = Math.Max(processedMx[q.city], q.remaining);
+
+                if (q.remaining != l)
+                    Enq(new State() { city = q.city, supply = q.supply + 1, remaining = l });
+
+                foreach (var path in map[q.city])
+                {
+                    Enq(new State() { city = path.To, supply = q.supply, remaining = q.remaining - path.Dist });
+                }
+            }
+
+            cache[s] = new List<int>();
+            foreach (var c in C.Loop(n))
+            {
+                var res = -1;
+                foreach (var i in C.Loop(n))
+                {
+                    if (rems[c, i] != initial)
+                    {
+                        res = i;
+                        break;
+                    }
+                }
+
+                cache[s].Add(res);
+            }
+
+            return cache[s][t];
         }
 
         public bool SolveBool()
