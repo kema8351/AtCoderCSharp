@@ -18,7 +18,17 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var a = Arr(n);
             var res = 0L;
+
+            while (a.Any(aa => aa >= n))
+            {
+                var s = a.Select(x => x / n).Sum();
+
+                a = a.Select(x => x + s - x / n - x / n * n).ToArray();
+                res += s;
+            }
+
             return res;
         }
 
