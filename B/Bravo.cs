@@ -18,7 +18,9 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var k = Read;
+            var p = Arr(n).OrderBy(x => x).Take((int)k).Sum();
+            var res = p;
             return res;
         }
 

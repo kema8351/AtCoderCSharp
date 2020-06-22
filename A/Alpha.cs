@@ -10,8 +10,14 @@ namespace V
     {
         public void Solve()
         {
+            var str = Str;
+
+            if (str == str.ToLower())
+                Wr("a");
+            else
+                Wr("A");
             //var n = Read;
-            Write(SolveLong());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

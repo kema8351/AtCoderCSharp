@@ -10,8 +10,29 @@ namespace V
     {
         public void Solve()
         {
+            var n = Read;
+            var dic = Arr(n).GroupBy(x => x).ToDictionary(x => x.Key, x => x.LongCount());
+            var res = dic.Select(x => x.Key * x.Value).Sum();
+
+            var q = Read;
+            foreach (var _ in C.Loop(q))
+            {
+                var b = Read;
+                var c = Read;
+
+                if (dic.ContainsKey(b))
+                {
+                    res += (c - b) * dic[b];
+                    var tb = dic[b];
+                    dic.Remove(b);
+                    dic.SafePlus(c, tb);
+                }
+
+                Wr(res);
+            }
+
             //var n = Read;
-            Write(SolveLong());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

@@ -10,16 +10,72 @@ namespace V
     {
         public void Solve()
         {
+            var k = Read;
+            var s = Str;
+
+
             //var n = Read;
-            Write(SolveLong());
+            Write(SolveLong(k, s));
+            //Write(SolveLong2(k, s));
             //YesNo(SolveBool());
         }
-
-        public long SolveLong()
+        public long SolveLong2(long k, string s)
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var dic = new HashSet<string>() { s };
+            foreach (var _ in C.Loop(k))
+            {
+                var ndic = new HashSet<string>();
+
+                foreach (var ss in dic)
+                {
+                    for (int i = 0; i <= ss.Length; i++)
+                    {
+                        for (char c = 'a'; c <= 'z'; c++)
+                        {
+                            var sss = ss.Substring(0, i) + new string(new char[] { c }) + ss.Substring(i, ss.Length - i);
+                            ndic.SafeAdd(sss);
+                        }
+                    }
+                }
+
+                dic = ndic;
+            }
+
+            return dic.LongCount();
+        }
+
+        public long SolveLong(long k, string s)
+        {
+            var res = new Mint();
+            var l = s.Length;
+            var minus = false;
+
+            var d = Mint.Pow(26, k);
+            var dd2 = k + l;
+            var d2 = Mint.Comb(dd2, k);
+            var d3 = Mint.Comb(l - 1, l - 1);
+
+            foreach (var i in C.Loop(k + 1))
+            {
+                var c1 = d;
+                var c2 = d2;//Mint.Comb(dd2, k - i);
+                var c3 = d3;//Mint.Comb(l - 1 + i, l - 1);
+
+                var c = c1 * c2 * c3;
+                if (minus)
+                    res -= c;
+                else
+                    res += c;
+
+                minus = !minus;
+                d /= 26;
+                d2 *= (k - i);
+                d2 /= dd2 - k + 1 + i;
+                d3 *= l + i;
+                d3 /= i + 1;
+            }
+
+            return res.Value;
         }
 
         public bool SolveBool()

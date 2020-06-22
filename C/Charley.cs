@@ -10,8 +10,35 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read - 1;
+            var mx = 26L;
+            var count = 1;
+
+            while (true)
+            {
+                if (mx > n)
+                {
+                    var p = n;
+                    var cs = new List<char>();
+
+                    foreach (var i in C.Loop(count))
+                    {
+                        cs.Add((char)(p % 26 + (int)'a'));
+                        p /= 26;
+                    }
+
+                    cs.Reverse();
+                    Wr(new string(cs.ToArray()));
+
+                    return;
+                }
+
+                n -= mx;
+                mx *= 26;
+                count++;
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
