@@ -17,9 +17,32 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var k = ReadInt;
+            var s = Str;
+
+            var d25 = new List<Mint>();
+            var d26 = new List<Mint>();
+            var t25 = new Mint(1);
+            var t26 = new Mint(1);
+            foreach (var i in C.Loop(k + 1))
+            {
+                d25.Add(t25);
+                d26.Add(t26);
+                t25 *= 25;
+                t26 *= 26;
+            }
+
+            var res = new Mint();
+            foreach (var i in C.Loop(k + 1))
+            {
+                var c26 = d26[k - i];
+                var c25 = d25[i];
+                var cc = Mint.Comb(s.Length + i - 1, i);
+
+                res += c26 * c25 * cc;
+            }
+
+            return res.Value;
         }
 
         public bool SolveBool()
