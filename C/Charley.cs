@@ -18,8 +18,33 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
-            return res;
+            var a = Arr(n);
+
+            var res = new Mint(1);
+            var prev = 0L;
+            var count = 0;
+
+
+            foreach (var i in C.Loop(n))
+            {
+                if (a[i] == -1)
+                {
+                    count++;
+                }
+                else
+                {
+                    if (count > 0)
+                    {
+                        res *= Mint.CombOneByOne(a[i] - prev + count, a[i] - prev);
+                    }
+
+                    prev = a[i];
+                    count = 0;
+                }
+
+            }
+
+            return res.Value;
         }
 
         public bool SolveBool()
@@ -1437,6 +1462,28 @@ namespace V
 
             var nrrr = (nr * rr) % divider;
             return (nn * InvImpl(nrrr)) % divider;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Mint CombOneByOne(long n, long r)
+        {
+            if (n < r)
+                return new Mint(0);
+
+            if (n == r)
+                return new Mint(1);
+
+            if (n - r < r)
+                return CombOneByOne(n, n - r);
+
+            var res = new Mint(1);
+            for (long i = 1; i <= r; i++)
+            {
+                res *= n - i + 1;
+                res /= i;
+            }
+
+            return res;
         }
     }
 }
