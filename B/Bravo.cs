@@ -1438,5 +1438,27 @@ namespace V
             var nrrr = (nr * rr) % divider;
             return (nn * InvImpl(nrrr)) % divider;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Mint CombOneByOne(long n, long r)
+        {
+            if (n < r)
+                return new Mint(0);
+
+            if (n == r)
+                return new Mint(1);
+
+            if (n - r < r)
+                return CombOneByOne(n, n - r);
+
+            var res = new Mint(1);
+            for (long i = 1; i <= r; i++)
+            {
+                res *= n - i + 1;
+                res /= i;
+            }
+
+            return res;
+        }
     }
 }
