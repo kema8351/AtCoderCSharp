@@ -11,8 +11,8 @@ namespace V
         public void Solve()
         {
             //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            //Write(SolveLong());
+            YESNO(SolveBool());
         }
 
         public long SolveLong()
@@ -24,9 +24,113 @@ namespace V
 
         public bool SolveBool()
         {
-            var n = Read;
-            var res = false;
-            return res;
+            var allMap = ArrStr(19).Select(x => x.ToArray()).ToArray();
+            var bCount = allMap.SelectMany(x => x).Count(x => x == 'o');
+            var wCount = allMap.SelectMany(x => x).Count(x => x == 'x');
+            var countDiff = bCount - wCount;
+            if (countDiff != 0 && countDiff != 1)
+                return false;
+
+            if (bCount + wCount == 0)
+                return true;
+
+            var ops = new (XY diff, XY bg, XY add)[]
+            {
+                (new XY(1, 0), new XY(0, 0), new XY(0, 1)),
+                (new XY(0, 1), new XY(0, 0), new XY(1, 0)),
+                (new XY(1, 1), new XY(0, 0), new XY(0, 1)),
+                (new XY(1, 1), new XY(1, 0), new XY(1, 0)),
+                (new XY(1, -1), new XY(0, 0), new XY(0, 1)),
+                (new XY(1, -1), new XY(1, 18), new XY(1, 0)),
+            };
+
+            foreach (var map in GetMaps(allMap, countDiff == 0 ? 'x' : 'o'))
+            {
+
+                var ws = new List<int>();
+                var bs = new List<int>();
+
+                foreach (var op in ops)
+                {
+                    var diff = op.diff;
+                    var bg = op.bg;
+                    var add = op.add;
+
+
+                    while (In(bg))
+                    {
+                        var prev = '.';
+                        var count = 0;
+                        var st = bg;
+
+                        while (true)
+                        {
+                            var cur = In(st) ? map[st.x][st.y] : '.';
+
+                            if (prev != cur)
+                            {
+                                if (prev == 'o')
+                                    bs.Add(count);
+                                else if (prev == 'x')
+                                    ws.Add(count);
+
+                                count = 1;
+                            }
+                            else
+                            {
+                                count++;
+                            }
+
+                            if (In(st) == false)
+                                break;
+
+                            prev = cur;
+                            st = new XY(st.x + diff.x, st.y + diff.y);
+                        }
+
+                        bg = new XY(bg.x + add.x, bg.y + add.y);
+
+                    }
+                }
+
+                if (ws.All(x => x < 5) && bs.All(x => x < 5))
+                    return true;
+            }
+
+            return false;
+        }
+
+        IEnumerable<char[][]> GetMaps(char[][] map, char erase)
+        {
+            for (int x = 0; x < 19; x++)
+            {
+                for (int y = 0; y < 19; y++)
+                {
+                    if (map[x][y] != erase)
+                        continue;
+
+                    map[x][y] = '.';
+                    yield return map;
+                    map[x][y] = erase;
+                }
+            }
+        }
+
+        private bool In(XY xy)
+        {
+            return xy.x >= 0 && xy.x <= 18 && xy.y >= 0 && xy.y <= 18;
+        }
+    }
+
+    public struct XY
+    {
+        public int x;
+        public int y;
+
+        public XY(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
         }
     }
 }
