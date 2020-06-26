@@ -18,7 +18,32 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var k = Read;
+            var a = Arr(n).OrderBy(x => x).ToArray();
+            var b = Arr(n).OrderBy(x => x).ToArray();
+
+            var invalid = 0L;
+            var valid = 1000000000000000000L;
+
+            while (invalid + 1 < valid)
+            {
+                var mid = (valid + invalid) / 2;
+
+                var c = 0L;
+                foreach (var aa in a)
+                {
+                    var bb = mid / aa;
+                    var cc = C.BinarySearch.GetCountSmallerOrEqual(bb, b);
+                    c += cc;
+                }
+
+                if (c >= k)
+                    valid = mid;
+                else
+                    invalid = mid;
+            }
+
+            var res = valid;
             return res;
         }
 
