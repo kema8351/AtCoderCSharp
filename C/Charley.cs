@@ -10,23 +10,46 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
-        }
-
-        public long SolveLong()
-        {
             var n = Read;
-            var res = 0L;
-            return res;
-        }
+            var t = 0L;
+            foreach (var _ in C.Loop(n))
+            {
+                var x = Read;
+                var y = Read;
+                var z = Read;
+                var m = Read;
+                var xMin = Read;
+                var xMax = xMin;
+                var yMin = Read;
+                var yMax = yMin;
+                var zMin = Read;
+                var zMax = zMin;
+                foreach (var __ in C.Loop(m - 1))
+                {
+                    var xx = Read;
+                    var yy = Read;
+                    var zz = Read;
 
-        public bool SolveBool()
-        {
-            var n = Read;
-            var res = false;
-            return res;
+                    xMin.TryMin(xx);
+                    xMax.TryMax(xx);
+                    yMin.TryMin(yy);
+                    yMax.TryMax(yy);
+                    zMin.TryMin(zz);
+                    zMax.TryMax(zz);
+                }
+
+                t ^= xMin;
+                t ^= yMin;
+                t ^= zMin;
+                t ^= x - 1 - xMax;
+                t ^= y - 1 - yMax;
+                t ^= z - 1 - zMax;
+            }
+
+            if (t == 0)
+                Wr("LOSE");
+            else
+                Wr("WIN");
         }
     }
 }
