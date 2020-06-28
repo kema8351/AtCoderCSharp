@@ -18,7 +18,56 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var a = Arr(n);
+            var xor = 0L;
+
+            foreach (var aa in a.Skip(2))
+                xor ^= aa;
+
+            var total = a[0] + a[1];
+
             var res = 0L;
+            var carry = 0L;
+            var na0 = 0L;
+            var na1 = 0L;
+            for (int i = 60; i >= 0; i--)
+            {
+                carry *= 2;
+
+                var dig = 1 << i;
+                var b0 = (a[0] & dig) == 0 ? 0L : 1L;
+                var b1 = (a[1] & dig) == 0 ? 0L : 1L;
+
+                var bt = (total & dig) == 0 ? 0L : 1L;
+                var xd = (xor & dig) == 0 ? 0L : 1L;
+                bt += carry;
+
+                var g0 = 0L;
+                var g1 = 0L;
+
+                if (xd == 0)
+                {
+                    if (bt == 0)
+                        continue;
+
+                    if (bt == 1)
+                    {
+                        carry++;
+                        continue;
+                    }
+
+                    g0 = 1L;
+                    g1 = 1L;
+                }
+                else
+                {
+                }
+
+            }
+
+            if (carry > 0)
+                return -1;
+
             return res;
         }
 

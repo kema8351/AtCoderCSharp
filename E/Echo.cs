@@ -18,8 +18,11 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
-            return res;
+            var m = Read;
+            var res = Mint.Perm(m, n);
+
+
+            return res.Value;
         }
 
         public bool SolveBool()

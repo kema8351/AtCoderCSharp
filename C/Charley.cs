@@ -18,7 +18,40 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var m = Read;
+            var k = Read;
+            var a = Arr(n);
+            var b = Arr(m);
             var res = 0L;
+
+            var aa = new List<long>() { 0 };
+            var bb = new List<long>() { 0 };
+
+            var ta = 0L;
+            foreach (var aaa in a)
+            {
+                ta += aaa;
+                aa.Add(ta);
+            }
+
+            var tb = 0L;
+            foreach (var bbb in b)
+            {
+                tb += bbb;
+                bb.Add(tb);
+            }
+
+            for (int i = 0; i < aa.Count; i++)
+            {
+                var aaa = aa[i];
+                if (aaa > k)
+                    continue;
+
+                var bc = C.BinarySearch.GetCountSmallerOrEqual(k - aaa, bb);
+
+                res.TryMax(i + bc - 1);
+            }
+
             return res;
         }
 

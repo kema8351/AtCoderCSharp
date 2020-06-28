@@ -17,8 +17,13 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
+            var s = Str;
+            var t = Str;
             var res = 0L;
+
+            for (int i = 0; i < s.Length; i++)
+                if (s[i] != t[i])
+                    res++;
             return res;
         }
 

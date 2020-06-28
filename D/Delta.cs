@@ -19,6 +19,13 @@ namespace V
         {
             var n = Read;
             var res = 0L;
+
+            for (long i = 1; i <= n; i++)
+            {
+                var c = n / i;
+                res += i * (c * (c + 1) / 2);
+            }
+
             return res;
         }
 
