@@ -17,8 +17,31 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
+            var h = ReadInt;
+            var w = ReadInt;
+            var k = Read;
+            var map = ArrStr(h);
+
             var res = 0L;
+            foreach (var i in C.Loop(1 << h))
+                foreach (var j in C.Loop(1 << w))
+                {
+                    var c = 0;
+                    foreach (var x in C.Loop(h))
+                        foreach (var y in C.Loop(w))
+                        {
+                            if ((i & (1 << x)) == 0)
+                                continue;
+                            if ((j & (1 << y)) == 0)
+                                continue;
+
+                            if (map[x][y] == '#')
+                                c++;
+                        }
+
+                    if (c == k)
+                        res++;
+                }
             return res;
         }
 
