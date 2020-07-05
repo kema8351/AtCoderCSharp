@@ -17,9 +17,87 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var n = ReadInt;
+            var k = ReadInt;
+            var a = Arr(n);
+
+            var plus = a.Where(x => x > 0).OrderByDescending(x => x).ToArray();
+            var minus = a.Where(x => x < 0).OrderBy(x => x).ToArray();
+
+            {
+                var res = new Mint(1);
+                var pCount = 0;
+                var mCount = 0;
+
+                while (pCount + mCount <= k)
+                {
+                    var remain = k - pCount - mCount;
+                    if (remain == 0)
+                        return res.Value;
+
+                    if (remain == 1)
+                    {
+                        if (plus.Length >= pCount + 1)
+                        {
+                            res *= plus[pCount];
+                            return res.Value;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    var pRem = plus.Length - pCount;
+                    var mRem = minus.Length - mCount;
+                    var selectPlus = false;
+
+                    if (pRem >= 2 && mRem >= 2)
+                    {
+                        var pp = plus[pCount] * plus[pCount + 1];
+                        var mm = minus[mCount] * minus[mCount + 1];
+
+                        selectPlus = pp > mm;
+
+                    }
+                    else if (pRem >= 2)
+                    {
+                        selectPlus = true;
+                    }
+                    else if (mRem >= 2)
+                    {
+                        selectPlus = false;
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    if (selectPlus)
+                    {
+                        res *= plus[pCount];
+                        res *= plus[pCount + 1];
+                        pCount += 2;
+                    }
+                    else
+                    {
+                        res *= Math.Abs(minus[mCount]);
+                        res *= Math.Abs(minus[mCount + 1]);
+                        mCount += 2;
+                    }
+                }
+            }
+
+            if (a.Any(x => x == 0))
+                return 0;
+
+            {
+                var res = new Mint(1);
+                foreach (var aa in a.OrderBy(x => Math.Abs(x)).Take(k))
+                    res *= Math.Abs(aa);
+                res *= new Mint(-1);
+                return res.Value;
+            }
         }
 
         public bool SolveBool()
@@ -1284,10 +1362,10 @@ namespace V
                 this.Value += divider;
         }
 
-        //public static implicit operator Mint(long a) => new Mint(a % divider);
-        //public static implicit operator Mint(int a) => new Mint(a % divider);
-        //public static explicit operator long(Mint a) => a.Value;
-        //public static explicit operator int(Mint a) => (int)a.Value;
+        public static implicit operator Mint(long a) => new Mint(a);
+        public static implicit operator Mint(int a) => new Mint(a);
+        public static explicit operator long(Mint a) => a.Value;
+        public static explicit operator int(Mint a) => (int)a.Value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Mint operator +(Mint a, Mint b) => new Mint((a.Value + b.Value) % divider);
