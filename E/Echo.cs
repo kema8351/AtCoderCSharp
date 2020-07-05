@@ -17,9 +17,102 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var n = ReadInt;
+            var k = ReadInt;
+            var a = Arr(n);
+
+            //var r = new Random();
+            //var n = r.Next(10) + 1;
+            //var k = Math.Min(n, r.Next(10) + 1);
+            //var a = Arr(0);
+            //a = Enumerable.Range(0, n).Select(x => (r.Next(10) + 1) * (r.Next(1) - 1L)).ToArray();
+            //var tRes = -long.MaxValue;
+            //foreach (var x in C.IterTools.Combinations(n, k))
+            //{
+            //    var c = 1L;
+            //    foreach (var xx in x)
+            //        c *= a[xx];
+
+            //    tRes.TryMax(c);
+            //}
+            //Wr(n);
+            //Wr(k);
+            //Wr(string.Join(" ", a.Select(x => x.ToString())));
+            //Wr(new Mint(tRes).Value);
+
+            var zeroCount = a.Count(x => x == 0);
+            if (zeroCount > n - k)
+                return 0;
+
+            var minusCount = a.Count(x => x < 0);
+            var plusCount = a.Count(x => x > 0);
+            var bPlus = false;
+
+            for (int i = 0; i <= minusCount && i <= k; i += 2)
+            {
+                if (i + plusCount >= k)
+                    bPlus = true;
+            }
+
+
+            if (!bPlus && zeroCount > 0)
+                return 0;
+
+            if (bPlus)
+            {
+                var res = new Mint(1);
+                var ps = a.Where(x => x > 0).OrderByDescending(x => Math.Abs(x)).ToArray();
+                var ms = a.Where(x => x < 0).OrderByDescending(x => Math.Abs(x)).ToArray();
+                var pp = Math.Min(ps.Length, k);
+                if (pp - k == 1)
+                    pp--;
+                var mp = k - pp;
+
+                while (true)
+                {
+                    if (mp + 2 > ms.Length)
+                        break;
+                    if (pp < 2)
+                        break;
+
+                    long pCand = ps[pp - 1] * ps[pp - 2];
+                    long mCand = ms[mp] * ms[mp + 1];
+
+                    if (mCand > pCand)
+                    {
+                        mp += 2;
+                        pp -= 2;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                foreach (var i in ps.Take(pp))
+                    res *= i;
+
+                foreach (var i in ms.Take(mp))
+                    res *= Math.Abs(i);
+
+                return res.Value;
+            }
+            else
+            {
+                var res = new Mint(1);
+                var count = 0;
+                a = a.OrderBy(x => Math.Abs(x)).ToArray();
+
+                foreach (var aa in a)
+                {
+                    res *= aa;
+                    count++;
+
+                    if (count == k)
+                        break;
+                }
+                return res.Value;
+            }
         }
 
         public bool SolveBool()

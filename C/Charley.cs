@@ -17,8 +17,45 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
+            var h = Read;
+            var w = Read;
+            var k = Read;
+            var s = ArrStr(h);
+
             var res = 0L;
+
+            foreach (var x in C.IterTools.CombinationsWithReplacement(2, h))
+            {
+                foreach (var y in C.IterTools.CombinationsWithReplacement(2, w))
+                {
+                    var b = false;
+                    var a = 0L;
+                    for (int i = 0; i < h; i++)
+                    {
+                        if (x[i] == 0)
+                        {
+                            b = true;
+                            continue;
+                        }
+
+                        for (int j = 0; j < w; j++)
+                        {
+                            if (y[j] == 0)
+                            {
+                                b = true;
+                                continue;
+                            }
+
+                            if (s[i][j] == '#')
+                                a++;
+                        }
+                    }
+
+                    if (a == k)
+                        res++;
+                }
+            }
+
             return res;
         }
 

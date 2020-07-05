@@ -18,7 +18,18 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var a = Arr(n).OrderByDescending(x => x).ToArray();
             var res = 0L;
+            var q = new Queue<long>();
+            q.Enqueue(a[0]);
+
+            foreach (var i in C.Loop(n).Skip(1))
+            {
+                res += q.Dequeue();
+                q.Enqueue(a[i]);
+                q.Enqueue(a[i]);
+            }
+
             return res;
         }
 

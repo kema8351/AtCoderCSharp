@@ -10,8 +10,16 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var s = ArrStr(n);
+            var rr = new string[] { "AC", "WA", "TLE", "RE" };
+            foreach (var r in rr)
+            {
+                var rrr = s.Count(x => x == r);
+                Wr($"{r} x {rrr}");
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
