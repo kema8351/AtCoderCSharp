@@ -18,7 +18,16 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var edges = sc.Pairs(n - 1);
+            var res = n * (n + 1) * (n + 2) / 6;
+            foreach (var e in edges)
+            {
+                var u = Math.Min(e.X, e.Y);
+                var v = Math.Max(e.X, e.Y);
+
+                res -= u * (n - v + 1);
+            }
+
             return res;
         }
 
