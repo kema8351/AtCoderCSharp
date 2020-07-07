@@ -10,16 +10,62 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
-        }
+            var n = ReadInt;
+            var m = ReadInt;
+            var a = Arr(n);
+            var uf = new C.UnionFind(n);
+            foreach (var i in C.Loop(m))
+            {
+                var x = ReadInt;
+                var y = ReadInt;
 
-        public long SolveLong()
-        {
-            var n = Read;
+                uf.TryUnite(x, y);
+            }
+
+            var rs = Enumerable.Range(0, n).Select(x => uf.GetRoot(x)).ToArray();
+            var roots = rs.Distinct().ToArray();
+
+            var necessary = roots.Length * 2 - 2;
+
+            if (n < necessary)
+            {
+                Wr("Impossible");
+                return;
+            }
+
+            var bs = new bool[n];
+            var oa = a.Select((x, idx) => new { x, idx }).OrderBy(x => x.x).ToArray();
+
             var res = 0L;
-            return res;
+            var free = 0;
+            var count = 0;
+            var maxFree = necessary - roots.Length;
+
+            for (int i = 0; i < oa.Length; i++)
+            {
+                if (count >= necessary)
+                    break;
+
+                var x = oa[i].x;
+                var idx = oa[i].idx;
+
+                var root = rs[idx];
+
+                if (bs[root])
+                {
+                    if (free >= maxFree)
+                        continue;
+
+                    free++;
+                }
+                else
+                    bs[root] = true;
+
+                res += x;
+                count++;
+            }
+
+            Wr(res);
         }
 
         public bool SolveBool()
