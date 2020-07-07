@@ -18,7 +18,33 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var a = Arr(n);
+
+            var valid = 1L;
+            var invalid = a.Max() + 1L;
+            var all = n * (n + 1) / 2;
+            var threshold = (all + 1) / 2;
+
+            while (valid + 1 < invalid)
+            {
+                var mid = (valid + invalid) / 2;
+                var sums = new int[n + 1];
+
+                foreach (var i in C.Loop(n))
+                {
+                    sums[i + 1] = sums[i] + (a[i] >= mid ? +1 : -1);
+                }
+
+                var ic = C.InversionNumberCountWithMinusCheck(sums);
+                var cand = all - ic;
+
+                if (cand >= threshold)
+                    valid = mid;
+                else
+                    invalid = mid;
+            }
+
+            var res = valid;
             return res;
         }
 
