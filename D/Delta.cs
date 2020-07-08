@@ -10,9 +10,13 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var x = Read;
+            var y = Read;
+
+            if (Math.Abs(x - y) <= 1)
+                Wr("Brown");
+            else
+                Wr("Alice");
         }
 
         public long SolveLong()
