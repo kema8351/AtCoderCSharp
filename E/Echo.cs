@@ -10,15 +10,70 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            foreach (var i in C.Loop(n))
+                Write(SolveLong());
             //YesNo(SolveBool());
+        }
+
+        public class Camel
+        {
+            public int k;
+            public long l;
+            public long r;
         }
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var n = ReadInt;
+            var cs = new List<Camel>();
+            foreach (var i in C.Loop(n))
+                cs.Add(new Camel() { k = ReadInt, l = Read, r = Read });
+
+            var res = cs.Sum(x => Math.Min(x.l, x.r));
+
+            {
+                var pq = new C.PriorityQueue<long, Camel>(x => x.l - x.r);
+
+                var gcs = cs.Where(x => x.l - x.r > 0).GroupBy(x => x.k).OrderBy(x => x.Key);
+
+                foreach (var g in gcs)
+                {
+                    foreach (var c in g)
+                    {
+                        pq.Enqueue(c);
+                        res += c.l - c.r;
+                    }
+
+                    while (pq.Count > g.Key)
+                    {
+                        var c = pq.Dequeue();
+                        res -= c.l - c.r;
+                    }
+                }
+            }
+
+            {
+                var pq = new C.PriorityQueue<long, Camel>(x => x.r - x.l);
+
+                var gcs = cs.Where(x => x.l - x.r < 0).GroupBy(x => n - x.k).OrderBy(x => x.Key);
+
+                foreach (var g in gcs)
+                {
+                    foreach (var c in g)
+                    {
+                        pq.Enqueue(c);
+                        res += c.r - c.l;
+                    }
+
+                    while (pq.Count > g.Key)
+                    {
+                        var c = pq.Dequeue();
+                        res -= c.r - c.l;
+                    }
+                }
+            }
+
             return res;
         }
 
