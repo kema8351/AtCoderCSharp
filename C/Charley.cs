@@ -10,15 +10,20 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            foreach (var i in C.Loop(n))
+                Write(SolveLong(i + 1));
             //YesNo(SolveBool());
         }
 
-        public long SolveLong()
+        public long SolveLong(long n)
         {
-            var n = Read;
             var res = 0L;
+            for (var x = 1; x * x <= n; x++)
+                for (var y = x; y * y + x * x + x * y <= n; y++)
+                    for (var z = y; x * x + y * y + z * z + x * y + y * z + z * x <= n; z++)
+                        if (x * x + y * y + z * z + x * y + y * z + z * x == n)
+                            res += x == y && y == z ? 1 : x == y ? 3 : y == z ? 3 : z == x ? 3 : 6;
             return res;
         }
 

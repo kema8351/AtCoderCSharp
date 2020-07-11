@@ -18,7 +18,8 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var a = Arr(n);
+            var res = a.Select((x, i) => new { x, n = i + 1 }).Count(x => x.x % 2 == 1 && x.n % 2 == 1);
             return res;
         }
 

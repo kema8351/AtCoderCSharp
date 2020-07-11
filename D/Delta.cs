@@ -10,9 +10,128 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var n = Read;
+            var s = Str;
+
+            var cache = new List<long>[200001];
+            foreach (var i in C.Loop(cache.Length))
+                cache[i] = new List<long>();
+
+            foreach (var i in C.Loop(cache.Length).Skip(1))
+            {
+                var b = BitCount(i);
+                var r = i % b;
+                cache[r].Add(i);
+            }
+
+            var res = new long[200001];
+
+            foreach (var i in C.Loop(cache.Length))
+            {
+                foreach (var x in cache[i])
+                    res[x] = res[i] + 1;
+            }
+
+            var c1 = s.Count(x => x == '1');
+            var c10 = new List<long>();
+            var t1 = 1L;
+            var dig = 0;
+            var or01 = 0L;
+            var or10 = 0L;
+
+            if (c1 - 1 > 0)
+            {
+                foreach (var i in C.Loop(200001))
+                {
+                    c10.Add(t1);
+
+                    t1 *= 2;
+                    t1 %= (c1 - 1);
+                }
+
+                foreach (var c in s.Reverse())
+                {
+                    if (c == '1')
+                    {
+                        or10 += c10[dig];
+                        or10 %= c1 - 1;
+                    }
+
+                    dig++;
+                }
+            }
+
+            var c01 = new List<long>();
+            t1 = 1L;
+            foreach (var i in C.Loop(200001))
+            {
+                c01.Add(t1);
+
+                t1 *= 2;
+                t1 %= (c1 + 1);
+            }
+
+            dig = 0;
+            foreach (var c in s.Reverse())
+            {
+                if (c == '1')
+                {
+                    or01 += c01[dig];
+                    or01 %= c1 + 1;
+                }
+
+                dig++;
+            }
+
+            foreach (var i in C.Loop(s.Length))
+            {
+                var ri = s.Length - i - 1;
+                if (s[i] == '0')
+                {
+                    var r = or01 + c01[ri];
+                    r %= c1 + 1;
+                    Wr(res[r] + 1);
+                }
+                else if (c1 == 1)
+                {
+                    Wr(0);
+                }
+                else
+                {
+                    var r = or10 - c10[ri];
+                    r += c1 - 1;
+                    r %= c1 - 1;
+                    Wr(res[r] + 1);
+                }
+            }
+
+        }
+
+        IEnumerable<long> Slv(long n)
+        {
+            var t = n;
+            while (t > 0)
+            {
+                yield return t;
+
+                t /= BitCount(t);
+            }
+            yield return t;
+
+        }
+
+
+        long BitCount(long n)
+        {
+            var t = n;
+            var res = 0;
+            while (t > 0)
+            {
+                if (t % 2 == 1)
+                    res++;
+                t /= 2;
+            }
+            return res;
         }
 
         public long SolveLong()

@@ -10,15 +10,38 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            foreach (var i in C.Loop(n))
+                Write(SolveLong());
             //YesNo(SolveBool());
+        }
+
+        public class Rakuda
+        {
+            public int BestIdx { get; set; }
+            public long Best { get; set; }
+            public long None { get; set; }
         }
 
         public long SolveLong()
         {
-            var n = Read;
+            var n = ReadInt;
+            var rs = new List<Rakuda>();
+            foreach (var i in C.Loop(n))
+            {
+                rs.Add(new Rakuda() { BestIdx = ReadInt - 1, Best = Read, None = Read });
+            }
+
+            rs = rs.OrderByDescending(x => x.Best - x.None).ToList();
+
+            var st = new C.SegmentTree<int>(Enumerable.Repeat(1, n).ToArray(), (x1, x2) => x1 + x2, 1);
+
             var res = 0L;
+            foreach (var x in rs)
+            {
+
+            }
+
             return res;
         }
 
