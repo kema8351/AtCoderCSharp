@@ -10,9 +10,72 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var gs = new List<Guard>();
+            gs.Add(new Guard() { x = Read, y = Read, r = 0 });
+            gs.Add(new Guard() { x = Read, y = Read, r = 0 });
+            var n = Read;
+            foreach (var i in C.Loop(n))
+                gs.Add(new Guard() { x = Read, y = Read, r = Read });
+
+            var start = 0;
+            var end = 1;
+            var inf = double.MaxValue;
+            var pq = new C.PriorityQueue<double, State>(x => x.damage);
+            var damages = new double[gs.Count];
+            foreach (var i in C.Loop(damages.Length))
+                damages[i] = inf;
+            Action<State> enq = (State state) =>
+            {
+                if (state.damage > damages[state.index])
+                    return;
+
+                damages[state.index] = state.damage;
+                pq.Enqueue(state);
+            };
+            enq.Invoke(new State() { index = start, damage = 0 });
+            var unpassed = new HashSet<int>(Enumerable.Range(0, gs.Count));
+
+            while (pq.Count > 0)
+            {
+                var q = pq.Dequeue();
+                if (q.damage != damages[q.index])
+                    continue;
+
+                if (q.index == end)
+                {
+                    Wr(q.damage);
+                    return;
+                }
+
+                var cur = gs[q.index];
+                unpassed.Remove(q.index);
+
+                foreach (var i in unpassed)
+                {
+                    var next = gs[i];
+                    var dx = cur.x - next.x;
+                    var dy = cur.y - next.y;
+                    var tr = cur.r + next.r;
+
+                    var add = Math.Sqrt(dx * dx + dy * dy) - tr;
+
+                    enq.Invoke(new State() { index = i, damage = q.damage + Math.Max(0, add) });
+                }
+            }
+
+        }
+
+        public class State
+        {
+            public int index;
+            public double damage;
+        }
+
+        public class Guard
+        {
+            public long x;
+            public long y;
+            public long r;
         }
 
         public long SolveLong()
