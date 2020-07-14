@@ -10,9 +10,31 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var n = Read;
+            var xys = sc.Pairs(n);
+
+            foreach (var xy in xys)
+            {
+                var ds = new List<double>();
+                foreach (var p in xys.Where(x => x != xy))
+                {
+                    var d = Math.Atan2(xy.X - p.X, xy.Y - p.Y);
+                    ds.Add(d);
+                }
+
+                ds = ds.OrderBy(x => x).ToList();
+                ds.Add(ds[0] + Math.PI * 2);
+
+                var mx = 0d;
+                for (int i = 0; i < ds.Count - 1; i++)
+                {
+                    mx.TryMax(ds[i + 1] - ds[i]);
+                }
+
+                var res = Math.Max(0d, (mx - Math.PI)) / Math.PI / 2d;
+                Wr(res);
+            }
+
         }
 
         public long SolveLong()
