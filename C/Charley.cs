@@ -18,8 +18,76 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var l = Read;
+
+            var firstRabbit = ReadRabbit();
+            var rs = new List<Rabbit>();
+            if (firstRabbit.isLeft)
+                rs.Add(new Rabbit() { x = 0, isLeft = false });
+            rs.Add(firstRabbit);
+
+            foreach (var i in C.Loop(n - 1))
+                rs.Add(ReadRabbit());
+
+            if (rs[rs.Count - 1].isLeft == false)
+                rs.Add(new Rabbit() { x = l + 1, isLeft = true });
+
             var res = 0L;
+            var prev = true;
+            var rights = new List<Rabbit>();
+            var lefts = new List<Rabbit>();
+            foreach (var r in rs)
+            {
+                if (prev && r.isLeft == false)
+                {
+                    res += Calc(rights, lefts);
+                    rights.Clear();
+                    lefts.Clear();
+                }
+
+                if (r.isLeft)
+                    lefts.Add(r);
+                else
+                    rights.Add(r);
+
+                prev = r.isLeft;
+            }
+
+            res += Calc(rights, lefts);
+
             return res;
+        }
+
+        long Calc(List<Rabbit> rights, List<Rabbit> lefts)
+        {
+            if (rights.Count == 0 && lefts.Count == 0)
+                return 0;
+
+            var res = 0L;
+            res += rights
+                .Select((r, i) => new { r, idx = rights.Count - i - 1 })
+                .Select(x => rights[rights.Count - 1].x - x.idx - x.r.x)
+                .Sum();
+
+            res += lefts
+                .Select((r, idx) => new { r, idx })
+                .Select(x => x.r.x - x.idx - lefts[0].x)
+                .Sum();
+
+            res += (lefts[0].x - rights[rights.Count - 1].x - 1) * Math.Max(rights.Count, lefts.Count);
+
+            return res;
+        }
+
+        Rabbit ReadRabbit()
+        {
+            return new Rabbit() { x = Read, isLeft = Str == "L" };
+        }
+
+        public class Rabbit
+        {
+            public long x;
+            public bool isLeft;
         }
 
         public bool SolveBool()
