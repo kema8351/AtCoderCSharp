@@ -17,8 +17,32 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var s = Str;
+            var dp = new Mint[s.Length + 1, 3];
+            var q3 = new Mint(1);
+
+            foreach (var i in C.Loop(s.Length))
+            {
+                var c = s[i];
+
+                var r = (c == '?') ? 3 : 1;
+                foreach (var j in C.Loop(3))
+                {
+                    dp[i + 1, j] = dp[i, j] * r;
+                }
+
+                if (c == 'A' || c == '?')
+                    dp[i + 1, 0] += q3;
+                if (c == 'B' || c == '?')
+                    dp[i + 1, 1] += dp[i, 0];
+                if (c == 'C' || c == '?')
+                    dp[i + 1, 2] += dp[i, 1];
+
+                if (c == '?')
+                    q3 *= 3;
+            }
+
+            var res = dp[s.Length, 2].Value;
             return res;
         }
 
