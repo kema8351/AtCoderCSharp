@@ -11,22 +11,79 @@ namespace V
         public void Solve()
         {
             //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            //Write(SolveLong());
+            YESNO(SolveBool());
         }
 
-        public long SolveLong()
+        public class Word
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            public IReadOnlyList<long> Counts { get; }
+            int? hash;
+
+            public Word(IEnumerable<long> counts)
+            {
+                this.Counts = counts.ToArray();
+            }
+
+            public override int GetHashCode()
+            {
+                if (hash.HasValue)
+                    return hash.Value;
+
+                long res = 0;
+                for (int i = 0; i < Counts.Count; i++)
+                {
+                    res += Counts[i] << i;
+                }
+
+                hash = (int)(res % (1 << 30));
+                return hash.Value;
+            }
+
+            public override bool Equals(object obj)
+            {
+                var arg = (Word)obj;
+
+                return arg.Counts.Zip(this.Counts, (x1, x2) => x1 == x2).All(x => x);
+            }
         }
 
         public bool SolveBool()
         {
-            var n = Read;
-            var res = false;
-            return res;
+            var n = ReadInt;
+            var k = ReadInt;
+            var s = Str;
+            var q = new Queue<Word>();
+            var cs = new long[26];
+            var hs = new HashSet<Word>();
+
+            for (int i = 0; i < k; i++)
+            {
+                cs[s[i] - 'a']++;
+            }
+
+            q.Enqueue(new Word(cs));
+
+            for (int i = k; i < n; i++)
+            {
+                if (q.Count >= k)
+                {
+                    var w = q.Dequeue();
+
+                    hs.SafeAdd(w);
+                }
+
+                cs[s[i] - 'a']++;
+                cs[s[i - k] - 'a']--;
+
+                var nw = new Word(cs);
+                q.Enqueue(nw);
+
+                if (hs.Contains(nw))
+                    return true;
+            }
+
+            return false;
         }
     }
 }
