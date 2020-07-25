@@ -11,8 +11,8 @@ namespace V
         public void Solve()
         {
             //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            //Write(SolveLong());
+            YesNo(SolveBool());
         }
 
         public long SolveLong()
@@ -24,8 +24,24 @@ namespace V
 
         public bool SolveBool()
         {
-            var n = Read;
-            var res = false;
+            var a = Read;
+            var b = Read;
+            var c = Read;
+            var k = Read;
+
+            while (a >= b)
+            {
+                b *= 2;
+                k--;
+            }
+
+            while (b >= c)
+            {
+                c *= 2;
+                k--;
+            }
+
+            var res = k >= 0;
             return res;
         }
     }

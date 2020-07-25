@@ -11,16 +11,102 @@ namespace V
         public void Solve()
         {
             //var n = Read;
-            Write(SolveLong());
+            Write(SolveLong()?.ToString() ?? "SAFE");
             //YesNo(SolveBool());
         }
 
-        public long SolveLong()
+        public class Plain
+        {
+            public long x;
+            public long y;
+            public string u;
+        }
+
+        public long? SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var ps = new List<Plain>();
+            foreach (var i in C.Loop(n))
+            {
+                ps.Add(new Plain() { x = Read, y = Read, u = Str });
+            }
+
+            var res = inf;
+
+            var r = ps.Where(x => x.u == "R").GroupBy(x => x.y).ToDictionary(x => x.Key, x => x.Select(xs => xs.x).ToList());
+            var l = ps.Where(x => x.u == "L").GroupBy(x => x.y).ToDictionary(x => x.Key, x => x.Select(xs => xs.x).ToList());
+            res.TryMin(Slv2(r, l) * 5);
+
+            var u = ps.Where(x => x.u == "U").GroupBy(x => x.x).ToDictionary(x => x.Key, x => x.Select(xs => xs.y).ToList());
+            var d = ps.Where(x => x.u == "D").GroupBy(x => x.x).ToDictionary(x => x.Key, x => x.Select(xs => xs.y).ToList());
+            res.TryMin(Slv2(u, d) * 5);
+
+            var urr = ps.Where(x => x.u == "R").GroupBy(x => x.y + x.x).ToDictionary(x => x.Key, x => x.Select(xs => xs.x).ToList());
+            var uru = ps.Where(x => x.u == "U").GroupBy(x => x.y + x.x).ToDictionary(x => x.Key, x => x.Select(xs => xs.x).ToList());
+            res.TryMin(Slv2(urr, uru) * 10);
+
+            var dld = ps.Where(x => x.u == "D").GroupBy(x => x.y + x.x).ToDictionary(x => x.Key, x => x.Select(xs => xs.x).ToList());
+            var dll = ps.Where(x => x.u == "L").GroupBy(x => x.y + x.x).ToDictionary(x => x.Key, x => x.Select(xs => xs.x).ToList());
+            res.TryMin(Slv2(dld, dll) * 10);
+
+            var rdr = ps.Where(x => x.u == "R").GroupBy(x => x.y - x.x).ToDictionary(x => x.Key, x => x.Select(xs => xs.x).ToList());
+            var rdd = ps.Where(x => x.u == "D").GroupBy(x => x.y - x.x).ToDictionary(x => x.Key, x => x.Select(xs => xs.x).ToList());
+            res.TryMin(Slv2(rdr, rdd) * 10);
+
+            var ulu = ps.Where(x => x.u == "U").GroupBy(x => x.y - x.x).ToDictionary(x => x.Key, x => x.Select(xs => xs.x).ToList());
+            var ull = ps.Where(x => x.u == "L").GroupBy(x => x.y - x.x).ToDictionary(x => x.Key, x => x.Select(xs => xs.x).ToList());
+            res.TryMin(Slv2(ulu, ull) * 10);
+
+            return res == inf ? (long?)null : res;
+        }
+
+        long Slv2(Dictionary<long, List<long>> r, Dictionary<long, List<long>> l)
+        {
+            var res = inf;
+            foreach (var pair in r)
+            {
+                if (l.ContainsKey(pair.Key) == false)
+                    continue;
+
+                res.TryMin(Slv(pair.Value, l[pair.Key]));
+            }
+
             return res;
         }
+
+        long Slv(List<long> ps, List<long> ms)
+        {
+            var pp = ps.OrderBy(x => x).ToArray();
+            var mm = ms.OrderBy(x => x).ToArray();
+
+            var res = inf;
+
+            var ip = 0;
+            var im = 0;
+
+            while (true)
+            {
+                if (ip == pp.Length)
+                    break;
+
+                if (im == mm.Length)
+                    break;
+
+                if (pp[ip] < mm[im])
+                {
+                    res.TryMin(mm[im] - pp[ip]);
+                    ip++;
+                }
+                else
+                {
+                    im++;
+                }
+            }
+
+            return res;
+        }
+
+        const long inf = long.MaxValue / 16;
 
         public bool SolveBool()
         {

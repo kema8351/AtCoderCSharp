@@ -18,7 +18,31 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var a = Arr(n).ToList();
+            a.Add(0);
+
+            var y = 1000L;
+            var s = 0L;
+
+            for (int i = 0; i < n; i++)
+            {
+                if (a[i] < a[i + 1])
+                {
+                    // buy
+                    var b = y / a[i];
+                    y -= b * a[i];
+                    s += b;
+                }
+                else
+                {
+                    // sell
+                    y += s * a[i];
+                    s = 0;
+                }
+
+            }
+
+            var res = y;
             return res;
         }
 

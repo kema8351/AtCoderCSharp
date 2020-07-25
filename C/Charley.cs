@@ -10,24 +10,16 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var n = Read;
+            var k = Read;
+            var a = Arr(n);
+
+            for (var i = k; i < n; i++)
+            {
+                YesNo(a[i - k] < a[i]);
+            }
         }
 
-        public long SolveLong()
-        {
-            var n = Read;
-            var res = 0L;
-            return res;
-        }
-
-        public bool SolveBool()
-        {
-            var n = Read;
-            var res = false;
-            return res;
-        }
     }
 }
 namespace V

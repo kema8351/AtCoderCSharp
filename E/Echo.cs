@@ -10,9 +10,132 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var n = Read;
+            var ss = new List<Syuraku>();
+            foreach (var i in C.Loop(n))
+            {
+                ss.Add(new Syuraku() { x = Read, y = Read, p = Read });
+            }
+
+
+            for (int i = 0; i <= n; i++)
+            {
+                Wr(Slv(ss, i));
+            }
+        }
+
+        long Slv(List<Syuraku> ss, int k)
+        {
+            if (k == ss.Count)
+                return 0;
+
+            if (k == 0)
+            {
+                var xs = new List<long>() { 0 };
+                var ys = new List<long>() { 0 };
+                return SS(ss, xs, ys);
+            }
+
+            if (k < 9)
+            {
+                var res = long.MaxValue;
+
+                foreach (var comb in C.IterTools.Combinations(ss.Count, k))
+                {
+                    for (int i = 0; i < (1 << k); i++)
+                    {
+                        var xs = new List<long>() { 0 };
+                        var ys = new List<long>() { 0 };
+
+                        for (int j = 0; j < k; j++)
+                        {
+                            var s = ss[(int)comb[j]];
+
+                            if (((i >> j) & 1) == 0)
+                                xs.Add(s.x);
+                            else
+                                ys.Add(s.y);
+                        }
+
+                        var cand = SS(ss, xs, ys);
+                        res.TryMin(cand);
+                    }
+                }
+
+                return res;
+            }
+
+            {
+                var res = long.MaxValue;
+
+                foreach (var comb in C.IterTools.Combinations(ss.Count, k))
+                {
+
+                    foreach (var ri in C.IterTools.Combinations(ss.Count - k, ss.Count - k))
+                    {
+                        var lines = comb.Select(x => ss[(int)x]).ToHashSet();
+
+                        var rems = Enumerable.Range(0, ss.Count).Where(x => comb.Contains(x) == false)
+                            .Select(x => ss[x])
+                            .ToArray();
+
+                        var xs = new List<long>() { 0 };
+                        var ys = new List<long>() { 0 };
+
+                        foreach (var r in ri)
+                        {
+                            var s = rems[(int)r];
+
+                            var xx = xs.Select(x => Math.Abs(s.x - x));
+                            var yy = ys.Select(x => Math.Abs(s.y - x));
+
+                            var min = xx.Concat(yy).Min();
+
+                            var line = lines.OrderBy(x => Math.Min(Math.Abs(x.x - s.x), Math.Abs(x.y - s.y))).FirstOrDefault();
+                            var minc = Math.Min(Math.Abs(line.x - s.x), Math.Abs(line.y - s.y));
+
+                            if (min > minc)
+                            {
+                                lines.Remove(line);
+
+                                if (Math.Abs(line.x - s.x) > Math.Abs(line.y - s.y))
+                                    ys.Add(line.y);
+                                else
+                                    xs.Add(line.x);
+                            }
+                        }
+
+                        xs.AddRange(lines.Select(x => x.x));
+
+                        res.TryMin(SS(ss, xs, ys));
+                    }
+                }
+
+                return res;
+            }
+
+        }
+
+        long SS(List<Syuraku> ss, List<long> xs, List<long> ys)
+        {
+            var cand = 0L;
+
+            foreach (var s in ss)
+            {
+                var xx = xs.Select(x => Math.Abs(s.x - x));
+                var yy = ys.Select(x => Math.Abs(s.y - x));
+
+                cand += xx.Concat(yy).Min() * s.p;
+            }
+
+            return cand;
+        }
+
+        public class Syuraku
+        {
+            public long x;
+            public long y;
+            public long p;
         }
 
         public long SolveLong()
