@@ -17,9 +17,38 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var n = ReadInt;
+            var s1 = Str;
+            var s2 = Str;
+            var b = new bool[n];
+
+            var res = new Mint(3);
+
+            var i = 0;
+            bool? vert = null;
+            while (i < n)
+            {
+                if (s1[i] == s2[i])
+                {
+                    if (vert == true)
+                        res *= 2;
+
+                    vert = true;
+                }
+                else
+                {
+                    if (vert == false)
+                        res *= 3;
+                    else
+                        res *= 2;
+                    i++;
+                    vert = false;
+                }
+
+                i++;
+            }
+
+            return res.Value;
         }
 
         public bool SolveBool()
