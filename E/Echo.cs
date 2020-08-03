@@ -18,7 +18,25 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var k = Read;
+            var a = Arr(n);
+
+            long valid = int.MaxValue;
+            long invalid = 0L;
+
+            while (invalid + 1 < valid)
+            {
+                var mid = (valid + invalid) / 2;
+
+                var kk = a.Sum(x => (x - 1) / mid + 1);
+
+                if (kk <= k + n)
+                    valid = mid;
+                else
+                    invalid = mid;
+            }
+
+            var res = valid;
             return res;
         }
 

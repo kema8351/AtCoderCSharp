@@ -18,7 +18,33 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var s = Str;
+
+            var rc = s.Count(x => x == 'R');
+            var wc = s.Count(x => x == 'W');
+
+            long res = int.MaxValue;
+            var lrc = 0L;
+            var lwc = 0L;
+
+
+            foreach (var i in C.Loop(s.Length + 1))
+            {
+                var rrc = rc - lrc;
+                var rwc = wc - lwc;
+
+                var cd = Math.Max(lwc, rrc);
+                res.TryMin(cd);
+
+                if (i == s.Length)
+                    break;
+
+                if (s[i] == 'R')
+                    lrc++;
+                else
+                    lwc++;
+            }
+
             return res;
         }
 

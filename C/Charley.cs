@@ -10,15 +10,36 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            //foreach (var i in C.Loop(1000000))
+            //    Wr(i + " " + SolveLong(i + 1));
+
+            var n = Read;
+            Write(SolveLong(n));
             //YesNo(SolveBool());
         }
 
-        public long SolveLong()
+        public long SolveLong(long k)
         {
-            var n = Read;
-            var res = 0L;
+            if (k % 2 == 0)
+                return -1;
+
+            if (k % 5 == 0)
+                return -1;
+
+
+            var res = 1L;
+            var d = 7L;
+
+            while (true)
+            {
+                if (d % k == 0)
+                    return res;
+
+                d *= 10;
+                d += 7;
+                d %= k;
+                res++;
+            }
             return res;
         }
 

@@ -18,7 +18,9 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var d = Read;
+            var xy = sc.Pairs(n);
+            var res = xy.Count(x => x.X * x.X + x.Y * x.Y <= d * d);
             return res;
         }
 

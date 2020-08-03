@@ -8,11 +8,62 @@ namespace V
 {
     partial class Solver
     {
+        public class Q
+        {
+            public long index;
+            public long l;
+            public long r;
+
+            public long res;
+        }
+
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var n = Read;
+            var qc = Read;
+            var cs = Arr(n);
+            var qs = new List<Q>();
+
+            var bit = new C.BinaryIndexTree(500005);
+
+            foreach (var i in C.Loop(qc))
+            {
+                var l = ReadInt;
+                var r = ReadInt;
+                qs.Add(new Q { l = l, r = r, index = i });
+            }
+
+            qs = qs.OrderBy(x => x.r).ToList();
+
+            var inf = int.MaxValue;
+            var lap = new long[500005];
+            foreach (var i in C.Loop(lap.Length))
+                lap[i] = inf;
+
+            var maxR = 0L;
+            foreach (var q in qs)
+            {
+                for (var i = maxR + 1; i <= q.r; i++)
+                {
+                    var c = cs[i - 1];
+                    var tmp = lap[c];
+                    lap[c] = i;
+
+                    if (inf != tmp)
+                        bit.Add(tmp, -1);
+
+                    bit.Add(i, +1);
+                }
+
+                maxR = q.r;
+
+                q.res = bit.Sum(q.r) - bit.Sum(q.l - 1);
+            }
+
+            qs = qs.OrderBy(x => x.index).ToList();
+
+            foreach (var qq in qs)
+                Wr(qq.res);
         }
 
         public long SolveLong()
