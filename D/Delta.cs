@@ -15,10 +15,69 @@ namespace V
             //YesNo(SolveBool());
         }
 
+        public class Bal
+        {
+            public long h;
+            public long s;
+        }
+
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var n = ReadInt;
+            var hs = new List<Bal>();
+            foreach (var i in C.Loop(n))
+                hs.Add(new Bal() { h = Read, s = Read });
+
+            var maxH = hs.Max(x => x.h);
+            var maxS = hs.Max(x => x.s);
+            var valid = n * maxS + maxH;
+            var invalid = 0L;
+
+            var ss = new long[n];
+
+            bool isValid(long mid)
+            {
+                foreach (var i in C.Loop(n))
+                {
+                    var dif = mid - hs[i].h;
+
+                    if (dif < 0)
+                        return false;
+
+
+                    ss[i] = dif / hs[i].s;
+                }
+
+                long d = 0L;
+                foreach (var x in ss.OrderBy(xs => xs))
+                {
+                    if (d <= x)
+                    {
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                    d++;
+                }
+
+                return true;
+            }
+
+            while (invalid + 1 < valid)
+            {
+                var mid = (valid + invalid) / 2;
+
+                var midValid = isValid(mid);
+
+                if (midValid)
+                    valid = mid;
+                else
+                    invalid = mid;
+            }
+
+            var res = valid;
             return res;
         }
 
