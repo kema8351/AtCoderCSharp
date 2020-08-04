@@ -17,8 +17,38 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var n = ReadInt;
+            var k = ReadInt;
+            var a = Arr(n);
+
+            var pSum = a.Where(x => x > 0).Sum();
+            var relMinus = a.Take(k).Where(x => x < 0).Sum();
+            var curMinus = relMinus;
+            for (int i = k; i < n; i++)
+            {
+                if (a[i - k] < 0)
+                    curMinus -= a[i - k];
+                if (a[i] < 0)
+                    curMinus += a[i];
+
+                relMinus.TryMax(curMinus);
+            }
+            var res1 = pSum + relMinus;
+
+            var relExPlus = a.Take(k).Where(x => x > 0).Sum();
+            var curExPlus = relExPlus;
+            for (int i = k; i < n; i++)
+            {
+                if (a[i - k] > 0)
+                    curExPlus -= a[i - k];
+                if (a[i] > 0)
+                    curExPlus += a[i];
+
+                relExPlus.TryMin(curExPlus);
+            }
+            var res2 = pSum - relExPlus;
+
+            var res = Math.Max(res1, res2);
             return res;
         }
 
