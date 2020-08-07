@@ -10,8 +10,17 @@ namespace V
     {
         public void Solve()
         {
+            if (SolveBool())
+            {
+                Wr("First");
+            }
+            else
+            {
+                Wr("Second");
+            }
+
             //var n = Read;
-            Write(SolveLong());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
@@ -24,9 +33,16 @@ namespace V
 
         public bool SolveBool()
         {
-            var n = Read;
-            var res = false;
-            return res;
+            var s = Str;
+
+            if (s[0] == s[s.Length - 1])
+            {
+                return s.Length % 2 == 0;
+            }
+            else
+            {
+                return s.Length % 2 != 0;
+            }
         }
     }
 }
