@@ -17,8 +17,19 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var s = Str;
+            var n = s.Length;
+            var res = n;
+
+            foreach (var i in C.Loop(n - 1))
+            {
+                if (s[i] != s[i + 1])
+                {
+                    var cand = Math.Max(n - i - 1, i + 1);
+                    res.TryMin(cand);
+                }
+            }
+
             return res;
         }
 
