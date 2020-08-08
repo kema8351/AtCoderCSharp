@@ -11,17 +11,41 @@ namespace V
         public void Solve()
         {
             //var n = Read;
-            Write(SolveLong());
+            var res = SolveLong();
+            Write(res == Inf ? "inf" : (-res).ToString());
             //YesNo(SolveBool());
         }
 
-        public long SolveLong()
+        public class Edge
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            public int from;
+            public int to;
+            public long point;
+            public bool Passed => useCount > 0;
+            public bool CanUse => useCount <= 1;
+            public int useCount;
         }
 
+        const long Inf = int.MaxValue;
+
+        public long SolveLong()
+        {
+            var n = ReadInt;
+            var m = ReadInt;
+            var es = new List<C.BellmanFord.Edge>();
+
+
+            foreach (var _ in C.Loop(m))
+            {
+                es.Add(new C.BellmanFord.Edge(ReadInt - 1, ReadInt - 1, -Read));
+            }
+
+
+
+            var res = C.BellmanFord.RunBellmanFord(n, es, 0, n - 1);
+
+            return res ?? Inf;
+        }
         public bool SolveBool()
         {
             var n = Read;
