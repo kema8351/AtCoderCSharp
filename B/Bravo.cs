@@ -17,8 +17,36 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
+            var n = ReadInt;
+            var a = Arr(n);
+            var indices = new int[n + 1];
+            foreach (var i in C.Loop(n))
+                indices[a[i]] = i;
+
+            var hs = new HashSet<int>();
+            var uf = new C.UnionFind(n);
+
             var res = 0L;
+
+            for (int i = n; i > 0; i--)
+            {
+                var idx = indices[i];
+                hs.Add(idx);
+
+                if (hs.Contains(idx - 1))
+                    uf.TryUnite(idx, idx - 1);
+
+                if (hs.Contains(idx + 1))
+                    uf.TryUnite(idx, idx + 1);
+
+                var root = uf.GetRoot(idx);
+                var min = uf.GetMin(root);
+                var max = uf.GetMax(root);
+
+                long count = (long)(idx - min + 1) * (long)(max - idx + 1);
+                res += count * (long)i;
+            }
+
             return res;
         }
 
@@ -397,11 +425,15 @@ namespace V
         public class UnionFind
         {
             private int[] parents;
+            private int[] min;
+            private int[] max;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public UnionFind(int count)
             {
                 parents = Enumerable.Repeat(-1, count).ToArray();
+                min = Enumerable.Range(0, count).ToArray();
+                max = Enumerable.Range(0, count).ToArray();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -422,6 +454,9 @@ namespace V
                 parents[rootX] += parents[rootY];
                 parents[rootY] = rootX;
 
+                min[rootY] = min[rootX] = Math.Min(min[rootX], min[rootY]);
+                max[rootY] = max[rootX] = Math.Max(max[rootX], max[rootY]);
+
                 return true;
             }
 
@@ -434,6 +469,18 @@ namespace V
                 while (parents[x] >= 0)
                     x = parents[x];
                 return x;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public int GetMin(int x)
+            {
+                return min[GetRoot(x)];
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public int GetMax(int x)
+            {
+                return max[GetRoot(x)];
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
