@@ -10,23 +10,143 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var qs = new List<string>();
+
+            void Cmp(int i, int j, int k)
+            {
+                qs.Add($"< {i} {j} {k}");
+            }
+
+            void Add(int i, int j, int k)
+            {
+                qs.Add($"+ {i} {j} {k}");
+            }
+
+            var md = 30;
+
+            // 2^n
+            var a = 0;
+            var b = 1;
+            var res = 2;
+            var zero = 3;
+            var n1 = 100;
+            var aCheckZero = 20;
+            var bCheckZero = 21;
+            var checkZeroAdded = 22;
+            Cmp(zero, a, aCheckZero);
+            Cmp(zero, b, bCheckZero);
+            Add(aCheckZero, bCheckZero, checkZeroAdded);
+
+            var p2s = Enumerable.Range(n1, md).ToArray();
+            Cmp(zero, checkZeroAdded, n1);
+            foreach (var i in C.Loop(md - 1))
+                Add(p2s[i], p2s[i], p2s[i + 1]);
+
+            // A+1, B+1
+            var aInc = 10;
+            var bInc = 11;
+            Add(n1, a, aInc);
+            Add(n1, b, bInc);
+
+            // bit(A)
+            var aThresholds = Enumerable.Range(1200, md + 1).ToArray();
+            var aBottoms = Enumerable.Range(1500, md + 2).ToArray();
+            var aBits = Enumerable.Range(1300, md + 1).ToArray();
+            var aP2s = Enumerable.Range(1400, md + 1).ToArray();
+            foreach (var i in C.Loop(md).Reverse())
+            {
+                Add(aBottoms[i + 1], p2s[i], aThresholds[i]);
+                Cmp(aThresholds[i], aInc, aBits[i]);
+                Add(aBits[i], aP2s[i], aP2s[i]);
+
+                foreach (var _ in C.Loop(i))
+                {
+                    Add(aP2s[i], aP2s[i], aP2s[i]);
+                }
+
+                Add(aBottoms[i + 1], aP2s[i], aBottoms[i]);
+            }
+
+            // bit(B)
+            var bThresholds = Enumerable.Range(2200, md + 1).ToArray();
+            var bBottoms = Enumerable.Range(2500, md + 1).ToArray();
+            var bBits = Enumerable.Range(2300, md + 1).ToArray();
+            var bP2s = Enumerable.Range(2400, md + 1).ToArray();
+            foreach (var i in C.Loop(md).Reverse())
+            {
+                Add(bBottoms[i + 1], p2s[i], bThresholds[i]);
+                Cmp(bThresholds[i], bInc, bBits[i]);
+                Add(bBits[i], bP2s[i], bP2s[i]);
+
+                foreach (var _ in C.Loop(i))
+                {
+                    Add(bP2s[i], bP2s[i], bP2s[i]);
+                }
+
+                Add(bBottoms[i + 1], bP2s[i], bBottoms[i]);
+            }
+
+            foreach (var ai in C.Loop(md))
+                foreach (var bi in C.Loop(md))
+                {
+                    var baseIndex = ai * 100 + bi;
+                    var added = 10000 + baseIndex;
+                    var multed = 20000 + baseIndex;
+                    var p2 = 30000 + baseIndex;
+
+                    Add(aBits[ai], bBits[bi], added);
+                    Cmp(n1, added, multed);
+                    Add(multed, p2, p2);
+
+                    foreach (var _ in C.Loop(ai + bi))
+                        Add(p2, p2, p2);
+
+                    Add(res, p2, res);
+                }
+
+            var test = false;
+            if (test)
+            {
+                Wr(Test(qs, 1000000000, 1000000000));
+                Wr(Test(qs, 0, 0));
+                Wr(Test(qs, 0, 1));
+                Wr(Test(qs, 2, 0));
+            }
+            else
+            {
+                Wr(qs.Count);
+                foreach (var q in qs)
+                    Wr(q);
+            }
         }
 
-        public long SolveLong()
+        long Test(List<string> qs, int a, int b)
         {
-            var n = Read;
-            var res = 0L;
-            return res;
-        }
+            var regs = new long[200000];
+            regs[0] = a;
+            regs[1] = b;
 
-        public bool SolveBool()
-        {
-            var n = Read;
-            var res = false;
-            return res;
+            foreach (var q in qs)
+            {
+                var ss = q.Split(' ');
+                var i = int.Parse(ss[1]);
+                var j = int.Parse(ss[2]);
+                var k = int.Parse(ss[3]);
+
+                if (ss[0] == "<")
+                {
+                    if (regs[i] < regs[j])
+                        regs[k] = 1;
+                    else
+                        regs[k] = 0;
+                }
+                else
+                {
+                    regs[k] = regs[i] + regs[j];
+                }
+            }
+
+            return regs[2];
         }
     }
 }
