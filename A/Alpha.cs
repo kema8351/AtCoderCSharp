@@ -18,8 +18,65 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var a = ArrStr(n).Select(x => decimal.Parse(x)).ToArray();
+
+            var d = new int[n];
+            var f2 = new int[n];
+            var f5 = new int[n];
+
+            foreach (var i in C.Loop(n))
+            {
+                var t = a[i];
+                while (Math.Floor(t) != t)
+                {
+                    d[i]++;
+                    t *= 10m;
+                }
+
+                while (t % 2 == 0)
+                {
+                    f2[i]++;
+                    t /= 2;
+                }
+                f2[i] += 9 - d[i];
+
+                while (t % 5 == 0)
+                {
+                    f5[i]++;
+                    t /= 5;
+                }
+                f5[i] += 9 - d[i];
+            }
+
+            var mx2 = f2.Max();
+            var mx5 = f5.Max();
+            var map = new long[mx2 + 1, mx5 + 1];
+
+            foreach (var i in C.Loop(n))
+            {
+                map[f2[i], f5[i]]++;
+            }
+
+
             var res = 0L;
-            return res;
+            foreach (var i in C.Loop(n))
+            {
+                var ff2 = f2[i];
+                var ff5 = f5[i];
+                var n2 = Math.Max(0, 18 - ff2);
+                var n5 = Math.Max(0, 18 - ff5);
+
+                for (int x2 = n2; x2 <= mx2; x2++)
+                    for (int x5 = n5; x5 <= mx5; x5++)
+                    {
+                        res += map[x2, x5];
+                    }
+
+                if (ff2 >= 9 && ff5 >= 9)
+                    res--;
+            }
+
+            return res / 2;
         }
 
         public bool SolveBool()

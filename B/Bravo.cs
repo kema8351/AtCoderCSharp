@@ -18,7 +18,73 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var ss = ArrStr(n);
+            //ss[0] = new string(Enumerable.Range(0, 100000).Select(x => 'a').ToArray());
+            //ss[1] = new string(Enumerable.Range(0, 100000).Select(x => 'a').ToArray());
+            //ss[2] = new string(Enumerable.Range(0, 100000).Select(x => 'a').ToArray());
+            //ss[3] = new string(Enumerable.Range(0, 100000).Select(x => 'a').ToArray());
+            //ss[4] = new string(Enumerable.Range(0, 100000).Select(x => 'a').ToArray());
+            //ss[5] = new string(Enumerable.Range(0, 100000).Select(x => 'a').ToArray());
+            var cmp = StringComparer.CurrentCultureIgnoreCase;
+
+            //var dic = new Dictionary<string, Dictionary<char, long>>();
+            var dic = ss.Select((s, idx) => new { s, p = s.Substring(1) })
+                .GroupBy(x => x.p, cmp)
+                .ToDictionary(
+                x => x.Key,
+                x => x.Select(xs => xs.s[0]).GroupBy(xs => xs).ToDictionary(xs => xs.Key, xs => xs.Count()));
+
+            //var lens = new HashSet<int>();
+            var lens = dic.Select(x => x.Key.Length).ToHashSet();
+
             var res = 0L;
+
+            foreach (var s in ss)
+            {
+                var hs = new HashSet<char>();
+                for (int i = 1; i <= s.Length; i++)
+                {
+                    hs.SafeAdd(s[i - 1]);
+
+                    var len = s.Length - i;
+                    if (lens.Contains(len) == false)
+                        continue;
+
+                    var p = s.Substring(i);
+
+                    if (dic.TryGetValue(p, out var chdic))
+                    {
+                        foreach (var pair in chdic)
+                        {
+                            if (hs.Contains(pair.Key))
+                            {
+                                res += pair.Value;
+                            }
+                        }
+                    }
+                }
+
+                res--;
+
+                //var part = s.Substring(1);
+                //if (dic.TryGetValue(part, out var chlong) == false)
+                //{
+                //    chlong = new Dictionary<char, long>();
+                //    dic.Add(part, chlong);
+                //}
+                //lens.SafeAdd(part.Length);
+
+                //var first = s[0];
+                //chlong.SafePlus(first, +1);
+            }
+
+            var dis = ss.GroupBy(x => x, cmp).Select(x => x.Count()).ToArray();
+            foreach (var d in dis)
+            {
+                res -= d * (d - 1) / 2;
+            }
+
+
             return res;
         }
 

@@ -15,10 +15,65 @@ namespace V
             //YesNo(SolveBool());
         }
 
+        const long p = 200003;
+
         public long SolveLong()
         {
             var n = Read;
+            var a = Arr(n);
+
+            n = 200003;
+            a = Enumerable.Range(0, (int)p).Select(x => (long)x).ToArray();
+
+            var c = new long[p];
+            foreach (var aa in a)
+                c[aa]++;
+
+            var cs = new long[p + 1];
+            var ss = new long[p + 1];
+            foreach (var i in C.Loop(p))
+            {
+                cs[i + 1] = cs[i] + c[i];
+                ss[i + 1] = ss[i] + i * c[i];
+            }
+
             var res = 0L;
+
+            foreach (var i in C.Loop(p).Skip(1))
+            {
+                if (c[i] == 0)
+                    continue;
+
+                var prev = 0L;
+                var mass = 0L;
+
+                while (prev < p)
+                {
+                    mass++;
+                    var next = mass * p / i;
+                    var limnext = Math.Min(next, p - 1);
+
+                    var ssx = ss[limnext + 1] - ss[prev + 1];
+                    var csx = cs[limnext + 1] - cs[prev + 1];
+
+                    var temp = prev;
+                    prev = next;
+
+                    if (ssx == 0)
+                        continue;
+
+                    res += (ssx * i - (mass - 1) * p * csx) * c[i];
+
+                }
+            }
+
+            foreach (var aa in a)
+            {
+                res -= (aa * aa) % p;
+            }
+
+            res /= 2;
+
             return res;
         }
 
