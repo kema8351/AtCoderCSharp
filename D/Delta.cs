@@ -10,23 +10,28 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var a = GetVal(sc.Pairs<double, double>(n));
+            var b = GetVal(sc.Pairs<double, double>(n));
+            Write(b / a);
             //YesNo(SolveBool());
         }
 
-        public long SolveLong()
+        double GetVal(IReadOnlyList<Pair<double, double>> pairs)
         {
-            var n = Read;
-            var res = 0L;
-            return res;
-        }
+            var x = 0d;
+            var y = 0d;
+            foreach (var p in pairs)
+            {
+                x += p.X;
+                y += p.Y;
+            }
+            x /= (double)pairs.Count;
+            y /= (double)pairs.Count;
 
-        public bool SolveBool()
-        {
-            var n = Read;
-            var res = false;
-            return res;
+            var sqds = pairs.Select(p => (p.X - x) * (p.X - x) + (p.Y - y) * (p.Y - y));
+
+            return Math.Sqrt(sqds.OrderByDescending(z => z).FirstOrDefault());
         }
     }
 }
