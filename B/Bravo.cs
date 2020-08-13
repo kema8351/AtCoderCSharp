@@ -17,9 +17,34 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var n = ReadInt;
+            var x = Read;
+            var a = Arr(n);
+
+            var res = a.Sum();
+
+            foreach (var i in C.Loop(n))
+            {
+                Shift(ref a);
+
+                res.TryMin(a.Sum() + (i + 1) * x);
+            }
             return res;
+        }
+
+        void Shift(ref long[] a)
+        {
+            var n = a.Length;
+            var b = new long[n];
+
+            foreach (var i in C.Loop(n))
+            {
+                var prev = a[(i + n - 1) % n];
+
+                b[i] = Math.Min(a[i], prev);
+            }
+
+            a = b;
         }
 
         public bool SolveBool()
