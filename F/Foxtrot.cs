@@ -15,10 +15,135 @@ namespace V
             //YesNo(SolveBool());
         }
 
+        public class Word
+        {
+            public string s;
+            public long c;
+        }
+
+        public class State
+        {
+            public string remain;
+            public long cost;
+            public bool remainHead;
+
+            public bool IsEnd()
+            {
+                if (cost == 0)
+                    return false;
+
+                for (int i = 0; i < remain.Length / 2; i++)
+                {
+                    if (remain[i] != remain[remain.Length - 1 - i])
+                        return false;
+                }
+
+                return true;
+            }
+
+            public string Hash => (remainHead ? "1" : "2") + remain;
+        }
+
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+
+            var words = new List<Word>();
+            for (int i = 0; i < n; i++)
+            {
+                words.Add(new Word() { s = Str, c = Read });
+            }
+
+            var pq = new C.PriorityQueue<long, State>(x => x.cost);
+            var passed = new HashSet<string>();
+
+            void enq(State st)
+            {
+                var hash = st.Hash;
+                if (passed.Contains(hash))
+                    return;
+                passed.Add(st.Hash);
+
+
+                foreach (var w in words)
+                {
+                    var canSelect = true;
+                    var nextRemain = "";
+                    var nextRemainHead = false;
+
+                    if (st.remainHead)
+                    {
+                        for (int i = 0; i < st.remain.Length && i < w.s.Length; i++)
+                        {
+                            if (st.remain[i] != w.s[w.s.Length - 1 - i])
+                            {
+                                canSelect = false;
+                                break;
+                            }
+                        }
+
+                        if (!canSelect)
+                            continue;
+
+                        if (st.remain.Length >= w.s.Length)
+                        {
+                            nextRemain = st.remain.Substring(w.s.Length);
+                            nextRemainHead = true;
+                        }
+                        else
+                        {
+                            nextRemain = w.s.Substring(0, w.s.Length - st.remain.Length);
+                            nextRemainHead = false;
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < st.remain.Length && i < w.s.Length; i++)
+                        {
+                            if (st.remain[st.remain.Length - 1 - i] != w.s[i])
+                            {
+                                canSelect = false;
+                                break;
+                            }
+                        }
+
+                        if (!canSelect)
+                            continue;
+
+                        if (st.remain.Length >= w.s.Length)
+                        {
+                            nextRemain = st.remain.Substring(0, st.remain.Length - w.s.Length);
+                            nextRemainHead = false;
+                        }
+                        else
+                        {
+                            nextRemain = w.s.Substring(st.remain.Length);
+                            nextRemainHead = true;
+                        }
+                    }
+
+                    pq.Enqueue(new State()
+                    {
+                        remain = nextRemain,
+                        remainHead = nextRemainHead,
+                        cost = st.cost + w.c
+                    });
+                }
+            }
+
+            pq.Enqueue(new State() { remain = "", cost = 0, remainHead = false });
+
+            while (pq.Count > 0)
+            {
+                var st = pq.Dequeue();
+
+                if (st.IsEnd())
+                    return st.cost;
+
+                enq(st);
+            }
+
+            var res = -1;
             return res;
         }
 

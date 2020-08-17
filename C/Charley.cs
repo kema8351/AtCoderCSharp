@@ -17,8 +17,20 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var x = Math.Abs(Read);
+            var k = Read;
+            var d = Read;
+
+            var c = x / d;
+            if (k <= c)
+                return x - k * d;
+
+            k -= c;
+            k %= 2;
+            x -= c * d;
+
+            var res =
+                k == 0 ? x : Math.Abs(x - d);
             return res;
         }
 

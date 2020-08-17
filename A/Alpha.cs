@@ -17,8 +17,10 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var s = Str;
+            var res = s.Count(x => x == 'R');
+            if (res == 2 && s[1] == 'S')
+                res = 1;
             return res;
         }
 

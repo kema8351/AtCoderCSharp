@@ -18,7 +18,63 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var k = Read;
+            var ps = Arr(n).Select(x => x - 1).ToArray();
+            var cs = Arr(n);
+
+            long calc(long i)
+            {
+                var hs = new HashSet<long>();
+                var cur = i;
+                var point = 0L;
+                var hist = new List<long>() { 0 };
+
+                while (true)
+                {
+                    if (hs.Contains(cur))
+                        break;
+                    hs.Add(cur);
+
+                    cur = ps[cur];
+                    point += cs[cur];
+
+                    hist.Add(point);
+                }
+
+                var last = hist[hist.Count - 1];
+
+                if (last >= 0)
+                {
+                    var loop = hist.Count - 1;
+                    var lc = Math.Max(0, k / loop - 1);
+                    var lp = last * lc;
+                    var cand = lc > 0 ? lp : long.MinValue;
+
+                    var rem = k - lc * loop;
+
+                    for (long x = 1; x <= rem && x < loop; x++)
+                    {
+                        cand.TryMax(lp + hist[(int)x]);
+                    }
+
+                    for (long x = 0; x + loop <= rem && x < loop; x++)
+                    {
+                        cand.TryMax(lp + last + hist[(int)x]);
+                    }
+
+                    return cand;
+                }
+                else
+                {
+                    return hist.Skip(1).Take((int)k).Max();
+                }
+            }
+
+            var res = long.MinValue;
+
+            foreach (var i in C.Loop(n))
+                res.TryMax(calc(i));
+
             return res;
         }
 

@@ -17,8 +17,71 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var r = ReadInt;
+            var c = ReadInt;
+            var k = ReadInt;
+            var items = new long[r][];
+            for (int i = 0; i < r; i++)
+            {
+                items[i] = new long[c];
+            }
+
+            for (int i = 0; i < k; i++)
+            {
+                items[ReadInt - 1][ReadInt - 1] = Read;
+            }
+
+            //r = 3000;
+            //c = 3000;
+            //items = new long[3000, 3000];
+            //var rand = new Random();
+            //foreach (var i in C.Loop(r))
+            //{
+            //    foreach (var j in C.Loop(c))
+            //    {
+            //        items[i, j] = rand.Next();
+            //    }
+            //}
+
+            var dp = new long[r + 1][][];
+            for (int i = 0; i < r + 1; i++)
+            {
+                dp[i] = new long[c + 1][];
+                for (int j = 0; j < c + 1; j++)
+                {
+                    dp[i][j] = new long[5];
+                }
+            }
+
+            foreach (int i in C.Loop(r))
+            {
+                foreach (int j in C.Loop(c))
+                {
+                    var item = items[i][j];
+
+                    for (int pu = 3; pu >= 0; pu--)
+                    {
+                        var cur = dp[i][j][pu];
+
+                        dp[i][j][pu + 1] = Math.Max(dp[i][j][pu + 1], cur + item);
+                    }
+
+                    foreach (int pu in C.Loop(4))
+                    {
+                        var cur = dp[i][j][pu];
+
+                        dp[i + 1][j][0] = Math.Max(dp[i + 1][j][0], cur);
+                        dp[i][j + 1][pu] = Math.Max(dp[i][j + 1][pu], cur);
+                    }
+                }
+            }
+
+            var cands = new List<long>();
+
+            foreach (var pu in C.Loop(4))
+                cands.Add(dp[r - 1][c - 1][pu]);
+
+            var res = cands.Max();
             return res;
         }
 
@@ -64,7 +127,6 @@ namespace V
         private readonly Printer pr;
 
         private IEnumerable<int> Loop(int n) => C.Loop(n);
-        private IEnumerable<long> Loop(long n) => C.Loop(n);
 
         private int RdInt => sc.Int;
         private int ReadInt => sc.Int;
@@ -1246,23 +1308,9 @@ namespace V
             return res;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<int> Loop(int n)
-        {
-            for (int i = 0; i < n; i++)
-                yield return i;
-        }
+        public static IEnumerable<int> Loop(int n) => Enumerable.Range(0, n);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<long> Loop(long n)
-        {
-            for (long i = 0L; i < n; i++)
-                yield return i;
-        }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<T> Repeat<T>(T t, long n)
-        {
-            for (long i = 0L; i < n; i++)
-                yield return t;
-        }
+        public static IEnumerable<T> Repeat<T>(T t, int n) => Enumerable.Repeat(t, n);
     }
     struct Mint
     {
