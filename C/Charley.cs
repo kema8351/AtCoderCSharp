@@ -17,8 +17,98 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var h = Read;
+            var w = Read;
+            var k = Read;
+            var map = new List<string>();
+            var sx = 0L;
+            var sy = 0L;
+            for (int i = 0; i < h; i++)
+            {
+                var s = Str;
+                map.Add(s);
+
+                if (s.Contains('S'))
+                {
+                    sy = i;
+                    sx = s.IndexOf('S');
+                }
+            }
+
+            (long x, long y) Decode(long code) => (code >> 10, code & 1023);
+            long Encode(long x, long y) => x << 10 | y;
+
+            HashSet<long> passed = new HashSet<long>();
+            HashSet<long> next = new HashSet<long>();
+            next.Add(Encode(sx, sy));
+            (long x, long y)[] ops = new (long x, long y)[] {
+                (-1, 0),
+                (+1, 0),
+                (0, +1),
+                (0, -1),
+            };
+
+            for (int i = 0; i < k; i++)
+            {
+                var newNext = new HashSet<long>();
+
+                foreach (var xy in next)
+                {
+                    passed.Add(xy);
+
+                    foreach (var op in ops)
+                    {
+                        var (x, y) = Decode(xy);
+                        x += op.x;
+                        y += op.y;
+
+                        if (x < 0)
+                            continue;
+
+                        if (y < 0)
+                            continue;
+
+                        if (x >= w)
+                            continue;
+
+                        if (y >= h)
+                            continue;
+
+                        if (map[(int)y][(int)x] == '#')
+                            continue;
+
+                        var newCode = Encode(x, y);
+
+                        if (passed.Contains(newCode))
+                            continue;
+
+                        if (newNext.Contains(newCode))
+                            continue;
+
+                        newNext.Add(newCode);
+                    }
+                }
+
+                next = newNext;
+            }
+
+            var res = long.MaxValue;
+
+            foreach (var xy in next.Concat(passed))
+            {
+                var (x, y) = Decode(xy);
+
+                var min = new long[] {
+                    x,
+                    y,
+                    w - x - 1,
+                    h - y - 1,
+                }.Min();
+
+                var cand = min == 0 ? 1 : (min - 1) / k + 2;
+                res.TryMin(cand);
+            }
+
             return res;
         }
 
