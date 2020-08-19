@@ -8,10 +8,103 @@ namespace V
 {
     partial class Solver
     {
+        public class Term
+        {
+            public double begin;
+            public double end;
+            public double speed;
+
+            public double t;
+            public double v;
+
+            public double StartSpeed => speed - begin;
+            public double FinishSpeed => speed - (t - end);
+
+            public double Distance =>
+                (StartSpeed + speed) / 2d * begin
+                + speed * (end - begin)
+                + (speed + FinishSpeed) / 2d * (t - end);
+        }
+
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var ts = Arr(n);
+            var vs = Arr(n);
+
+            var terms = new List<Term>();
+            terms.Add(new Term());
+            for (int i = 0; i < n; i++)
+            {
+                var t = new Term() { t = (double)ts[i], v = (double)vs[i] };
+                t.t = ts[i];
+                terms.Add(t);
+            }
+            terms.Add(new Term());
+
+            for (int i = 1; i < terms.Count; i++)
+            {
+                var startSpeed = terms[i - 1].FinishSpeed;
+
+                var t = terms[i];
+
+                if (startSpeed <= t.v)
+                {
+                    var maxSpeed = Math.Min(startSpeed + t.t, t.v);
+
+                    t.speed = maxSpeed;
+                    t.end = t.t;
+                    t.begin = maxSpeed - startSpeed;
+                }
+                else
+                {
+                    t.speed = t.v;
+                    t.begin = 0;
+                    t.end = t.t;
+
+                    for (int j = i - 1; j >= 0; j--)
+                    {
+                        var finishSpeed = terms[j + 1].StartSpeed;
+
+                        var prevT = terms[j];
+
+                        if (finishSpeed == prevT.FinishSpeed)
+                            break;
+
+                        var endTimeCand = prevT.end - (prevT.FinishSpeed - finishSpeed);
+                        if (endTimeCand >= prevT.begin)
+                        {
+                            prevT.end = endTimeCand;
+                            break;
+                        }
+
+                        var mid = (prevT.begin + endTimeCand) / 2d;
+
+                        if (mid >= 0)
+                        {
+
+                            prevT.end = mid;
+                            prevT.begin = mid;
+                            prevT.speed = finishSpeed + (prevT.t - mid);
+                            break;
+                        }
+
+                        prevT.begin = 0;
+                        prevT.end = 0;
+                        prevT.speed = finishSpeed + prevT.t;
+                    }
+                }
+
+            }
+
+
+            var res = 0d;
+            foreach (var t in terms)
+            {
+                res += t.Distance;
+            }
+            Wr(res);
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 
