@@ -15,11 +15,86 @@ namespace V
             //YesNo(SolveBool());
         }
 
+        public class CI
+        {
+            public int c;
+            public int i;
+        }
+
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var mh = Read;
+            var mw = Read;
+            var m = Read;
+
+
+            var hCount = new int[mh];
+            var wCount = new int[mw];
+
+            var hs = new HashSet<(long, long)>();
+            //var sw = Stopwatch.StartNew();
+
+            for (int i = 0; i < m; i++)
+            {
+                var h = Read - 1;
+                var w = Read - 1;
+                hCount[h]++;
+                wCount[w]++;
+
+                hs.Add((h, w));
+            }
+
+            //Wr(sw.ElapsedMilliseconds);
+
+            //mh = 300000;
+            //mw = 300000;
+            //m = 360000;
+            //hCount = new int[mh];
+            //wCount = new int[mw];
+            //hs = new HashSet<long>();
+            //var r = new Random();
+            //while (m > 0)
+            //{
+            //    //var h = r.Next((int)mh);
+            //    //var w = r.Next((int)mw);
+            //    var h = m / 600;
+            //    var w = m % 600;
+            //    var cd = Encode(h, w);
+
+            //    //if (hs.Contains(cd) == true)
+            //    //    continue;
+
+            //    hCount[h]++;
+            //    wCount[w]++;
+
+            //    hs.Add(Encode(h, w));
+
+            //    m--;
+            //}
+
+            var maxH = hCount.Max();
+            var maxW = wCount.Max();
+
+            var phs = hCount.Select((c, i) => new CI() { c = c, i = i }).Where(x => x.c == maxH).Select(x => x.i).ToArray();
+            var pws = wCount.Select((c, i) => new CI() { c = c, i = i }).Where(x => x.c == maxW).Select(x => x.i).ToArray();
+
+            for (int i = 0; i < phs.Length; i++)
+            {
+                var ph = phs[i];
+                for (int j = 0; j < pws.Length; j++)
+                {
+                    var pw = pws[j];
+
+                    if (hs.Contains((ph, pw)) == false)
+                    {
+                        //Wr(sw.ElapsedMilliseconds);
+                        return maxH + maxW;
+                    }
+                }
+            }
+
+            //Wr(sw.ElapsedMilliseconds);
+            return maxH + maxW - 1;
         }
 
         public bool SolveBool()
@@ -124,7 +199,7 @@ namespace V
             }
         }
 
-        public int Int => int.Parse(this.Str);
+        public int Int => (int)System.Convert.ChangeType(this.Str, typeof(int));//int.Parse(this.Str);
         public long Long => long.Parse(this.Str);
         public double Double => double.Parse(this.Str);
 

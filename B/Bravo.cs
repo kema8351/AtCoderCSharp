@@ -11,21 +11,20 @@ namespace V
         public void Solve()
         {
             //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            //Write(SolveLong());
+            YesNo(SolveBool());
         }
 
         public long SolveLong()
         {
-            var n = Read;
             var res = 0L;
             return res;
         }
 
         public bool SolveBool()
         {
-            var n = Read;
-            var res = false;
+            var n = Str.Select(x => (long)(x - '0')).Sum();
+            var res = n % 9 == 0;
             return res;
         }
     }

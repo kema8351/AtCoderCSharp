@@ -18,7 +18,71 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var a = ArrInt(n * 3).Select(x => x - 1).ToArray();
+            var p = 0;
+            var c = new long[n];
+            var canErase = new long[n];
+            var q = new HashSet<long>();
+            var res = 0;
+
+            void process(int count)
+            {
+                var cur = new long[count];
+                for (int i = 0; i < count; i++)
+                {
+                    var aa = a[i + p];
+                    cur[i] = aa;
+
+                    c[aa]++;
+                    if (c[aa] == 3)
+                        q.Add(aa);
+                }
+                var dic = cur.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count());
+
+                var picked = false;
+                foreach (var pair in dic.OrderByDescending(x => x.Value))
+                {
+                    if (q.Contains(pair.Key) == false)
+                        continue;
+
+                    var qq = pair.Key;
+                    q.Remove(qq);
+                    c[qq] -= 3;
+                    res++;
+                    picked = true;
+                    break;
+                }
+
+                if (!picked)
+                {
+                    if (q.Count > 0)
+                    {
+                        var qq = q.FirstOrDefault();
+                        q.Remove(qq);
+                        c[qq] -= 3;
+                        res++;
+                        picked = true;
+                    }
+                }
+
+                if (!picked || count > 3)
+                {
+                    for (int i = 0; i < n; i++)
+                    {
+                        canErase[i] = c[i];
+                    }
+                }
+
+                p += count;
+            }
+
+            process(5);
+            for (int i = 0; i < n - 2; i++)
+                process(3);
+
+            if (canErase[a[n * 3 - 1]] >= 2)
+                res++;
+
             return res;
         }
 

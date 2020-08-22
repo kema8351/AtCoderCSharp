@@ -17,9 +17,109 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var mh = Read;
+            var mw = Read;
+            var sh = Read - 1;
+            var sw = Read - 1;
+            var gh = Read - 1;
+            var gw = Read - 1;
+            var map = ArrStr(mh);
+
+            var passed = new long[mh, mw];
+            for (int i = 0; i < mh; i++)
+            {
+                for (int j = 0; j < mw; j++)
+                {
+                    passed[i, j] = -1;
+                }
+            }
+
+            passed[sh, sw] = 0;
+            var q = new Queue<(long h, long w)>();
+            q.Enqueue((sh, sw));
+            var warp = new Queue<(long h, long w)>();
+            warp.Enqueue((sh, sw));
+
+            var ops = new (long h, long w)[]
+            {
+                (+1, 0),
+                (-1, 0),
+                (0, +1),
+                (0, -1),
+            };
+
+            while (true)
+            {
+                while (q.Count > 0)
+                {
+                    var c = q.Dequeue();
+
+                    foreach (var op in ops)
+                    {
+                        var nh = c.h + op.h;
+                        var nw = c.w + op.w;
+
+                        if (nh < 0 || nw < 0 || nh >= mh || nw >= mw)
+                        {
+                            continue;
+                        }
+
+                        if (passed[nh, nw] >= 0)
+                            continue;
+
+                        if (map[nh][(int)nw] == '#')
+                            continue;
+
+                        passed[nh, nw] = passed[c.h, c.w];
+                        q.Enqueue((nh, nw));
+                        warp.Enqueue((nh, nw));
+
+                        if (nh == gh && nw == gw)
+                            return passed[nh, nw];
+                    }
+                }
+
+                var nextWarp = new Queue<(long h, long w)>();
+
+                while (warp.Count > 0)
+                {
+                    var c = warp.Dequeue();
+
+                    for (int i = -2; i <= 2; i++)
+                    {
+                        for (int j = -2; j <= 2; j++)
+                        {
+                            var nh = c.h + i;
+                            var nw = c.w + j;
+
+                            if (nh < 0 || nw < 0 || nh >= mh || nw >= mw)
+                            {
+                                continue;
+                            }
+
+                            if (passed[nh, nw] >= 0)
+                                continue;
+
+                            if (map[nh][(int)nw] == '#')
+                                continue;
+
+                            passed[nh, nw] = passed[c.h, c.w] + 1;
+                            q.Enqueue((nh, nw));
+                            nextWarp.Enqueue((nh, nw));
+
+                            if (nh == gh && nw == gw)
+                                return passed[nh, nw];
+                        }
+                    }
+                }
+
+                warp = nextWarp;
+
+                if (q.Count <= 0 && nextWarp.Count <= 0)
+                    break;
+            }
+
+            return -1;
         }
 
         public bool SolveBool()
