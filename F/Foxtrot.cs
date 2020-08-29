@@ -8,10 +8,26 @@ namespace V
 {
     partial class Solver
     {
+        public class AB
+        {
+            public int a;
+            public int b;
+        }
+
         public void Solve()
         {
+            var h = ReadInt;
+            var w = ReadInt;
+            var abs = new List<AB>();
+            for (int i = 0; i < h; i++)
+            {
+                var ab = new AB() { a = ReadInt - 1, b = ReadInt - 1 };
+                abs.Add(ab);
+            }
+
+
             //var n = Read;
-            Write(SolveLong());
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

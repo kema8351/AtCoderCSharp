@@ -17,8 +17,16 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var n = ReadInt;
+            var m = ReadInt;
+            var uf = new C.UnionFind(n);
+            for (int i = 0; i < m; i++)
+            {
+                var a = ReadInt - 1;
+                var b = ReadInt - 1;
+                uf.TryUnite(a, b);
+            }
+            var res = Enumerable.Range(0, n).Select(x => uf.GetSize(x)).Max();
             return res;
         }
 

@@ -10,8 +10,69 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var max = 1000000;
+            var n = Read;
+            var a = Arr(n);
+            //a = Enumerable.Range(1, max).Select(x => (long)x).ToArray();
+            var g = a[0];
+            var bs = true;
+            var hs = new HashSet<long>();
+
+            //var ss = new bool[max + 1];
+            //var sosu = new List<long>();
+            //for (int i = 2; i <= max; i++)
+            //{
+            //    ss[i] = true;
+            //}
+            //for (int i = 2; i <= max; i++)
+            //{
+            //    if (ss[i])
+            //    {
+            //        sosu.Add(i);
+            //        for (int j = i * 2; j <= max; j += i)
+            //        {
+            //            ss[j] = false;
+            //        }
+            //    }
+            //}
+
+            foreach (var aa in a)
+            {
+                g = C.Gcd(g, aa);
+
+                //for (int i = 0; i < sosu.Count; i++)
+                //{
+                //    var s = sosu[i];
+                //    if (aa % s == 0)
+                //    {
+                //        if (hs.Contains(s))
+                //            bs = false;
+                //        else
+                //            hs.Add(s);
+
+                //    }
+                //}
+                if (bs)
+                {
+                    var f = C.Factorize(aa);
+                    foreach (var k in f.Keys)
+                    {
+                        if (hs.Contains(k))
+                            bs = false;
+                        else
+                            hs.Add(k);
+                    }
+                }
+            }
+
+            if (bs)
+                Wr("pairwise coprime");
+            else if (g == 1)
+                Wr("setwise coprime");
+            else
+                Wr("not coprime");
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

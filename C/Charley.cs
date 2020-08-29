@@ -18,7 +18,16 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var a = Arr(n);
+            var s = new Mint();
+            foreach (var aa in a)
+                s += aa;
+
+            var ss = s * s;
+            foreach (var aa in a)
+                ss -= new Mint(aa) * aa;
+
+            var res = (ss / 2).Value;
             return res;
         }
 
