@@ -265,6 +265,8 @@ namespace V
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> ts) => new HashSet<T>(ts.Distinct());
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Queue<T> ToQueue<T>(this IEnumerable<T> ts) => new Queue<T>(ts);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ToDigit(this char c) => (long)(c - '0');
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ToSmallAbcIndex(this char c) => (long)(c - 'a');
