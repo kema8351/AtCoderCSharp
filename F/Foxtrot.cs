@@ -18,7 +18,55 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var q = Read;
+            var res = (n - 2) * (n - 2);
+
+            var ci = new List<long>() { -n + 1 };
+            var di = new List<long>() { -n + 1 };
+            var ch = new HashSet<long>();
+            var dh = new HashSet<long>();
+            var cn = new List<long>() { n - 2 };
+            var dn = new List<long>() { n - 2 };
+
+
+
+            for (int i = 0; i < q; i++)
+            {
+                var type = Read;
+                var idx = Read - 2;
+
+                var xi = type == 1 ? ci : di;
+                var yi = type == 1 ? di : ci;
+                var xh = type == 1 ? ch : dh;
+                var yh = type == 1 ? dh : ch;
+                var xn = type == 1 ? cn : dn;
+                var yn = type == 1 ? dn : cn;
+
+                if (xh.Contains(idx))
+                    continue;
+
+                xh.Add(idx);
+
+                var ii = C.BinarySearch.GetFirstIndexGreater(-idx, xi);
+                var newI = xn[(int)ii - 1];
+                res -= newI;
+
+                if (ii == xi.Count && yn[yn.Count - 1] > idx)
+                {
+                    yn.Add(idx);
+                    yi.Add(-newI);
+                }
+                //if (yi[yi.Count - 1] == -newI)
+                //{
+                //    yn[yn.Count - 1] = idx;
+                //}
+                //else if (yi[yi.Count - 1] < -newI)
+                //{
+                //    yn.Add(idx);
+                //    yi.Add(-newI);
+                //}
+            }
+
             return res;
         }
 

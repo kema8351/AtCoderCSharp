@@ -18,8 +18,43 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
-            return res;
+            var x = Read;
+            var m = Read;
+
+            var hs = new Dictionary<long, int>();
+            var ls = new List<long>();
+            var c = x;
+            var idx = 0;
+
+            while (true)
+            {
+                if (hs.ContainsKey(c))
+                    break;
+
+                hs.Add(c, idx);
+                ls.Add(c);
+
+                c = (c * c) % m;
+                idx++;
+            }
+
+            var beg = hs[c];
+            var t = idx - beg;
+
+            if (n <= beg)
+            {
+                return ls.Take((int)n).Sum();
+            }
+            else
+            {
+                var loop = (n - beg) / t;
+                var rem = n - t * loop;
+                var s = ls.Take((int)rem).Sum();
+                var ms = ls.Skip((int)beg).Sum();
+                s += ms * loop;
+                return s;
+
+            }
         }
 
         public bool SolveBool()

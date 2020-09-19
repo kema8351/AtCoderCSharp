@@ -10,8 +10,13 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Str;
+
+            if (n[n.Length - 1] == 's')
+                Wr(n + "es");
+            else
+                Wr(n + "s");
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

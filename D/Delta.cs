@@ -15,10 +15,45 @@ namespace V
             //YesNo(SolveBool());
         }
 
+        public class LR
+        {
+            public long l;
+            public long r;
+        }
+
         public long SolveLong()
         {
+            Mint.Set998244353();
             var n = Read;
-            var res = 0L;
+            var k = Read;
+            var lrs = new List<LR>();
+            for (int i = 0; i < k; i++)
+            {
+                lrs.Add(new LR() { l = Read, r = Read });
+            }
+
+            var dp = new Mint[n + 2];
+            dp[0] = new Mint(1);
+            dp[1] = new Mint(-1);
+            var c = new Mint(0);
+
+            for (int i = 0; i < n; i++)
+            {
+
+                //c = dp.Take(i + 1).Aggregate(new Mint(), (s1, s2) => s1 + s2);
+                c += dp[i];
+                foreach (var lr in lrs)
+                {
+                    if (i + lr.l <= n)
+                        dp[i + lr.l] += c;
+
+                    if (i + lr.r + 1 <= n)
+                        dp[i + lr.r + 1] -= c;
+                }
+            }
+            //c += dp[n];
+
+            var res = c.Value;
             return res;
         }
 
