@@ -18,8 +18,15 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
-            return res;
+            var res = new Mint(0);
+
+            for (int i = 1; i <= n / 3; i++)
+            {
+                var rem = n - i * 3;
+                res += Mint.Comb(rem + i - 1, i - 1);
+            }
+
+            return res.Value;
         }
 
         public bool SolveBool()

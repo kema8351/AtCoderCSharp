@@ -17,8 +17,22 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var a = Read;
+            var b = Read;
+            var c = Read;
+            var d = Read;
+
+            var ab = new List<long>() { a, b };
+            var cd = new List<long>() { c, d };
+
+            if (a * b < 0)
+                ab.Add(0);
+            if (c * d < 0)
+                ab.Add(0);
+            var res = long.MinValue;
+            foreach (var x in ab)
+                foreach (var y in cd)
+                    res.TryMax(x * y);
             return res;
         }
 

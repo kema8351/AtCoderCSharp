@@ -18,7 +18,13 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var xys = sc.Pairs(n);
+
+            var xmys = xys.Select(x => x.X - x.Y).OrderBy(x => x).ToArray();
+            var xpys = xys.Select(x => x.X + x.Y).OrderBy(x => x).ToArray();
+
+            var res = xmys[n - 1] - xmys[0];
+            res.TryMax(xpys[n - 1] - xpys[0]);
             return res;
         }
 

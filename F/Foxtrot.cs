@@ -10,9 +10,66 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var n = Read;
+            var a = Arr(n);
+            var b = Arr(n);
+
+            var cc = a.Concat(b).GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count());
+            //var aa = a.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count());
+            //var bb = a.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count());
+
+            if (cc.Values.Any(x => x > n))
+            {
+                Wr("No");
+                return;
+            }
+
+            var aa = a.Select((x, i) => new { x, i }).GroupBy(x => x.x).ToDictionary(x => x.Key, x => new Queue<int>(x.Select(xs => xs.i)));
+            var bb = b.Select((x, i) => new { x, i }).GroupBy(x => x.x).ToDictionary(x => x.Key, x => new Queue<int>(x.Select(xs => xs.i)));
+
+            var c = cc.OrderByDescending(x => x.Value).ToArray();
+            var aaa = new LinkedList<KeyValuePair<long, Queue<int>>>();
+            foreach (var pair in c)
+            {
+                if (aa.TryGetValue(pair.Key, out var q))
+                {
+                    aaa.AddFirst(new KeyValuePair<long, Queue<int>>(pair.Key, q));
+                }
+            }
+
+            var res = new long[n];
+
+            foreach (var pair in c)
+            {
+                var key = pair.Key;
+
+                if (bb.TryGetValue(key, out var q) == false)
+                    continue;
+
+                var node = aaa.First;
+
+                while (q.Count > 0)
+                {
+                    if (node.Value.Key == key)
+                        node = node.Next;
+
+                    var qq = node.Value.Value;
+                    var d = qq.Dequeue();
+                    res[d] = key;
+                    q.Dequeue();
+
+                    if (qq.Count <= 0)
+                    {
+                        var next = node.Next;
+                        aaa.Remove(node);
+                        node = next;
+                    }
+                }
+
+            }
+
+            Wr("Yes");
+            Wr(string.Join(" ", res.Select(x => x.ToString())));
         }
 
         public long SolveLong()
