@@ -8,11 +8,139 @@ namespace V
 {
     partial class Solver
     {
+        public class City
+        {
+            public int index;
+            public int x;
+            public int y;
+            public long result;
+        }
+
+        public class StackList<T> : IList<T>
+        {
+            private int count;
+            private List<T> list = new List<T>();
+
+            public T this[int index] { get => list[index]; set => throw new NotImplementedException(); }
+
+            public int Count => count;
+
+            public bool IsReadOnly => throw new NotImplementedException();
+
+            public void Add(T item)
+            {
+                if (list.Count > count)
+                    list[count] = item;
+                else
+                    list.Add(item);
+
+                count++;
+            }
+
+            public void RemoveEnd()
+            {
+                count--;
+            }
+
+            public void Clear()
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Contains(T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void CopyTo(T[] array, int arrayIndex)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+
+            public int IndexOf(T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Insert(int index, T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Remove(T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RemoveAt(int index)
+            {
+                throw new NotImplementedException();
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var n = ReadInt;
+            var cs = new List<City>();
+            for (int i = 0; i < n; i++)
+            {
+                cs.Add(new City() { index = i, x = ReadInt, y = ReadInt });
+            }
+
+            var yDict = cs.ToDictionary(x => x.y, x => x);
+
+            var uf = new C.UnionFind(n);
+            var hs = new HashSet<int>();
+            cs = cs.OrderBy(x => x.x).ToList();
+            var sl = new StackList<int>();
+            sl.Add(-cs[0].y);
+
+            for (int i = 1; i < n; i++)
+            {
+                var c = cs[i];
+                var my = -sl[sl.Count - 1];
+                var mc = yDict[my];
+
+                if (mc.y > c.y)
+                {
+                    sl.Add(-c.y);
+                }
+                else
+                {
+                    var idx = C.BinarySearch.GetFirstIndexGreater(-c.y, sl);
+                    for (int j = (int)idx; j < sl.Count; j++)
+                    {
+                        var cc = yDict[-sl[j]];
+                        uf.TryUnite(c.index, cc.index);
+                    }
+
+                    var last = sl[sl.Count - 1];
+
+                    for (int j = sl.Count - 1; j >= idx; j--)
+                    {
+                        sl.RemoveEnd();
+                    }
+                    sl.Add(last);
+                }
+            }
+
+            foreach (var c in cs)
+            {
+                c.result = uf.GetSize(c.index);
+            }
+
+            foreach (var c in cs.OrderBy(x => x.index))
+                Wr(c.result);
         }
 
         public long SolveLong()
