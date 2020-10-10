@@ -10,8 +10,13 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var s = "";
+            for (int i = 0; i < n; i++)
+            {
+                s += "ACL";
+            }
+            Write(s);
             //YesNo(SolveBool());
         }
 

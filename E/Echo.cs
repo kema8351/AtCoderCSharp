@@ -10,8 +10,17 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            Mint.Set998244353();
+            var n = Read;
+            var q = Read;
+            for (int i = 0; i < q; i++)
+            {
+                var l = ReadInt - 1;
+                var r = ReadInt - 1;
+                var d = ReadInt;
+
+            }
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

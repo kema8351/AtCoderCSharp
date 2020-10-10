@@ -17,9 +17,23 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var n = ReadInt;
+            var m = ReadInt;
+            var uf = new C.UnionFind(n);
+            for (int i = 0; i < m; i++)
+            {
+                var a = ReadInt - 1;
+                var b = ReadInt - 1;
+                uf.TryUnite(a, b);
+            }
+            var hs = new HashSet<int>();
+
+            for (int i = 0; i < n; i++)
+            {
+                hs.SafeAdd(uf.GetRoot(i));
+            }
+
+            return hs.Count - 1; ;
         }
 
         public bool SolveBool()
