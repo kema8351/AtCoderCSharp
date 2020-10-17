@@ -10,8 +10,9 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            foreach (var x in C.Divisors(n))
+                Wr(x);
             //YesNo(SolveBool());
         }
 

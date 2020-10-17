@@ -8,6 +8,13 @@ namespace V
 {
     partial class Solver
     {
+        class City
+        {
+            public long x;
+            public long y;
+            public long z;
+        }
+
         public void Solve()
         {
             //var n = Read;
@@ -17,10 +24,99 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var n = ReadInt;
+            var cities = new List<City>();
+
+            for (int i = 0; i < n; i++)
+            {
+                cities.Add(new City() { x = Read, y = Read, z = Read });
+            }
+
+
+            var dists = new long[cities.Count, cities.Count];
+
+            for (int ci = 0; ci < cities.Count; ci++)
+            {
+                for (int cj = 0; cj < cities.Count; cj++)
+                {
+                    var cii = cities[ci];
+                    var cij = cities[cj];
+
+                    dists[ci, cj] = Math.Abs(cii.x - cij.x) + Math.Abs(cii.y - cij.y) + Math.Max(0, cij.z - cii.z);
+                }
+            }
+
+            var dp = new long[1 << n, n];
+            var pq = new C.PriorityQueue<long, State>(x => x.distance);
+
+            for (int i = 0; i < 1 << n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    dp[i, j] = long.MaxValue;
+                }
+            }
+
+            void Enq(State state)
+            {
+                var cd = dp[state.city, state.current];
+
+                if (cd > state.distance)
+                {
+                    dp[state.city, state.current] = state.distance;
+                    pq.Enqueue(state);
+                }
+            }
+
+            var dest = (1 << (n)) - 1;
+            Enq(new State() { city = 0, current = 0, distance = 0 });
+
+            while (true)
+            {
+                var q = pq.Dequeue();
+
+                if (q.city == dest && q.current == 0)
+                    return q.distance;
+
+                if (q.distance != dp[q.city, q.current])
+                    continue;
+
+                void Process(int i)
+                {
+                    var d = dists[q.current, i];
+
+                    var nd = q.distance + d;
+                    var nc = q.city | (1 << i);
+
+                    Enq(new State() { city = nc, current = i, distance = nd });
+                }
+
+
+                if (q.city == dest - 1)
+                {
+                    Process(0);
+                }
+
+                for (int i = 1; i < n; i++)
+                {
+                    if ((q.city & (1 << i)) != 0)
+                        continue;
+
+                    Process(i);
+                }
+            }
+
+            return 0;
+
         }
+
+        public class State
+        {
+            public int city;
+            public int current;
+            public long distance;
+        }
+
 
         public bool SolveBool()
         {

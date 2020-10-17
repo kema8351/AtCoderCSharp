@@ -15,11 +15,94 @@ namespace V
             //YesNo(SolveBool());
         }
 
+
+        Mint Slv(Stack<Tree> trees, int remVertex, int remEdge)
+        {
+            var pk = trees.Peek();
+            var rv = remVertex - pk.vertexCount;
+            var re = remEdge - pk.EdgeCount;
+            if (rv < 0 || re < 0)
+            {
+                return new Mint();
+            }
+
+            if (rv == 0 && re > 0)
+            {
+                return new Mint();
+            }
+
+            if (rv == 0 && re == 0)
+            {
+                var ts = trees.ToList();
+
+                var x = n;
+                var r = new Mint(1);
+                foreach (var t in ts)
+                {
+                    if (t.isRing == false)
+                        r *= (Mint.Fac(t.vertexCount) / 2);
+                    else
+                    {
+                        r *= (Mint.Fac(t.vertexCount - 1));
+
+                        if (t.vertexCount > 2)
+                            r /= 2;
+                    }
+
+
+                    r *= Mint.Comb(x, t.vertexCount);
+                    x -= t.vertexCount;
+
+                }
+
+                return r;
+                // Todo count
+            }
+
+            var res = new Mint();
+
+            for (int v = 1; v <= pk.vertexCount; v++)
+            {
+                trees.Push(new Tree() { vertexCount = v, isRing = false });
+                res += Slv(trees, rv, re);
+                trees.Pop();
+
+                if (v > 1 && (pk.isRing || v != pk.vertexCount))
+                {
+                    trees.Push(new Tree() { vertexCount = v, isRing = true });
+                    res += Slv(trees, rv, re);
+                    trees.Pop();
+                }
+            }
+
+            return res;
+        }
+
+        int n;
+
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            n = ReadInt;
+            var m = ReadInt;
+            var l = ReadInt;
+
+            var st1 = new Stack<Tree>();
+            st1.Push(new Tree() { vertexCount = l, isRing = true });
+            var res = Slv(st1, n, m);
+
+            var st2 = new Stack<Tree>();
+            st2.Push(new Tree() { vertexCount = l, isRing = false });
+            res += Slv(st2, n, m);
+
+            return res.Value;
+        }
+
+        public class Tree
+        {
+            public int vertexCount;
+            public bool isRing;
+
+            public int EdgeCount => isRing ? vertexCount : vertexCount - 1;
         }
 
         public bool SolveBool()

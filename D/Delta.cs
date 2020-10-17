@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace V
@@ -17,9 +18,25 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var x = new BigInteger(Read);
+            var y = new BigInteger(Read);
+            var a = new BigInteger(Read);
+            var b = new BigInteger(Read);
+            var res = new BigInteger(0);
+
+            while (x * a <= x + b)
+            {
+                x *= a;
+                if (x >= y)
+                    return (long)res;
+
+                res++;
+            }
+
+            if (y > x)
+                res += (y - x - 1) / b;
+
+            return (long)res;
         }
 
         public bool SolveBool()

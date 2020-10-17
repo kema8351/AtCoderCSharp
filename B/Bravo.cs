@@ -10,8 +10,11 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var x = Arr(n);
+            Wr(x.Select(xs => Math.Abs(xs)).Sum());
+            Wr(Math.Sqrt(x.Select(xs => xs * xs).Sum()));
+            Wr(x.Select(xs => Math.Abs(xs)).Max());
             //YesNo(SolveBool());
         }
 
