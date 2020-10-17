@@ -10,9 +10,24 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            var n = Read;
+            var p = Arr(n);
+
+            var b = new bool[200005];
+            var c = 0;
+
+            foreach (var pp in p)
+            {
+                b[pp] = true;
+
+                if (pp == c)
+                {
+                    while (b[c])
+                        c++;
+                }
+
+                Wr(c);
+            }
         }
 
         public long SolveLong()

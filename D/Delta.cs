@@ -10,16 +10,73 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            for (int i = 0; i < n; i++)
+            {
+                Write(SolveLong());
+
+            }
             //YesNo(SolveBool());
         }
 
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
-            return res;
+            var a = Read;
+            var b = Read;
+
+            if (a < b)
+            {
+                var tp = a;
+                a = b;
+                b = tp;
+            }
+
+            if (a + b > n)
+                return 0;
+
+
+            var aa = Mint.Pow(n - a + 1, 2);
+            var bb = Mint.Pow(n - b + 1, 2);
+
+            var res = aa * bb;
+
+            var c = new Mint(n) * 3 - (new Mint(n) - a - b + 1) * 2;
+            var cc = c * c;
+            res -= cc;
+
+            //if (n >= a + b * 2)
+            //{
+            //    var x = n - 2 * b - a + 1;
+            //    var aa = new Mint(x) * new Mint(x);
+            //    var y = n - b + 1;
+            //    var xy = a + b - 1;
+            //    var bb = new Mint(y) * new Mint(y) - new Mint(xy) * new Mint(xy);
+            //    res += aa * bb;
+            //}
+
+            //if (n >= a + b * 2)
+            //{
+            //    var x = n - 2 * b - a + 1;
+            //    var aa = new Mint(x) * new Mint(b - 1);
+            //    var y = n - b + 1;
+            //    var xy = a + b - 1;
+
+            //    var bb = new Mint(b) * (b - 1) / 2 * (new Mint(y) * y - new Mint(a) * xy)
+            //        - new Mint(x) * xy * (b - 1) * b * (b * 2 - 1) / 6;
+            //    res += (aa * bb) * 4;
+            //}
+
+
+
+
+            //var aa = new Mint(n - a + 1) * new Mint(n - a + 1);
+            //var bb = new Mint(n - b + 1) * new Mint(n - b + 1);
+            //var res = aa * bb;
+
+
+
+            return res.Value;
         }
 
         public bool SolveBool()

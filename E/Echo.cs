@@ -17,9 +17,97 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var h = ReadInt;
+            var w = ReadInt;
+            var ss = ArrStr(h);
+
+            h += 2;
+            w += 2;
+
+            var b = new bool[h, w];
+            var n = 0;
+
+            for (int i = 0; i < ss.Length; i++)
+            {
+                for (int j = 0; j < ss[i].Length; j++)
+                {
+                    if (ss[i][j] == '.')
+                    {
+                        b[i + 1, j + 1] = true;
+                        n++;
+                    }
+                }
+            }
+
+
+            int Encode(int x, int y) { return x * 2048 + y; }
+
+            var ufH = new C.UnionFind(2048 * 2048);
+            var ufW = new C.UnionFind(2048 * 2048);
+
+            for (int i = 1; i < h - 1; i++)
+            {
+                for (int j = 1; j < w - 1; j++)
+                {
+                    if (b[i, j] == false)
+                        continue;
+
+                    var c = Encode(i, j);
+
+                    if (b[i - 1, j])
+                        ufH.TryUnite(c, Encode(i - 1, j));
+
+                    if (b[i + 1, j])
+                        ufH.TryUnite(c, Encode(i + 1, j));
+
+                    if (b[i, j - 1])
+                        ufW.TryUnite(c, Encode(i, j - 1));
+
+                    if (b[i, j + 1])
+                        ufW.TryUnite(c, Encode(i, j + 1));
+                }
+            }
+
+            var res = new Mint();
+
+            //var pow = new Mint[4096];
+            //pow[0] = new Mint(1);
+            //for (int i = 1; i < 4096; i++)
+            //{
+            //    pow[i] = pow[i - 1] * 2;
+            //}
+            var cache = new Mint[4096];
+            var ps = new Mint(1);
+            var pns = Mint.Pow(2, n);
+            for (int i = 0; i < 4096; i++)
+            {
+                cache[i] = pns * (ps - 1);
+
+                ps *= 2;
+                pns /= 2;
+            }
+
+            for (int i = 1; i < h - 1; i++)
+            {
+                for (int j = 1; j < w - 1; j++)
+                {
+                    if (b[i, j] == false)
+                        continue;
+
+                    var c = Encode(i, j);
+                    var hh = ufH.GetSize(c);
+                    var ww = ufW.GetSize(c);
+                    var sum = hh + ww - 1;
+
+                    //var cand =  pow[n - sum] * (pow[sum] - 1);
+                    //var cand = Mint.Pow(2, n - sum) * (Mint.Pow(2, sum) - 1);
+
+                    res += cache[sum];
+                }
+            }
+
+            var p = Mint.Pow(2, 2000 * 2000);
+            return res.Value;
         }
 
         public bool SolveBool()

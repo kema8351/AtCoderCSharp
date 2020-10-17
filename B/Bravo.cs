@@ -17,8 +17,29 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
+            var h = Read;
+            var w = Read;
+            var s = ArrStr(h);
             var res = 0L;
+
+            for (int i = 0; i < h; i++)
+            {
+                for (int j = 0; j < w - 1; j++)
+                {
+                    if (s[i][j] == '.' && s[i][j + 1] == '.')
+                        res++;
+                }
+            }
+
+            for (int i = 0; i < h - 1; i++)
+            {
+                for (int j = 0; j < w; j++)
+                {
+                    if (s[i][j] == '.' && s[i + 1][j] == '.')
+                        res++;
+                }
+            }
+
             return res;
         }
 
