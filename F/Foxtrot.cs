@@ -10,9 +10,137 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            var xys = new List<Point>();
+            for (int i = 0; i < n; i++)
+            {
+                xys.Add(new Point() { x = Read, y = Read });
+            }
+
+            var edges = new List<Edge>();
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = i + 1; j < n; j++)
+                {
+                    var xy1 = xys[i];
+                    var xy2 = xys[j];
+
+                    var cx = (xy1.x + xy2.x) / 2d;
+                    var cy = (xy1.y + xy2.y) / 2d;
+                    var dx = cx - xy1.x;
+                    var dy = cy - xy1.y;
+                    var sqr = dx * dx + dy * dy;
+
+                    var ty = 100 - cy;
+                    if (ty * ty < sqr)
+                        continue;
+
+                    var by = cy + 100;
+                    if (by * by < sqr)
+                        continue;
+
+                    var b = true;
+                    for (int k = 0; k < n; k++)
+                    {
+                        if (i == k)
+                            continue;
+
+                        if (j == k)
+                            continue;
+
+                        var xy3 = xys[k];
+                        var dx3 = cx - xy3.x;
+                        var dy3 = cy - xy3.y;
+                        if (dx3 * dx3 + dy3 * dy3 < sqr)
+                        {
+                            b = false;
+                            break;
+                        }
+                    }
+                    if (!b)
+                        continue;
+
+
+                    edges.Add(new Edge()
+                    {
+                        x1 = xy1.x,
+                        y1 = xy1.y,
+                        i1 = i,
+                        x2 = xy2.x,
+                        y2 = xy2.y,
+                        i2 = j
+                    });
+                }
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                var xy1 = xys[i];
+                var xy2 = new Point() { x = xy1.x, y = 100 };
+                var cx = (xy1.x + xy2.x) / 2d;
+                var cy = (xy1.y + xy2.y) / 2d;
+                var dx = cx - xy1.x;
+                var dy = cy - xy1.y;
+                var sqr = dx * dx + dy * dy;
+
+                var b = true;
+                for (int k = 0; k < n; k++)
+                {
+                    if (i == k)
+                        continue;
+
+                    if (j == k)
+                        continue;
+
+                    var xy3 = xys[k];
+                    var dx3 = cx - xy3.x;
+                    var dy3 = cy - xy3.y;
+                    if (dx3 * dx3 + dy3 * dy3 < sqr)
+                    {
+                        b = false;
+                        break;
+                    }
+                }
+                if (!b)
+                    continue;
+
+
+                edges.Add(new Edge()
+                {
+                    x1 = xy1.x,
+                    y1 = xy1.y,
+                    i1 = i,
+                    x2 = xy2.x,
+                    y2 = xy2.y,
+                    i2 = j
+                });
+            }
+
+            //Write(SolveLong());
             //YesNo(SolveBool());
+        }
+
+        public bool IsValidEdge(Point xy1, Point xy2)
+        {
+        }
+
+        public class Point
+        {
+            public double x;
+            public double y;
+        }
+
+        public class Edge
+        {
+            public double x1;
+            public double y1;
+            public int i1;
+            public double x2;
+            public double y2;
+            public int i2;
+
+            public double SquareLength => (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
         }
 
         public long SolveLong()

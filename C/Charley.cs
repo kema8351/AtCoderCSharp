@@ -11,8 +11,8 @@ namespace V
         public void Solve()
         {
             //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            //Write(SolveLong());
+            YesNo(SolveBool());
         }
 
         public long SolveLong()
@@ -25,6 +25,30 @@ namespace V
         public bool SolveBool()
         {
             var n = Read;
+            var xys = sc.Pairs(n);
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = i + 1; j < n; j++)
+                {
+                    for (int k = j + 1; k < n; k++)
+                    {
+                        var a = xys[i];
+                        var b = xys[j];
+                        var c = xys[k];
+
+                        var x1 = a.X - b.X;
+                        var y1 = a.Y - b.Y;
+                        var x2 = a.X - c.X;
+                        var y2 = a.Y - c.Y;
+
+                        if (x1 * y2 == x2 * y1)
+                            return true;
+                    }
+                }
+            }
+
+            return false;
             var res = false;
             return res;
         }

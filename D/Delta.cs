@@ -11,8 +11,8 @@ namespace V
         public void Solve()
         {
             //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            //Write(SolveLong());
+            YesNo(SolveBool());
         }
 
         public long SolveLong()
@@ -24,7 +24,43 @@ namespace V
 
         public bool SolveBool()
         {
-            var n = Read;
+            var s = Str.Select(x => (int)(x - '0')).ToArray();
+            if (s.Length == 1)
+                return s[0] == 8;
+
+            if (s.Length == 2)
+            {
+                if ((s[0] * 10 + s[1]) % 8 == 0)
+                    return true;
+                if ((s[1] * 10 + s[0]) % 8 == 0)
+                    return true;
+            }
+
+
+            var d = s.GroupBy(x => x).SelectMany(x => Enumerable.Repeat(x.Key, Math.Min((int)x.Count(), 3))).ToArray();
+
+            var n = d.Length;
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    for (int k = 0; k < n; k++)
+                    {
+                        if (i == j)
+                            continue;
+                        if (j == k)
+                            continue;
+                        if (k == i)
+                            continue;
+
+                        var x = d[i] * 100 + d[j] * 10 + d[k];
+
+                        if (x % 8 == 0)
+                            return true;
+                    }
+                }
+            }
+
             var res = false;
             return res;
         }

@@ -10,8 +10,9 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = Read;
+            Wr(n % 2 == 0 ? "White" : "Black");
+            //            Write(SolveLong());
             //YesNo(SolveBool());
         }
 

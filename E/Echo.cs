@@ -18,7 +18,86 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var m = Read;
+            var hs = Arr(n).OrderBy(x => x).ToArray();
+            var ws = Arr(m).OrderBy(x => x).ToArray();
+
+            var odd = new List<long>() { 0 };
+            var even = new List<long>() { 0 };
+            var sumOdd = 0L;
+            var sumEven = 0L;
+            for (int i = 0; i < n / 2; i++)
+            {
+                sumOdd += hs[i * 2 + 1] - hs[i * 2];
+                odd.Add(sumOdd);
+
+                sumEven += hs[i * 2 + 2] - hs[i * 2 + 1];
+                even.Add(sumEven);
+            }
+
+            var res = long.MaxValue;
+
+            var pH = 0;
+            var pW = 0;
+            var hh = new List<long>() { 0 };
+            hh.AddRange(hs);
+            hh.Add(long.MaxValue);
+
+            while (pW < ws.Length)
+            {
+                var w = ws[pW];
+                if (hh[pH] <= w && w < hh[pH + 1])
+                {
+                    var originPH = pH - 1;
+
+                    if (pH == 0)
+                    //if (false)
+                    {
+                        var od = odd[0];
+
+                        var ev = even[even.Count - 1];
+
+                        var bs = hh[1] - w;
+                        var cand = od + ev + bs;
+
+                        res.TryMin(cand);
+                    }
+                    else if (originPH % 2 == 0)
+                    {
+                        var pOdd = originPH / 2;
+                        var od = odd[pOdd];
+
+                        var pEven = originPH / 2 + 1;
+                        var ev = even[even.Count - 1] - even[pEven - 1];
+
+                        var bs = w - hh[pH];
+                        var cand = od + ev + bs;
+
+                        res.TryMin(cand);
+                    }
+                    else
+                    {
+                        var pOdd = originPH / 2 + 1;
+                        var od = odd[pOdd];
+
+                        var pEven = originPH / 2 + 2;
+                        var ev = even[even.Count - 1] - even[pEven - 1];
+
+                        var bs = hh[pH + 1] - w;
+                        var cand = od + ev + bs;
+
+                        res.TryMin(cand);
+                    }
+
+                    pW++;
+                }
+                else
+                {
+                    pH++;
+                }
+
+            }
+
             return res;
         }
 
