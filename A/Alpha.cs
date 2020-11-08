@@ -17,8 +17,7 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
+            var res = Math.Max(0, Read * 2 - Read + 100);
             return res;
         }
 

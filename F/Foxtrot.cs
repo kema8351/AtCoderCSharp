@@ -17,8 +17,68 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
+            var n = ReadInt;
+            var x = Read;
+            var aa = Arr(n);
             var res = 0L;
+
+            long[] Slv(long p)
+            {
+                var r = new long[n];
+                var cur = p;
+
+                for (int i = n - 1; i >= 0; i--)
+                {
+                    var d = p / aa[i];
+                    r[i] = d * aa[i];
+                    p %= aa[i];
+                }
+
+                return r;
+            }
+
+            bool Ok(long[] x1, long[] x2)
+            {
+                for (int i = 0; i < n; i++)
+                {
+                    if (x1[i] > 0 && x2[i] > 0)
+                        return false;
+                }
+                return true;
+            }
+
+            var passed = new HashSet<long>();
+
+            for (long i = 1; i < 1 << n; i++)
+            {
+                var pay = 0L;
+
+                for (int j = 0; j < n; j++)
+                {
+                    if ((i & (1 << j)) != 0)
+                    {
+                        var rm = x - pay;
+                        var dd = j < n - 1 ? rm % aa[j + 1] : rm;
+                        var ddd = dd / aa[j];
+                        if (dd % aa[j] != 0)
+                            ddd++;
+                        pay += ddd * aa[j];
+                    }
+                }
+
+                if (pay < x)
+                    continue;
+
+                if (passed.Contains(pay))
+                    continue;
+
+                if (Ok(Slv(pay), Slv(pay - x)))
+                {
+                    res++;
+                    passed.Add(pay);
+                }
+            }
+
             return res;
         }
 

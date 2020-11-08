@@ -18,7 +18,22 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var a = Arr(n);
             var res = 0L;
+
+            var cur = 0L;
+            var sum = 0L;
+            var mxSum = 0L;
+
+            for (int i = 0; i < n; i++)
+            {
+                sum += a[i];
+                mxSum.TryMax(sum);
+
+                res.TryMax(cur + mxSum);
+                cur += sum;
+            }
+
             return res;
         }
 

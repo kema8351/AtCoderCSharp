@@ -17,9 +17,45 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var s = Str.Select(x => (int)(x - '0')).ToArray();
+            var c0 = s.Count(x => x % 3 == 0);
+            var c1 = s.Count(x => x % 3 == 1);
+            var c2 = s.Count(x => x % 3 == 2);
+
+            var rm = s.Sum() % 3;
+
+            if (rm == 0)
+                return 0;
+
+            var res = 0;
+
+            if (rm == 1)
+            {
+                if (c1 > 0)
+                    res = 1;
+
+                else if (c2 > 1)
+                    res = 2;
+                else
+                    return -1;
+            }
+            else
+            {
+
+                if (c2 > 0)
+                    res = 1;
+
+                else if (c1 > 1)
+                    res = 2;
+                else
+                    return -1;
+
+            }
+
+            if (res < s.Length)
+                return res;
+            else
+                return -1;
         }
 
         public bool SolveBool()

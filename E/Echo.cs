@@ -17,8 +17,82 @@ namespace V
 
         public long SolveLong()
         {
+            var h = Read;
+            var w = Read;
             var n = Read;
+            var m = Read;
+
+            var mp = new int[h + 2, w + 2];
+            var ls = sc.Pairs(n);
+
+            for (int i = 0; i < m; i++)
+            {
+                mp[ReadInt, ReadInt] = -1;
+            }
+
+            for (int i = 0; i < h + 2; i++)
+            {
+                mp[i, 0] = -1;
+                mp[i, w + 1] = -1;
+            }
+
+            for (int i = 0; i < w + 2; i++)
+            {
+                mp[0, i] = -1;
+                mp[h + 1, i] = -1;
+            }
+
+            var ds = new (int dx, int dy)[] {
+                (+1, 0),
+                (-1, 0),
+                (0, +1),
+                (0, -1),
+            };
+
+            for (int i = 0; i < n; i++)
+            {
+                var lx = (int)ls[i].X;
+                var ly = (int)ls[i].Y;
+
+                mp[lx, ly] = 3;
+
+                foreach (var (dx, dy) in ds)
+                {
+                    var d = 1;
+                    var stp = dx == 0 ?
+                        new int[] { 1, 3, -1 } :
+                        new int[] { 2, 3, -1 };
+                    var add = dx == 0 ?
+                        1 : 2;
+
+
+                    while (true)
+                    {
+                        var c = mp[lx - dx * d, ly - dy * d];
+
+                        if (stp.Contains(c))
+                            break;
+
+                        mp[lx - dx * d, ly - dy * d] += add;
+
+                        d++;
+                    }
+                }
+
+
+            }
+
             var res = 0L;
+
+            for (int i = 0; i < h + 2; i++)
+            {
+                for (int j = 0; j < w + 2; j++)
+                {
+                    if (mp[i, j] > 0)
+                        res++;
+                }
+            }
+
             return res;
         }
 
