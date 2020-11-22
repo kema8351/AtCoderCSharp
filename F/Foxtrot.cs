@@ -10,8 +10,74 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var n = ReadInt;
+            var q = ReadInt;
+            var cs = ArrInt(n);
+
+            //n = 200000;
+            //q = 200000;
+            //cs = Enumerable.Range(0, n).ToArray();
+
+            var uf = new C.UnionFind(n);
+            var dics = cs.Select(x => new Dictionary<int, int>() { { x, 1 } }).ToArray();
+
+            for (int i = 0; i < q; i++)
+            {
+                var type = Read;
+                //var type = 1;
+                if (type == 1)
+                {
+                    var a = ReadInt - 1;
+                    var b = ReadInt - 1;
+
+                    //var a = new Random().Next(n);
+                    //var b = new Random().Next(n);
+
+
+                    var r1 = uf.GetRoot(a);
+                    var r2 = uf.GetRoot(b);
+
+                    if (r1 == r2)
+                        continue;
+
+                    uf.TryUnite(a, b);
+
+                    var r0 = uf.GetRoot(a);
+                    var rx = r0 == r1 ? r2 : r1;
+
+
+
+                    var d0 = dics[r0];
+                    var d1 = dics[rx];
+
+                    var dbase = d0.Count > d1.Count ? d0 : d1;
+                    var dadd = d0.Count > d1.Count ? d1 : d0;
+
+                    foreach (var p in dadd)
+                    {
+                        if (dbase.ContainsKey(p.Key))
+                            dbase[p.Key] += p.Value;
+                        else
+                            dbase.Add(p.Key, p.Value);
+                    }
+
+                    dics[r0] = dbase;
+
+                }
+                else
+                {
+                    var x = ReadInt - 1;
+                    var c = ReadInt;
+
+                    var r = uf.GetRoot(x);
+
+                    Wr(dics[r].TryGetValue(c, out var res) ? res : 0);
+                }
+
+            }
+
+            //Wr("End");
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

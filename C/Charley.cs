@@ -18,7 +18,32 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var k = Read;
+
+            var t = new List<List<long>>();
+            for (int i = 0; i < n; i++)
+            {
+                t.Add(Arr(n).ToList());
+            }
+
             var res = 0L;
+            foreach (var c in C.IterTools.Permutations(n - 1, n - 1))
+            {
+                var cur = 0;
+                var cand = 0L;
+
+                foreach (var city in c.Select(x => (int)x + 1))
+                {
+                    cand += t[cur][city];
+
+                    cur = city;
+                }
+                cand += t[cur][0];
+
+                if (cand == k)
+                    res++;
+            }
+
             return res;
         }
 

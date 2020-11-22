@@ -17,9 +17,60 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var h = ReadInt;
+            var w = ReadInt;
+            var map = ArrStr(h);
+            var bs = map.Select(x => x.Select(xs => xs == '.').ToList()).ToList();
+
+            //h = 2000;
+            //w = 2000;
+            //bs = Enumerable.Range(0, h).Select(y => Enumerable.Range(0, w).Select(x => true).ToList()).ToList();
+
+            foreach (var b in bs)
+                b.Add(false);
+            bs.Add(bs[0].ToList());
+
+            var dp = new Mint[h + 1, w + 1];
+            var dpx = new Mint[h + 1, w + 1];
+            var dpy = new Mint[h + 1, w + 1];
+            var dpz = new Mint[h + 1, w + 1];
+            dp[0, 0] = new Mint(1);
+
+
+            for (int i = 0; i < h; i++)
+            {
+                for (int j = 0; j < w; j++)
+                {
+                    if (bs[i][j])
+                    {
+                        dpx[i, j] += dp[i, j];
+                        dpy[i, j] += dp[i, j];
+                        dpz[i, j] += dp[i, j];
+
+
+                        if (bs[i + 1][j])
+                        {
+                            dp[i + 1, j] += dpx[i, j];
+                            dpx[i + 1, j] += dpx[i, j];
+                        }
+                        if (bs[i][j + 1])
+                        {
+                            dp[i, j + 1] += dpy[i, j];
+                            dpy[i, j + 1] += dpy[i, j];
+                        }
+                        if (bs[i + 1][j + 1])
+                        {
+                            dp[i + 1, j + 1] += dpz[i, j];
+                            dpz[i + 1, j + 1] += dpz[i, j];
+                        }
+                    }
+                }
+
+            }
+
+
+            var res = dp[h - 1, w - 1];
+            return res.Value;
         }
 
         public bool SolveBool()

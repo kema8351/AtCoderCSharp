@@ -10,8 +10,14 @@ namespace V
     {
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            var sx = ReadDouble;
+            var sy = ReadDouble;
+            var gx = ReadDouble;
+            var gy = ReadDouble;
+
+            var res = sx + (gx - sx) * sy / (sy + gy);
+            Wr(res);
+            //Write(SolveLong());
             //YesNo(SolveBool());
         }
 

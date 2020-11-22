@@ -11,8 +11,8 @@ namespace V
         public void Solve()
         {
             //var n = Read;
-            Write(SolveLong());
-            //YesNo(SolveBool());
+            //Write(SolveLong());
+            YesNo(SolveBool());
         }
 
         public long SolveLong()
@@ -22,11 +22,38 @@ namespace V
             return res;
         }
 
+        class Query
+        {
+            public long t;
+            public long p;
+        }
+
         public bool SolveBool()
         {
             var n = Read;
-            var res = false;
-            return res;
+            var w = Read;
+            var qs = new List<Query>();
+            for (int i = 0; i < n; i++)
+            {
+                var s = Read;
+                var t = Read;
+                var p = Read;
+                qs.Add(new Query() { t = s, p = p });
+                qs.Add(new Query() { t = t, p = -p });
+            }
+
+            var dic = qs.GroupBy(x => x.t).ToDictionary(x => x.Key, x => x.ToList());
+            var cur = 0L;
+
+            foreach (var pair in dic.OrderBy(x => x.Key))
+            {
+                cur += pair.Value.Select(x => x.p).Sum();
+
+                if (cur > w)
+                    return false;
+            }
+
+            return true;
         }
     }
 }

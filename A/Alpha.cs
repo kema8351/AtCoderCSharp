@@ -18,7 +18,7 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
-            var res = 0L;
+            var res = n >= 0 ? n : 0;
             return res;
         }
 
