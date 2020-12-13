@@ -15,11 +15,136 @@ namespace V
             //YesNo(SolveBool());
         }
 
+        public class Point
+        {
+            public int x;
+            public int y;
+
+            public override int GetHashCode()
+            {
+                return (x << 12) + y;
+            }
+
+            public override bool Equals(object obj)
+            {
+                var p = (Point)obj;
+                return x == p.x && y == p.y;
+            }
+        }
+
         public long SolveLong()
         {
-            var n = Read;
+            var h = ReadInt;
+            var w = ReadInt;
+            var map = ArrStr(h);
+
+            var usedWarp = new HashSet<char>();
+            var passed = new HashSet<Point>();
+            var checking = new HashSet<Point>();
+            Point start = new Point();
+            Point goal = new Point();
+            List<Point>[] warps = new List<Point>[26];
+            for (int i = 0; i < 26; i++)
+            {
+                warps[i] = new List<Point>();
+            }
+
+            for (int i = 0; i < h; i++)
+            {
+                for (int j = 0; j < w; j++)
+                {
+                    var c = map[i][j];
+
+                    if (c == 'S')
+                        start = new Point() { x = i, y = j };
+                    else if (c == 'G')
+                        goal = new Point() { x = i, y = j };
+                    else if (c == '#')
+                    {
+                    }
+                    else if (c == '.')
+                    {
+                    }
+                    else
+                    {
+                        warps[(int)(c - 'a')].Add(new Point() { x = i, y = j });
+                    }
+                }
+            }
+
+            checking.Add(start);
             var res = 0L;
-            return res;
+            (int, int)[] ops = new (int, int)[] { (0, 1), (0, -1), (1, 0), (-1, 0) };
+
+            while (checking.Count > 0)
+            {
+                if (passed.Contains(goal))
+                    return res;
+
+                res++;
+
+                var next = new HashSet<Point>();
+
+                void Try(Point point)
+                {
+                    if (point.x < 0)
+                        return;
+
+                    if (point.y < 0)
+                        return;
+
+                    if (point.x >= h)
+                        return;
+
+                    if (point.y >= w)
+                        return;
+
+                    var c = map[point.x][point.y];
+                    if (c == '#')
+                        return;
+
+                    if (passed.Contains(point))
+                        return;
+
+                    if (next.Contains(point))
+                        return;
+
+                    passed.Add(point);
+                    next.Add(point);
+                }
+
+
+                foreach (var p in checking)
+                {
+                    var c = map[p.x][p.y];
+
+                    foreach (var op in ops)
+                    {
+                        var np = new Point() { x = p.x + op.Item1, y = p.y + op.Item2 };
+                        Try(np);
+                    }
+
+                    if ('a' <= c && c <= 'z')
+                    {
+                        if (usedWarp.Contains(c) == false)
+                        {
+                            usedWarp.Add(c);
+
+                            var idx = (int)(c - 'a');
+
+                            foreach (var np in warps[idx])
+                            {
+                                Try(np);
+                            }
+                        }
+                    }
+                }
+
+                checking = next;
+            }
+
+
+            return -1;
         }
 
         public bool SolveBool()

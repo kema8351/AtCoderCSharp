@@ -18,7 +18,43 @@ namespace V
         public long SolveLong()
         {
             var n = Read;
+            var t = Read;
+            var a = Arr(n);
+
             var res = 0L;
+
+            var dp = new HashSet<long>() { 0L };
+
+            for (int i = 0; i < n; i++)
+            {
+                var aa = a[i];
+
+                var add = new HashSet<long>();
+
+                foreach (var d in dp)
+                {
+                    var nd = d + aa;
+                    if (nd > t)
+                        continue;
+
+                    if (dp.Contains(nd))
+                        continue;
+
+                    if (add.Contains(nd))
+                        continue;
+
+                    add.Add(nd);
+                }
+
+                foreach (var d in add)
+                {
+                    dp.Add(d);
+                }
+
+                if (add.Count > 0)
+                    res.TryMax(add.Max());
+            }
+
             return res;
         }
 

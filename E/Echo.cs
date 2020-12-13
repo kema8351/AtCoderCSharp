@@ -14,13 +14,149 @@ namespace V
             Write(SolveLong());
             //YesNo(SolveBool());
         }
+        int h, w;
+        string[] map;
+        HashSet<int> passed;
+        HashSet<int> next;
+        HashSet<int> checking;
 
         public long SolveLong()
         {
-            var n = Read;
+            h = ReadInt;
+            w = ReadInt;
+            map = ArrStr(h);
+
+            //h = 2000;
+            //w = 2000;
+            //map = Enumerable.Repeat(new string(Enumerable.Repeat('a', w).ToArray()), h).ToArray();
+            //var c0 = Enumerable.Repeat('a', w - 1).ToList();
+            //c0.Add('S');
+            //map[0] = new string(c0.ToArray());
+            //var c1 = Enumerable.Repeat('a', w - 1).ToList();
+            //c1.Add('G');
+            //map[h - 1] = new string(c1.ToArray());
+
+
+            var usedWarp = new HashSet<char>();
+            passed = new HashSet<int>();
+            checking = new HashSet<int>();
+            (int x, int y) start = (0, 0);
+            (int x, int y) goal = (0, 0);
+            List<(int x, int y)>[] warps = new List<(int x, int y)>[26];
+            for (int i = 0; i < 26; i++)
+            {
+                warps[i] = new List<(int x, int y)>();
+            }
+
+            for (int i = 0; i < h; i++)
+            {
+                for (int j = 0; j < w; j++)
+                {
+                    var c = map[i][j];
+                    var p = (i, j);
+
+                    if (c == 'S')
+                        start = p;
+                    else if (c == 'G')
+                        goal = p;
+                    else if (c == '#')
+                    {
+                    }
+                    else if (c == '.')
+                    {
+                    }
+                    else
+                    {
+                        warps[(int)(c - 'a')].Add(p);
+                    }
+                }
+            }
+
+            var codeStart = Encode(start.x, start.y);
+            var codeGoal = Encode(goal.x, goal.y);
+            passed.Add(codeStart);
+            checking.Add(codeStart);
             var res = 0L;
-            return res;
+            (int, int)[] ops = new (int, int)[] { (0, 1), (0, -1), (1, 0), (-1, 0) };
+
+            while (checking.Count > 0)
+            {
+                if (passed.Contains(codeGoal))
+                    return res;
+
+                res++;
+
+                next = new HashSet<int>();
+
+                foreach (var ch in checking)
+                {
+                    var p = Decode(ch);
+
+                    var c = map[p.x][p.y];
+
+                    foreach (var op in ops)
+                    {
+                        var np = (p.x + op.Item1, p.y + op.Item2);
+                        Try(np);
+                    }
+
+                    if ('a' <= c && c <= 'z')
+                    {
+                        if (usedWarp.Contains(c) == false)
+                        {
+                            usedWarp.Add(c);
+
+                            var idx = (int)(c - 'a');
+                            var ws = warps[idx];
+
+                            for (int i = 0; i < ws.Count; i++)
+                            {
+                                Try(ws[i]);
+                            }
+                        }
+                    }
+                }
+
+                checking = next;
+            }
+
+
+            return -1;
         }
+
+        void Try((int x, int y) p)
+        {
+            var code = Encode(p.x, p.y);
+
+            if (passed.Contains(code))
+                return;
+
+            if (next.Contains(code))
+                return;
+
+            if (p.x < 0)
+                return;
+
+            if (p.y < 0)
+                return;
+
+            if (p.x >= h)
+                return;
+
+            if (p.y >= w)
+                return;
+
+            var c = map[p.x][p.y];
+            if (c == '#')
+                return;
+
+            passed.Add(code);
+            next.Add(code);
+        }
+
+        int Encode(int x, int y) => (x << 12) + y;
+        (int x, int y) Decode(int c) => (c >> 12, c & ((1 << 12) - 1));
+
 
         public bool SolveBool()
         {

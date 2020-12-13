@@ -8,10 +8,70 @@ namespace V
 {
     partial class Solver
     {
+        public class State
+        {
+            int[] vals;
+
+            public int Count { get; private set; }
+
+            public State(int a, int b, int c, int count)
+            {
+                vals = new int[] { a, b, c }.OrderBy(x => x).ToArray();
+                Count = count;
+            }
+
+            public int Key => Count * 101 * 101 * 101 + vals[0] * 101 * 101 + vals[1] * 101 + vals[2];
+
+            public double Prb(int i) => (double)vals[i] / (double)vals.Sum();
+
+            public State Next(int i)
+            {
+                var a = vals[0];
+                var b = vals[1];
+                var c = vals[2];
+                if (i == 0)
+                    a++;
+                else if (i == 1)
+                    b++;
+                else
+                    c++;
+
+                return new State(a, b, c, Count + 1);
+            }
+
+            public bool IsFinished => vals.Any(x => x == 100);
+        }
+
+        public Dictionary<int, double> Cache = new Dictionary<int, double>();
+
+        public double Slv(State state)
+        {
+            if (state.IsFinished)
+                return state.Count;
+
+            if (Cache.TryGetValue(state.Key, out var res))
+                return res;
+
+            double r = 0d;
+
+            for (int i = 0; i < 3; i++)
+            {
+                var p = state.Prb(i);
+                if (p == 0d)
+                    continue;
+
+                r += p * Slv(state.Next(i));
+            }
+
+            Cache.Add(state.Key, r);
+
+            return r;
+        }
+
+
         public void Solve()
         {
-            //var n = Read;
-            Write(SolveLong());
+            Write(Slv(new State(ReadInt, ReadInt, ReadInt, 0)));
             //YesNo(SolveBool());
         }
 

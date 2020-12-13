@@ -17,9 +17,48 @@ namespace V
 
         public long SolveLong()
         {
-            var n = Read;
-            var res = 0L;
-            return res;
+            var x1 = Read;
+            var y1 = Read;
+            var x2 = Read;
+            var y2 = Read;
+
+            if (x1 == x2 && y1 == y2)
+                return 0;
+
+            if (x1 + y1 == x2 + y2)
+                return 1;
+
+            if (x1 - y1 == x2 - y2)
+                return 1;
+
+            if (Math.Abs(x1 - x2) + Math.Abs(y1 - y2) <= 3)
+                return 1;
+
+            if (Math.Abs(x1 + y1) % 2 == Math.Abs(x2 + y2) % 2)
+                return 2;
+
+            if (Math.Abs(x1 - x2) + Math.Abs(y1 - y2) <= 6)
+                return 2;
+
+            for (int i = -3; i <= 3; i++)
+            {
+                for (int j = -3; j <= 3; j++)
+                {
+                    if (Math.Abs(i) + Math.Abs(j) > 3)
+                        continue;
+
+                    var x0 = x1 + i;
+                    var y0 = y1 + j;
+
+                    if (x0 + y0 == x2 + y2)
+                        return 2;
+
+                    if (x0 - y0 == x2 - y2)
+                        return 2;
+                }
+            }
+
+            return 3;
         }
 
         public bool SolveBool()
